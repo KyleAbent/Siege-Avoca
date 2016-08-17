@@ -1,0 +1,7 @@
+modEntry = [[
+	Client: lua/AvocaSiege/Client.lua,
+	Server: lua/AvocaSiege/Server.lua,
+	Predict: lua/AvocaSiege/Predict.lua,
+	Shared: lua/AvocaSiege/Shared.lua,
+	Priority: 3
+]]
