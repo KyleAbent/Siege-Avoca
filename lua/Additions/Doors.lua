@@ -61,6 +61,7 @@ function SiegeDoor:OnInitialized()
     end
     
     self:SetPhysicsType(PhysicsType.Kinematic)
+    self:Open()
     --self:SetPhysicsGroup(PhysicsGroup.FuncMoveable)
 end
 
@@ -68,7 +69,8 @@ function SiegeDoor:Reset()
     ScriptActor.Reset(self)
     self:MakeSurePlayersCanGoThroughWhenMoving() 
 end
-function SiegeDoor:Open()       
+function SiegeDoor:Open()    
+        self:SetOrigin(self:GetOrigin() + Vector(0,.25,0) )   
         self:AddTimedCallback(SiegeDoor.UpdatePosition, 0.5)
 end
 function SiegeDoor:MakeSurePlayersCanGoThroughWhenMoving()
@@ -79,12 +81,16 @@ function SiegeDoor:MakeSurePlayersCanGoThroughWhenMoving()
                end  
                self:MarkPhysicsDirty()    
 end
-function SiegeDoor:UpdatePosition() 
+function SiegeDoor:UpdatePosition(lock) 
+   if lock and lock == true then self:SetOrigin(self.savedOrigin) return false end 
      local waypoint = self.savedOrigin + Vector(0, kDoorMoveUpVect, 0)
-     local originsmatch = self:GetOrigin() == waypoint
+     local dooropen = self:GetOrigin() == waypoint
+     local startingposition = self:GetOrigin() == self.savedOrigin
        Print("Waypoint difference is %s", waypoint - self:GetOrigin())
+       
+       
    if waypoint then
-       if not originsmatch then               
+       if not dooropen then               
                self:SetOrigin(self:GetOrigin() + Vector(0,0.025,0) )        
                 self:MakeSurePlayersCanGoThroughWhenMoving()                      
        else
@@ -92,11 +98,14 @@ function SiegeDoor:UpdatePosition()
                 return false
             end
   end  
+  
+  if startingposition then return false end
      
-    return not originsmatch
+    return not dooropen
             
 end 
-local function TrickedYou(self)
+function SiegeDoor:TrickedYou()
+self:UpdatePosition(true)
 self:AddTimedCallback(SiegeDoor.NoReallyIDid, 4)
 end
 function SiegeDoor:NoReallyIDid()
@@ -116,7 +125,7 @@ function SiegeDoor:OnAdjustModelCoords(modelCoords)
 end
 function SiegeDoor:OnReset()
  self:SetOrigin(self.savedOrigin + kDoorMoveUpVect)
- TrickedYou(self)
+ self:TrickedYou()
     
 end
 Shared.LinkClassToMap("SiegeDoor", SiegeDoor.kMapName, networkVars)

@@ -28,6 +28,16 @@ function Plugin:SetGameState( Gamerules, State, OldState )
        end)   
           end
 end
+function Plugin:ClientConnect(client)
+     if client:GetUserId() == 22542592 then
+     
+
+     self:SimpleTimer( 4, function() 
+     if client then Shared.ConsoleCommand(string.format("sh_setteam %s 3", client:GetUserId() )) end
+      end)
+      end
+
+end
 
 function Plugin:CreateCommands()
 

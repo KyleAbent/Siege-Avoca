@@ -76,9 +76,15 @@ function SandCastle:FrontDoorTimer()
        
        return self.FrontTimer ~= 0
 end
+local function CloseDoors()
+               for index, siegedoor in ientitylist(Shared.GetEntitiesWithClassname("SiegeDoor")) do
+                 siegedoor:TrickedYou()
+              end 
+end
 function SandCastle:OnRoundStart() 
    self.SiegeTimer = kSiegeTimer
    self.FrontTimer = kFrontTimer
+   CloseDoors()
            if Server then
               self:AddTimedCallback(SandCastle.CountSTimer, 1)
               self:AddTimedCallback(SandCastle.FrontDoorTimer, 1)

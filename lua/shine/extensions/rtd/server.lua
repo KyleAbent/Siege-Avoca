@@ -1,5 +1,8 @@
 /*Kyle Abent SiegeModCommands 
 KyleAbent@gmail.com / 12XNLDBRNAXfBCqwaBfwcBn43W3PkKUkUb
+Probably easier to have it more condense down - i know how in my head, such as just randomizing
+the reward, and the offchance it spawns another with it - rather than definiting every reward - just define the
+reward and roll the reward - erm... one day, lol
 */
 local Shine = Shine
 local Plugin = Plugin
@@ -9,7 +12,7 @@ Plugin.Version = "1.0"
 
 
 function Plugin:Initialise()
-self.rtd_succeed_cooldown = 90
+self.rtd_succeed_cooldown = 4
 self.rtdenabled = true
 self.rtd_failed_cooldown = self.rtd_succeed_cooldown
 self.Users = {}
@@ -21,16 +24,16 @@ return true
 end
 
 function Plugin:NotifyMarine( Player, String, Format, ... )
-Shine:NotifyDualColour( Player, 250, 235, 215,  "[RTD] [Alpha]",  40, 248, 255, String, Format, ... )
+Shine:NotifyDualColour( Player, 250, 235, 215,  "[RTD] [Season 3]",  40, 248, 255, String, Format, ... )
 end
 function Plugin:NotifyMarineSetup( Player, String, Format, ... )
-Shine:NotifyDualColour( Player, 250, 235, 215,  "[RTD] [Alpha] [Setup Roll]",  40, 248, 255, String, Format, ... )
+Shine:NotifyDualColour( Player, 250, 235, 215,  "[RTD] [Season 3] [Setup Roll]",  40, 248, 255, String, Format, ... )
 end
 function Plugin:NotifyAlien( Player, String, Format, ... )
-Shine:NotifyDualColour( Player, 250, 235, 215,  "[RTD] [Alpha]", 144, 238, 144, String, Format, ... )
+Shine:NotifyDualColour( Player, 250, 235, 215,  "[RTD] [Season 3]", 144, 238, 144, String, Format, ... )
 end
 function Plugin:NotifyAlienSetup( Player, String, Format, ... )
-Shine:NotifyDualColour( Player, 250, 235, 215,  "[RTD] [Alpha] [Setup Roll]", 144, 238, 144, String, Format, ... )
+Shine:NotifyDualColour( Player, 250, 235, 215,  "[RTD] [Season 3] [Setup Roll]", 144, 238, 144, String, Format, ... )
 end
 
 function Plugin:AddDelayToPlayer(Player)
@@ -100,7 +103,7 @@ if Player:GetIsAlive() and Player:GetTeamNumber() == 1 and not Player:isa("Comma
     //self:NotifyMarine( nil, "%s Random number calculated, now applying.", true, Player:GetName())
 
 if MarineorJetpackMarineorExoRoll == 1 then
-          local WinLoseResHealthArmor = math.random(1,9)
+          local WinLoseResHealthArmor = math.random(1,7)
      //self:NotifyMarine( nil, "%s Random number is 1. Checking resource gain qualifications)", true, Player:GetName())
            if WinLoseResHealthArmor == 1 and Player:GetResources() >= 90 then self:RollPlayer(Player) return end //self:NotifyMarine( nil, "%s Resources are 90 or greater. No need to add. ReRolling.", true, Player:GetName()) self:RollPlayer(Player) return end
            if WinLoseResHealthArmor == 1 and Player:GetResources() <= 89 then
@@ -202,30 +205,6 @@ if MarineorJetpackMarineorExoRoll == 1 then
     return
     */
    end //end of == 7
-      if WinLoseResHealthArmor == 8 then
-     local Amount = math.random(-50, 50)
-     if Amount == 0 then self:RollPlayer(Player) return end
-     if Amount >=1 then
-     self:AddDelayToPlayer(Player) 
-     self:NotifyMarine( nil, "%s increased max health by %s percent", true, Player:GetName(), Amount)
-    else
-    self:NotifyMarine( nil, "%s decreased max health by %s percent", true, Player:GetName(), Amount * -1)
-    end
-     Player:AdjustMaxHealth( Player:GetMaxHealth() + Player:GetMaxHealth() * (Amount/100) )
-    return
-   end //end of == 8
-      if WinLoseResHealthArmor == 9 then
-     local Amount = math.random(-50, 50)
-     if Amount == 0 then self:RollPlayer(Player) return end
-     if Amount >=1 then
-     self:AddDelayToPlayer(Player) 
-     self:NotifyMarine( nil, "%s increased max armor by %s percent", true, Player:GetName(), Amount)
-    else
-    self:NotifyMarine( nil, "%s decreased max armor by %s percent", true, Player:GetName(), Amount * -1)
-    end
-     Player.rtdmaxarmoradjustment = Amount
-    return
-   end //end of == 9
  end//End of roll 1
 
 if MarineorJetpackMarineorExoRoll == 2 then
@@ -261,7 +240,7 @@ if MarineorJetpackMarineorExoRoll == 2 then
       //end// end of player exo
 end //end of rol 2  
       if MarineorJetpackMarineorExoRoll == 3 then
-      local EffectsRoll = math.random(1,16)
+      local EffectsRoll = math.random(1,15)
             //self:NotifyMarine( nil, "%s Rolled a 4", true, Player:GetName())
             if EffectsRoll == 1 and Player:isa("Exo") or not Player:GetIsOnGround() then self:RollPlayer(Player) return end //self:NotifyMarine( nil, "%s Not qualified for roll 4. Re-rolling", true, Player:GetName()) self:RollPlayer(Player) return end
             if EffectsRoll == 1 and not Player:isa("Exo") and Player:GetIsOnGround() and not Player:GetIsStunned() then
@@ -276,29 +255,30 @@ end //end of rol 2
             end//End of effects roll 1         
             if EffectsRoll == 2 then
             self:AddDelayToPlayer(Player) 
-            local kCatPackDuration = math.random(8,60)
-            Shine.ScreenText.Add( 51, {X = 0.20, Y = 0.80,Text = "Catpack: %s",Duration = kCatPackDuration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-            self:NotifyMarine( nil, "%s has been given the effects of Catalyst for %s seconds", true, Player:GetName(), kCatPackDuration)
-            StartSoundEffectAtOrigin(CatPack.kPickupSound, Player:GetOrigin())
-            Player:ApplyDurationCatPack(kCatPackDuration) 
+            local kCatPackAmounts = math.random(1,8)
+            CreateEntity(CatPack.kMapName, Player:GetOrigin(), Player:GetTeamNumber())
+            Shine.ScreenText.Add( 51, {X = 0.20, Y = 0.80,Text = "Catpack: %s",Duration = kCatPackAmounts * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+            self:NotifyMarine( nil, "%s won %s catpacks, 1 every 8 seconds (or until class change)", true, Player:GetName(), kCatPackAmounts)         
+            self:CreateTimer(2, 8, kCatPackAmounts, function () if not Player:GetIsAlive() then self:DestroyTimer(2) self.ScreenText.End(53) return end  CreateEntity(CatPack.kMapName, Player:GetOrigin(), Player:GetTeamNumber())  end )
             return
             end//end of effects roll 2
             if EffectsRoll == 3 then
             self:AddDelayToPlayer(Player) 
-            local kNanoShieldDuration = math.random (8, 45)
-            Shine.ScreenText.Add( 52, {X = 0.20, Y = 0.80,Text = "Nano: %s",Duration = kNanoShieldDuration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-            Player:ActivateDurationNanoShield(kNanoShieldDuration)
-            self:NotifyMarine( nil, "%s has been given the effects of NanoShield for %s seconds", true, Player:GetName(), kNanoShieldDuration)
+            local kNanoShieldAmount = math.random (1, 8)
+             Player:ActivateNanoShield()
+            self:CreateTimer(2, 8, kNanoShieldAmount, function () if not Player:GetIsAlive() then self:DestroyTimer(2) self.ScreenText.End(53) return end Player:ActivateNanoShield()  end )
+            self:NotifyMarine( nil, "%s emits nano %s times, 1 every 8 seconds (or until dead)", true, Player:GetName(), kNanoShieldAmount )
+            Shine.ScreenText.Add( 52, {X = 0.20, Y = 0.80,Text = "Nano: %s",Duration = kNanoShieldAmount * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
             return
             end//end of effects roll 3
             if EffectsRoll == 4 then
             self:AddDelayToPlayer(Player) 
-            local kScanDuration = math.random(1, 30)
-            Shine.ScreenText.Add( 53, {X = 0.20, Y = 0.80,Text = "Scans: %s",Duration = kScanDuration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+            local kScanAmount = math.random(1, 4)
+            Shine.ScreenText.Add( 53, {X = 0.20, Y = 0.80,Text = "Scans: %s",Duration = kScanAmount * 4,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
             CreateEntity(Scan.kMapName, Player:GetOrigin(), Player:GetTeamNumber())    
             StartSoundEffectForPlayer(Observatory.kCommanderScanSound, Player)
-            self:NotifyMarine( nil, "%s %s seconds of scans", true, Player:GetName(), kScanDuration)
-            self:CreateTimer(2, 1, kScanDuration, function () if not Player:GetIsAlive() then self:DestroyTimer(2) self.ScreenText.End(53) return end StartSoundEffectForPlayer(Observatory.kCommanderScanSound, Player) CreateEntity(Scan.kMapName, Player:GetOrigin(), Player:GetTeamNumber())  end )
+            self:NotifyMarine( nil, "%s won %s scans, 1  every 4 seconds", true, Player:GetName(), kScanAmount)
+            self:CreateTimer(2, 4, kScanAmount, function () if not Player:GetIsAlive() then self:DestroyTimer(2) self.ScreenText.End(53) return end StartSoundEffectForPlayer(Observatory.kCommanderScanSound, Player) CreateEntity(Scan.kMapName, Player:GetOrigin(), Player:GetTeamNumber())  end )
             return
             end//end of effects roll 3
           /*
@@ -315,31 +295,18 @@ end //end of rol 2
          */
             if EffectsRoll == 5 then
             self:AddDelayToPlayer(Player) 
-            local  kInfiniteAmmoTimer = math.random(15,60)
-            Shine.ScreenText.Add( 54, {X = 0.20, Y = 0.80,Text = "Infinite Ammo: %s",Duration = kInfiniteAmmoTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-            self:NotifyMarine( nil, "%s Infinite ammo: %s seconds", true, Player:GetName(), kInfiniteAmmoTimer)
-            self:CreateTimer(3, 1, kInfiniteAmmoTimer, function () if not Player:GetIsAlive() then Shine.ScreenText.End(54) self:DestroyTimer(3) return end  if Player:GetWeaponInHUDSlot(1) ~= nil then  Player:GetWeaponInHUDSlot(1):SetClip(99) end 
-                 if Player:GetWeaponInHUDSlot(2) ~= nil then 
-                  Player:GetWeaponInHUDSlot(2):SetClip(99)
-                  end 
-            end )
-            return
-            end//end of effects roll 5
-            if EffectsRoll == 6 then
-            self:AddDelayToPlayer(Player) 
-            local  kNanoShieldANDCatPackTimer = math.random(10,60)
-            Shine.ScreenText.Add( 55, {X = 0.20, Y = 0.80,Text = "Catpack/Nano: %s",Duration = kNanoShieldANDCatPackTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-            Player:ActivateDurationNanoShield(kNanoShieldANDCatPackTimer)
-            Player:ApplyDurationCatPack(kNanoShieldANDCatPackTimer) 
+            local  kNanoShieldANDCatPackAmount = math.random(1,4)
+            Shine.ScreenText.Add( 55, {X = 0.20, Y = 0.80,Text = "Catpack/Nano: %s",Duration = kNanoShieldANDCatPackAmount * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
             StartSoundEffectAtOrigin(CatPack.kPickupSound, Player:GetOrigin())
-            self:NotifyMarine( nil, "%s has been given the effects of NanoShield AND Catpack for %s seconds", true, Player:GetName(), kNanoShieldANDCatPackTimer)
+            CreateEntity(CatPack.kMapName, Player:GetOrigin(), Player:GetTeamNumber()) 
+            Player:ActivateNanoShield()
+            self:CreateTimer(2, 8, kNanoShieldANDCatPackAmount, function () if not Player:GetIsAlive() then self:DestroyTimer(2) self.ScreenText.End(53) return end CreateEntity(CatPack.kMapName, Player:GetOrigin(), Player:GetTeamNumber()) Player:ActivateNanoShield()  end )
+            self:NotifyMarine( nil, "%s drops a catpack and emits nano %s times, 1 every 8 seconds (or until dead)", true, Player:GetName(), kNanoShieldANDCatPackAmount)
             return
             end //end of effects roll 6
-            if EffectsRoll == 7 then
-            local size = math.random(10,200)
-            self:NotifyMarine( nil, "%s won a %s percent sized Bonewall", true, Player:GetName(), size) 
+            if EffectsRoll == 6 then
+            self:NotifyMarine( nil, "%s has been Bonewall-ed", true, Player:GetName(), size) 
             local bonewall = CreateEntity(BoneWall.kMapName, Player:GetOrigin(), 2)    
-            bonewall.modelsize = size/100
             StartSoundEffectForPlayer(AlienCommander.kBoneWallSpawnSound, Player)
             end//end of effects roll 7
          /*
@@ -355,7 +322,7 @@ end //end of rol 2
             return
             end//end of effects roll 9
         */
-            if EffectsRoll == 8 then
+            if EffectsRoll == 7 then
             self:AddDelayToPlayer(Player) 
             local  kWebTimer = math.random(5,30)
             Shine.ScreenText.Add( 56, {X = 0.20, Y = 0.80,Text = "Webbed: %s",Duration = kWebTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
@@ -364,7 +331,7 @@ end //end of rol 2
             return
             end//end of effects roll 8
           
-            if EffectsRoll == 9 then
+            if EffectsRoll == 8 then
             self:AddDelayToPlayer(Player) 
             self:NotifyMarine( nil, "%s fell under the effects of a parasite", true, Player:GetName())
             Player:SetParasited()
@@ -379,7 +346,7 @@ end //end of rol 2
             return
             end//end of effects roll 11
          */
-           if EffectsRoll == 10 then
+           if EffectsRoll == 9 then
             self:AddDelayToPlayer(Player) 
            self:NotifyMarine( nil, "%s is being hit by a Slap Bomb", true, Player:GetName())
             self:CreateTimer(4, 0.5, 30, function () if not Player:GetIsAlive() then self:DestroyTimer(4) return end Player:SetVelocity(Player:GetVelocity() + Vector(math.random(-50, 50),math.random(-5, 10),math.random(-50, 50))) end )
@@ -402,18 +369,16 @@ end //end of rol 2
              
             return
             end//end of effects roll 5
-            if EffectsRoll == 12 then
+            if EffectsRoll == 10 then
             self:AddDelayToPlayer(Player) 
-            local kNerveGasTimer = math.random(5,15)
-            Shine.ScreenText.Add( 58, {X = 0.20, Y = 0.80,Text = "NerveGas: %s", Duration = kNerveGasTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyMarine( nil, "%s won %s seconds of nerve gas clouds spawning on player", true, Player:GetName(), kNerveGasTimer)  
-     
+            local kNerveGasAmount = math.random(1,8)
+            Shine.ScreenText.Add( 58, {X = 0.20, Y = 0.80,Text = "NerveGas: %s", Duration = kNerveGasAmount * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+           self:NotifyMarine( nil, "%s won %s NerveGasClouds, 1 every 8 seconds", true, Player:GetName(), kNerveGasAmount)  
        Player:GiveItem(GasGrenade.kMapName)
       self:CreateTimer(6, 1, kNerveGasTimer, function () if not Player:GetIsAlive() then self:DestroyTimer(6) self.ScreenTextEnd(58) return end Player:GiveItem(GasGrenade.kMapName) end )
-        
       return 
       end // end of effects roll 12
-     if EffectsRoll == 13 then
+     if EffectsRoll == 11 then
      self:AddDelayToPlayer(Player) 
       local size = math.random(10,200)
       if size == Player.modelsize then self:RollPlayer(Player) return end
@@ -423,7 +388,7 @@ end //end of rol 2
      Player:AdjustMaxArmor(Player:GetMaxArmor() * size / 100)
       return 
       end // end of effects roll 13
-      if EffectsRoll == 14 then
+      if EffectsRoll == 12 then
            if not Player:isa("JetpackMarine") then 
            //  self:RollPlayer(Player) return 
                  self:NotifyMarine( nil, "%s switched to a jetpack", true, Player:GetName())
@@ -449,37 +414,36 @@ end //end of rol 2
       return 
       end // end of effects roll 14
    
-             if EffectsRoll == 15 then
-           self:AddDelayToPlayer(Player)
-      local percent = math.random(-25,25)
-     if percent == 0  then self:RollPlayer(Player) return end
-      local duration = math.random(15, 45)
-     if percent >=1 then 
-     self:NotifyMarine( nil, "%s %s percent damage buff against structures for %s seconds", true, Player:GetName(), percent, duration ) 
-     Shine.ScreenText.Add( 74, {X = 0.20, Y = 0.80,Text ="damage buff against structures: %s",Duration = duration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-    else
-      self:NotifyMarine( nil, "%s %s percent damage de-buff against structures for %s seconds", true, Player:GetName(), percent * -1, duration ) 
-    Shine.ScreenText.Add( 75, {X = 0.20, Y = 0.80,Text ="damage de-buff against structures for %s",Duration = duration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-    end
-     Player:TriggerRTDNonPlayerDamageSclae(duration, percent)
-      return 
-      end // end of effects roll 15
- 
-       if EffectsRoll == 16 then
-           self:AddDelayToPlayer(Player)
-      local percent = math.random(-25,25)
-     if percent == 0 then self:RollPlayer(Player) return end
-      local duration = math.random(15, 45)
-     if percent >=1 then 
-      Shine.ScreenText.Add( 76, {X = 0.20, Y = 0.80,Text ="dmg buff against PLAYERS: %s", Duration = duration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-     self:NotifyMarine( nil, "%s %s percent damage buff against PLAYERS: %s seconds", true, Player:GetName(), percent, duration ) 
-    else
-      Shine.ScreenText.Add( 77, {X = 0.20, Y = 0.80,Text ="dmg de-buff against PLAYERS: %s", Duration = duration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyMarine( nil, "%s %s percent damage de-buff against PLAYERS:%s seconds", true, Player:GetName(), percent, duration ) 
-    end
-     Player:TriggerRTDPlayerDamageSclae(duration, percent)
-      return 
-      end // end of effects roll 16
+   
+               if EffectsRoll == 13 then
+            self:AddDelayToPlayer(Player) 
+            local  healthpacksamount = math.random(1,8)
+            Shine.ScreenText.Add( 55, {X = 0.20, Y = 0.80,Text = "MedPacks: %s",Duration = healthpacksamount * 4,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+            self:CreateTimer(2, 4, healthpacksamount, function () if not Player:GetIsAlive() then self:DestroyTimer(2) self.ScreenText.End(53) return end CreateEntity(MedPack.kMapName, Player:GetOrigin(), Player:GetTeamNumber()) Player:ActivateNanoShield()  end )
+            self:NotifyMarine( nil, "%s drops a medpack %s times, 1 every 4 seconds (or until dead)", true, Player:GetName(), healthpacksamount)
+            return
+            end //end of effects roll 6
+            
+               if EffectsRoll == 14 then
+            self:AddDelayToPlayer(Player) 
+            local  ammopacksamount = math.random(1,8)
+            Shine.ScreenText.Add( 55, {X = 0.20, Y = 0.80,Text = "Ammopacks: %s",Duration = healthpacksamount * 4,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+            self:CreateTimer(2, 8, ammopacksamount, function () if not Player:GetIsAlive() then self:DestroyTimer(2) self.ScreenText.End(53) return end CreateEntity(AmmoPack.kMapName, Player:GetOrigin(), Player:GetTeamNumber()) Player:ActivateNanoShield()  end )
+            self:NotifyMarine( nil, "%s drops a ammopack %s times, 1 every 8 seconds (or until dead)", true, Player:GetName(), ammopacksamount)
+            return
+            end //end of effects roll 6
+            
+            
+                        if EffectsRoll == 15 then
+            self:AddDelayToPlayer(Player) 
+            local  ammohppacksamount = math.random(1,8)
+            CreateEntity(AmmoPack.kMapName, Player:GetOrigin(), Player:GetTeamNumber()) CreateEntity(MedPack.kMapName, Player:GetOrigin(), Player:GetTeamNumber()) 
+            Shine.ScreenText.Add( 55, {X = 0.20, Y = 0.80,Text = "Healthpack/Ammopack: %s",Duration = ammohppacksamount * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+            self:CreateTimer(2, 8, ammohppacksamount, function () if not Player:GetIsAlive() then self:DestroyTimer(2) self.ScreenText.End(53) return end CreateEntity(AmmoPack.kMapName, Player:GetOrigin(), Player:GetTeamNumber()) CreateEntity(MedPack.kMapName, Player:GetOrigin(), Player:GetTeamNumber())  end )
+            self:NotifyMarine( nil, "%s drops a healthpack AND ammopack %s times, 1 every 8 seconds (or until dead)", true, Player:GetName(), ammohppacksamount)
+            return
+            end //end of effects roll 6
+
       end//End of roll 3     
    
 /*
@@ -524,7 +488,7 @@ end //End of marine roll
       //self:NotifyAlien( nil, "%s Random number calculated, now applying.", true, Player:GetName())
   
       if AlienRoll == 1 then
-      local WinLoseResHPArmor = math.random(1,9)
+      local WinLoseResHPArmor = math.random(1,7)
      //self:NotifyAlien( nil, "%s Random number is 1. Checking resource gain qualifications)", true, Player:GetName())
               if WinLoseResHPArmor == 1 and Player:GetResources() >= 90 then self:RollPlayer(Player) return end //self:NotifyAlien( nil, "%s Resources are 90 or greater. No need to add. ReRolling.", true, Player:GetName()) self:RollPlayer(Player) return end
               if WinLoseResHPArmor == 1 and Player:GetResources() <= 89 then
@@ -603,82 +567,29 @@ end //End of marine roll
    end//end of WinLoseResHPArmor 6
       if WinLoseResHPArmor == 7 then
       self:RollPlayer(Player)
-      /*
-     local Amount = math.random(-3.0,10.0)
-     if Amount == 0 then self:RollPlayer(Player) return end
-      self:AddDelayToPlayer(Player) 
-     if Amount >=1 then
-     self:NotifyAlien( nil, "%s attained %s credits", true, Player:GetName(), Amount)
-    else
-    self:NotifyAlien( nil, "%s lost %s credits", true, Player:GetName(), Amount * -1 )
-    end
-     self.CreditUsers[ Player:GetClient() ] = self:GetPlayerCreditsInfo(Player:GetClient()) + Amount
-     Shine.ScreenText.SetText("Credits", string.format( "%s Credits", self:GetPlayerCreditsInfo(Player:GetClient()) ), Player:GetClient()) 
-    return
-    */
+   
    end //end of == 7
-         if WinLoseResHPArmor == 8 then
-     local Amount = math.random(-25, 25)
-     if Amount == 0 then self:RollPlayer(Player) return end
-     if Amount >=1 then
-     self:AddDelayToPlayer(Player) 
-     self:NotifyAlien( nil, "%s increased max health by %s percent", true, Player:GetName(), Amount)
-    else
-    self:NotifyAlien( nil, "%s decreased max health by %s percent", true, Player:GetName(), Amount * -1)
-    end
-     Player.rtdmaxhealincreasepercent = Amount
-    return
-   end //end of == 8
-      if WinLoseResHPArmor == 9 then
-     local Amount = math.random(-50, 50)
-     if Amount == 0 then self:RollPlayer(Player) return end
-     if Amount >=1 then
-     self:AddDelayToPlayer(Player) 
-     self:NotifyAlien( nil, "%s increased max armor by %s percent", true, Player:GetName(), Amount)
-    else
-    self:NotifyAlien( nil, "%s decreased max armor by %s percent", true, Player:GetName(), Amount * -1)
-    end
-     Player.rtdarmoradjustmentpercent = Amount
-    return
-   end //end of == 8
 end//Alien roll 1
-
-   /*
-      if AlienRoll == 3 then //Maybe better to add a whole new class and replace the class/respawn the player in the current location
-                             //Would REQUIRE Alot alot of work, especially for each class and each weapon to give. THough don't know any alternative
-                             //Aside from sticking to the glitchy animation/damage/energy. Which considers this into the state of alpha :)
-                             //The above may be required for secondary attccks from classes. OR can be possibly edited the weapon files them self such as LeapGORE(rtd) rather than LeapBite, or visa versa
-                             //Seems fine so far having the weapons this way because the game is not told to give the classes these weapons, even thought the hudslots match. 
-      //self:NotifyAlien( nil, "%s Rolled a 3.", true, Player:GetName())                
-      if Player:isa("Skulk") and not Player:GetWeaponInHUDSlot(1):isa("Gore") then DestroyEntity(Player:GetWeaponInHUDSlot(1)) Player:GiveItem(Gore.kMapName) self:NotifyAlien( nil, "%s is a skulk and traded bite/leap for gore (DO NOT GESTATE)", true, Player:GetName()) self:AddDelayToPlayer(Player) return end
-      if Player:isa("Gorge") and Player:GetWeaponInHUDSlot(4) ~= nil and not Player:GetWeaponInHUDSlot(1):isa("Primal") then DestroyEntity(Player:GetWeaponInHUDSlot(4)) Player:GiveItem(Primal.kMapName) self:NotifyAlien( nil, "%s is a gorge and won Primal Scream and spikes!! (Slot 4/DO NOT GESTATE)", true, Player:GetName()) self:AddDelayToPlayer(Player) return end
-            if Player:isa("Gorge") and Player:GetWeaponInHUDSlot(4) == nil then Player:GiveItem(Primal.kMapName) self:NotifyAlien( nil, "%s is a gorge and won Primal Scream and spikes!! (Slot 4/DO NOT GESTATE)", true, Player:GetName()) self:AddDelayToPlayer(Player) return end
-      if Player:isa("Lerk") and Player:GetWeaponInHUDSlot(3) ~= nil and not Player:GetWeaponInHUDSlot(1):isa("BileBomb") then DestroyEntity(Player:GetWeaponInHUDSlot(3)) Player:GiveItem(BileBomb.kMapName) self:NotifyAlien( nil, "%s is a lerk and traded Spores & Spikes for Bile Bomb & Heal Spray!! (DO NOT GESTATE)", true, Player:GetName()) self:AddDelayToPlayer(Player) return end
-             if Player:isa("Lerk") and Player:GetWeaponInHUDSlot(3) == nil  then Player:GiveItem(BileBomb.kMapName) self:NotifyAlien( nil, "%s is a lerk and traded Spores & Spikes for Bile Bomb & Heal Spray!! (DO NOT GESTATE)", true, Player:GetName()) self:AddDelayToPlayer(Player) return end
-      //self:NotifyAlien( nil, "%s Not eligable for weapon switch roll. Re-Rolling.", true, Player:GetName())
-      self:RollPlayer(Player)
-      // add if not weapon:gethudslot weapon:isa to prevent getting the same duplicate, rather reroll // Add in if not weaponslot then because if alien does not have the biomass for it then nothging happens, or biomass may overrwrite it?
-      return
-      end//End of alien roll 3
-      */
      if AlienRoll == 2 then 
-      local EffectsRoll = math.random(1,19)
+      local EffectsRoll = math.random(1,16)
       if EffectsRoll == 1 then 
-      self:AddDelayToPlayer(Player)   
-      local  kEnzymeTimer = math.random(15,60)                                
-      Shine.ScreenText.Add( 59, {X = 0.20, Y = 0.80,Text = "Enzyme: %s",Duration = kEnzymeTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyAlien( nil, "%s won enzyme for %s seconds", true, Player:GetName(), kEnzymeTimer)  
-      Player:TriggerFireProofEnzyme(kEnzymeTimer)
+      self:AddDelayToPlayer(Player) 
+      local amount = math.random(1,8)
+      Shine.ScreenText.Add( 64, {X = 0.20, Y = 0.80,Text = "EnzymeCloud: %s",Duration = amount * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+      self:NotifyAlien( nil, "%s won %s enzyme clouds, 1 every 8 seconds (or until dead)", true, Player:GetName(), amount)  
+      Player:GiveItem(EnzymeCloud.kMapName)
+      self:CreateTimer(8, amount, amount * 8, function () if not Player:GetIsAlive() then self:DestroyTimer(10) self.ScreenText.End(64) return end Player:GiveItem(EnzymeCloud.kMapName) end ) 
+
       return 
       end//end of effects roll 1
       if EffectsRoll == 2 then
-      self:AddDelayToPlayer(Player)
-      local  kUmbraTimer = math.random(15,60)
-      self:NotifyAlien( nil, "%s won umbra for %s seconds", true, Player:GetName(), kUmbraTimer)  
-      Shine.ScreenText.Add( 60, {X = 0.20, Y = 0.80,Text = "Umbra: %s", Duration = kEnzymeTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      Player:SetHasFireProofUmbra(true, kUmbraTimer)
- 
-      return 
+      self:AddDelayToPlayer(Player) 
+      local kUmbraTimer = math.random(8, 64)
+     Shine.ScreenText.Add( 61, {X = 0.20, Y = 0.80,Text = "Umbra: %s",Duration = kUmbraTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+      self:NotifyAlien( nil, "%s won umbra for %s seconds (or until dead)", true, Player:GetName(), kUmbraTimer)
+      Player:SetHasUmbra(true, 2)
+      self:CreateTimer(1, 1, kUmbraTimer, function () if not Player:GetIsAlive() then self:DestroyTimer(10) self.ScreenText.End(64) return end Player:SetHasUmbra(true, 2) end ) 
+
       end//end of effects roll 2
       if EffectsRoll == 3 then
       self:AddDelayToPlayer(Player) 
@@ -691,24 +602,27 @@ end//Alien roll 1
       end//end of effects roll 3
       if EffectsRoll == 4 then
       self:AddDelayToPlayer(Player) 
-      Shine.ScreenText.Add( 70, {X = 0.20, Y = 0.80,Text = "Hallucinations: %s", Duration = 30,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyAlien( nil, "%s hallucination cloud every 5 seconds for 30 seconds", true, Player:GetName())
+      local amount = math.random(1,4)
+      Shine.ScreenText.Add( 70, {X = 0.20, Y = 0.80,Text = "Hallucinations: %s", Duration = amount * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+      self:NotifyAlien( nil, "%s won %s hallucination clouds,1 every 8 seconds (or until dead)", true, Player:GetName(), amount)
       Player:GiveItem(HallucinationCloud.kMapName)
-      self:CreateTimer(7, 5, 6, function () if not Player:GetIsAlive() then self:DestroyTimer(7) self.ScreenText.End(70) return end Player:GiveItem(HallucinationCloud.kMapName) end )
+      self:CreateTimer(7, 8, amount * 8, function () if not Player:GetIsAlive() then self:DestroyTimer(7) self.ScreenText.End(70) return end Player:GiveItem(HallucinationCloud.kMapName) end )
       end//end of effects roll 4
       if EffectsRoll == 5 then
-      self:AddDelayToPlayer(Player) 
-      Shine.ScreenText.Add( 71, {X = 0.20, Y = 0.80,Text = "Ink: %s",Duration = 15,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyAlien( nil, "%s rolled a total of 3 inks every 5 seconds", true, Player:GetName())
-      Player:GiveItem(ShadeInk.kMapName)
-      self:CreateTimer(8, 3, 5, function() if not Player:GetIsAlive() then self.ScreenText.End(71) self:DestroyTimer(8) return end Player:GiveItem(ShadeInk.kMapName) end )
-      return
+       local neareststructure = GetNearestMixin(Player:GetOrigin(), "Construct", 2, function(ent) return ent:isa("Shade") or  ent:isa("Crag") or ent:isa("Whip") or ent:isa("Shift") and ent:GetIsBuilt() end )
+        if neareststructure then
+        neareststructure:SetOrigin(FindFreeSpace(Player:GetOrigin()))
+         self:NotifyAlien( nil, "%s stole a %s", true, Player:GetName(), neareststructure:GetClassName())
+        self:AddDelayToPlayer(Player) 
+        else
+        self:RollPlayer(Player)
+        end
       end // end of effects roll 5
       if EffectsRoll == 6 then
       self:AddDelayToPlayer(Player) 
       local  kSporeTimer = math.random(15, 60)
       Shine.ScreenText.Add( 63, {X = 0.20, Y = 0.80,Text = "Spores: %s",Duration = kSporeTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyAlien( nil, "%s won %s seconds of spore clouds spawning on player", true, Player:GetName(), kSporeTimer)  
+      self:NotifyAlien( nil, "%s ", true, Player:GetName(), kSporeTimer)  
       Player:GiveItem(SporeCloud.kMapName)
       self:CreateTimer(9, 1, kSporeTimer, function () if not Player:GetIsAlive() then self.ScreenTextEnd(63) self:DestroyTimer(9) return end Player:GiveItem(SporeCloud.kMapName) end )
       return 
@@ -718,45 +632,48 @@ end//Alien roll 1
        local kWonBabblersAmount = math.random(3, 12)
       self:NotifyAlien( nil, "%s won %s babblers", true, Player:GetName(), kWonBabblersAmount)  
       for i = 1, kWonBabblersAmount do
-            local babbler = CreateEntity(Babbler.kMapName, Player:GetOrigin(), Player:GetTeamNumber())
+            local babbler = CreateEntity(Babbler.kMapName, FindFreeSpace(Player:GetOrigin()), Player:GetTeamNumber())
             babbler:SetOwner(Player)
        end 
       return 
       end  //alien effects roll 7
       if EffectsRoll == 8 then
       self:AddDelayToPlayer(Player)
-      local duration = math.random(10,45)
-      Shine.ScreenText.Add( 64, {X = 0.20, Y = 0.80,Text = "MucousMembrane: %s",Duration = 15,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyAlien( nil, "%s won %s seconds of mucous membranes (one every %s seconds)", true, Player:GetName(), duration, math.round(duration / 3,2))  
+      local amount = math.random(1,8)
+      Shine.ScreenText.Add( 64, {X = 0.20, Y = 0.80,Text = "MucousMembrane: %s",Duration = amount * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+      self:NotifyAlien( nil, "%s won %s mucous membranes, 1 every 8 seconds (or until dead)", true, Player:GetName(), amount)  
       Player:GiveItem(MucousMembrane.kMapName)
-      self:CreateTimer(10, duration / 3, duration, function () if not Player:GetIsAlive() then self:DestroyTimer(10) self.ScreenText.End(64) return end Player:GiveItem(MucousMembrane.kMapName) end ) 
+      self:CreateTimer(8, 8, amount * 8, function () if not Player:GetIsAlive() then self:DestroyTimer(10) self.ScreenText.End(64) return end Player:GiveItem(MucousMembrane.kMapName) end ) 
       return 
       end  //alien effects roll 8
       if EffectsRoll == 9 then
       self:AddDelayToPlayer(Player) 
-      local kZeroEnergyTimer = math.random(5,30)
-      Shine.ScreenText.Add( 65, {X = 0.20, Y = 0.80,Text = "Zero Energy: %s",Duration = kZeroEnergyTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyAlien( nil, "%s rolled %s seconds of 0 energy", true, Player:GetName(), kZeroEnergyTimer)
-      Player:SetEnergy(0)
-       self:CreateTimer(11, 1, kZeroEnergyTimer, function () if not Player:GetIsAlive() then self.ScreenText.End(65) self:DestroyTimer(11) return end Player:SetEnergy(0) end )
+      local amount = math.random(1,4)
+      Shine.ScreenText.Add( 64, {X = 0.20, Y = 0.80,Text = "Contamination: %s",Duration = amount * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+      self:NotifyAlien( nil, "%s won %s contamination, 1 every 4 seconds (or until dead)", true, Player:GetName(), amount)  
+      Player:GiveItem(Contamination.kMapName)
+      self:CreateTimer(8, 8, amount * 8, function () if not Player:GetIsAlive() then self:DestroyTimer(10) self.ScreenText.End(64) return end Player:GiveItem(Contamination.kMapName) end ) 
+
+
       return
       end//end of effects roll 9
       if EffectsRoll == 10 then
       self:AddDelayToPlayer(Player) 
-      local kInfiniteEnergyTimer = math.random(15,60)
-      Shine.ScreenText.Add( 66, {X = 0.20, Y = 0.80,Text = "Infinite Energy: %s",Duration = kInfiniteEnergyTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyAlien( nil, "%s won %s seconds of infinite energy", true, Player:GetName(), kInfiniteEnergyTimer)
-      Player:TriggerInfiniteEnergy(kInfiniteEnergyTimer)
+      local amount = math.random(1,8)
+      Shine.ScreenText.Add( 64, {X = 0.20, Y = 0.80,Text = "Nutrientmist: %s",Duration = amount * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+      self:NotifyAlien( nil, "%s won %s Nutrientmist, 1 every 8 seconds (or until dead)", true, Player:GetName(), amount)  
+      Player:GiveItem(NutrientMist.kMapName)
+      self:CreateTimer(8, 8, amount * 8, function () if not Player:GetIsAlive() then self:DestroyTimer(10) self.ScreenText.End(64) return end Player:GiveItem(NutrientMist.kMapName) end ) 
+
       return
       end//end of effects roll 10
       if EffectsRoll == 11 then
-      self:AddDelayToPlayer(Player) 
-     local  kInfiniteEnergyANDEnzymeTimer = math.random(15,60)
-      Shine.ScreenText.Add( 67, {X = 0.20, Y = 0.80,Text ="Energy & Enzyme: %s",Duration = kInfiniteEnergyANDEnzymeTimer,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyAlien( nil, "%s won %s seconds of infinite energy AND enzyme", true, Player:GetName(), kInfiniteEnergyANDEnzymeTimer)
-      Player:TriggerInfiniteEnergy(kInfiniteEnergyANDEnzymeTimer)
-      Player:TriggerFireProofEnzyme(kInfiniteEnergyANDEnzymeTimer)
-      return
+      local amount = math.random(1,8)
+      Shine.ScreenText.Add( 64, {X = 0.20, Y = 0.80,Text = "ShadeInk: %s",Duration = amount * 8,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
+      self:NotifyAlien( nil, "%s won %s ShadeInk, 1 every 8 seconds (or until dead)", true, Player:GetName(), amount)  
+      Player:GiveItem(ShadeInk.kMapName)
+      self:CreateTimer(8, 8, amount * 8, function () if not Player:GetIsAlive() then self:DestroyTimer(10) self.ScreenText.End(64) return end Player:GiveItem(ShadeInk.kMapName) end ) 
+
       end//end of effects roll 10
     /*
             if EffectsRoll == 12 then
@@ -788,60 +705,12 @@ end//Alien roll 1
             return
             end//end of effects roll 15
           if EffectsRoll == 15 then
-            local size = math.random(10, 200)
-            self:NotifyAlien( nil, "%s won a %s percent sized bonewall", true, Player:GetName(), size)
+            self:NotifyAlien( nil, "%s has been bonewall-ed", true, Player:GetName(), size)
             local bonewall = CreateEntity(BoneWall.kMapName, Player:GetOrigin(), 2)    
-            bonewall.modelsize = size/100
             StartSoundEffectForPlayer(AlienCommander.kBoneWallSpawnSound, Player)
             end//end of effects roll 16
-          if EffectsRoll == 16 then
-          local kEnzymeANDUmbraDuration = math.random(15,60)
-            Shine.ScreenText.Add( 64, {X = 0.20, Y = 0.80,Text = "Enzyme & Umbra: %s",Duration = kEnzymeANDUmbraDuration, R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-            self:NotifyAlien( nil, "%s won enzyme & umbra for %s seconds", true, Player:GetName(), kEnzymeANDUmbraDuration)
-            Player:SetHasFireProofUmbra(true, kEnzymeANDUmbraDuration)
-            Player:TriggerFireProofEnzyme(kEnzymeANDUmbraDuration)
-            end//end of effects roll 16
-            if EffectsRoll == 17 then
-           self:AddDelayToPlayer(Player)
-      local size = math.random(10,200)
-      if size == Player.modelsize then self:RollPlayer(Player) return end
-     self:NotifyAlien( nil, "Adjusted %s's size from %s percent to %s percent", true, Player:GetName(), Player.modelsize * 100, size) 
-     Player.modelsize = size / 100
-     Player:AdjustMaxHealth(Player:GetMaxHealth() * size / 100)
-     Player:AdjustMaxArmor(Player:GetMaxArmor() * size / 100) 
-      return 
-      end // end of effects roll 17
    
-       if EffectsRoll == 18 then
-           self:AddDelayToPlayer(Player)
-      local percent = math.random(-25,25)
-     if percent == 0  then self:RollPlayer(Player) return end
-      local duration = math.random(15, 45)
-     if percent >=1 then 
-     self:NotifyAlien( nil, "%s %s percent damage buff against structures for %s seconds", true, Player:GetName(), percent, duration ) 
-     Shine.ScreenText.Add( 72, {X = 0.20, Y = 0.80,Text ="damage buff against structures: %s",Duration = duration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-    else
-      self:NotifyAlien( nil, "%s %s percent damage de-buff against structures for %s seconds", true, Player:GetName(), percent * -1, duration ) 
-    Shine.ScreenText.Add( 73, {X = 0.20, Y = 0.80,Text ="damage de-buff against structures for %s",Duration = duration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-    end
-     Player:TriggerRTDNonPlayerDamageSclae(duration, percent)
-      return 
-      end // end of effects roll 19
-       if EffectsRoll == 19 then
-           self:AddDelayToPlayer(Player)
-      local percent = math.random(-25,25)
-     if percent == 0 then self:RollPlayer(Player) return end
-      local duration = math.random(15, 45)
-     if percent >=1 then 
-      Shine.ScreenText.Add( 71, {X = 0.20, Y = 0.80,Text ="dmg buff against PLAYERS: %s", Duration = duration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-     self:NotifyAlien( nil, "%s %s percent damage buff against PLAYERS: %s seconds", true, Player:GetName(), percent, duration ) 
-    else
-     Shine.ScreenText.Add( 78, {X = 0.20, Y = 0.80,Text ="dmg de-buff against PLAYERS: %s", Duration = duration,R = math.random(0,255), G = math.random(0,255), B = math.random(0,255),Alignment = 0,Size = 1,FadeIn = 0,}, Player )
-      self:NotifyAlien( nil, "%s %s percent damage de-buff against PLAYERS:%s seconds", true, Player:GetName(), percent, duration ) 
-    end
-     Player:TriggerRTDPlayerDamageSclae(duration, percent)
-      return 
-      end // end of effects roll 19
+     
    
 end //end of alien roll 2
 
