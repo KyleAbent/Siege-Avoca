@@ -86,7 +86,7 @@ function SiegeDoor:UpdatePosition(lock)
      local waypoint = self.savedOrigin + Vector(0, kDoorMoveUpVect, 0)
      local dooropen = self:GetOrigin() == waypoint
      local startingposition = self:GetOrigin() == self.savedOrigin
-       Print("Waypoint difference is %s", waypoint - self:GetOrigin())
+      -- Print("Waypoint difference is %s", waypoint - self:GetOrigin())
        
        
    if waypoint then

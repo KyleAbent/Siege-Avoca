@@ -12,7 +12,7 @@ Plugin.Version = "1.0"
 
 
 function Plugin:Initialise()
-self.rtd_succeed_cooldown = 4
+self.rtd_succeed_cooldown = 90
 self.rtdenabled = true
 self.rtd_failed_cooldown = self.rtd_succeed_cooldown
 self.Users = {}
