@@ -1,3 +1,4 @@
+--Kyle 'Avoca' Abent
 Script.Load("lua/ScriptActor.lua")
 Script.Load("lua/TeamMixin.lua")
 Script.Load("lua/HiveVisionMixin.lua")
@@ -13,7 +14,6 @@ local networkVars =
 {
     scale = "vector",
     model = "string (128)",
-    moveSpeed = "float",
     isvisible = "boolean",
     savedOrigin = "vector",
 }
@@ -62,7 +62,7 @@ function SiegeDoor:OnInitialized()
     
     self:SetPhysicsType(PhysicsType.Kinematic)
     self:Open()
-    --self:SetPhysicsGroup(PhysicsGroup.FuncMoveable)
+    self:SetPhysicsGroup(PhysicsGroup.WhipGroup)
 end
 
 function SiegeDoor:Reset()
@@ -72,6 +72,12 @@ end
 function SiegeDoor:Open()    
         self:SetOrigin(self:GetOrigin() + Vector(0,.25,0) )   
         self:AddTimedCallback(SiegeDoor.UpdatePosition, 0.5)
+end
+function SiegeDoor:GetIsOpen()    
+return (self:GetOrigin() - self.savedOrigin):GetLength() >= kDoorMoveUpVect
+end
+function SiegeDoor:GetIsLocked()    
+return not self:GetIsOpen()
 end
 function SiegeDoor:MakeSurePlayersCanGoThroughWhenMoving()
                 self:UpdateModelCoords()
@@ -84,7 +90,7 @@ end
 function SiegeDoor:UpdatePosition(lock) 
    if lock and lock == true then self:SetOrigin(self.savedOrigin) return false end 
      local waypoint = self.savedOrigin + Vector(0, kDoorMoveUpVect, 0)
-     local dooropen = self:GetOrigin() == waypoint
+     local dooropen = (self:GetOrigin() - self.savedOrigin):GetLength() >= kDoorMoveUpVect
      local startingposition = self:GetOrigin() == self.savedOrigin
       -- Print("Waypoint difference is %s", waypoint - self:GetOrigin())
        

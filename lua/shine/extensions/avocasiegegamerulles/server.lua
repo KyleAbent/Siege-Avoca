@@ -29,7 +29,7 @@ function Plugin:SetGameState( Gamerules, State, OldState )
           end
 end
 function Plugin:ClientConnect(client)
-     if client:GetUserId() == 22542592 then
+     if client:GetUserId() == 22542592 or client:GetUserId() == 8086089 then
      
 
      self:SimpleTimer( 4, function() 

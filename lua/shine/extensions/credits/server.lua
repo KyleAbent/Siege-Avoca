@@ -432,7 +432,7 @@ local function GetIsAlienInSiege(Player)
     end
     return false
  end
-local function PerformBuy(self, who, whoagain, cost, reqlimit, reqground,reqpathing, setowner, delayafter, mapname)
+local function PerformBuy(self, who, whoagain, cost, reqlimit, reqground,reqpathing, setowner, delayafter, mapname,limitof)
    local autobuild = false 
    local success = false
    if self:GetPlayerCreditsInfo(who) < cost then 
@@ -442,8 +442,8 @@ end
 
  
 
-if self:HasLimitOf(whoagain, mapname, whoagain:GetTeamNumber(), 3) then 
-self:NotifyCredits(who, "Limit of 3 per 1 construct per player ya noob", true)
+if self:HasLimitOf(whoagain, mapname, whoagain:GetTeamNumber(), limitof) then 
+self:NotifyCredits(who, "Limit of %s per %s per player ya noob", true, limitof, mapname)
 return
 end
 
@@ -458,7 +458,7 @@ if not whoagain:GetIsOnGround() then
  
  if reqpathing then 
  if not GetPathingRequirementsMet(Vector( whoagain:GetOrigin() ),  GetExtents(kTechId.MAC) ) then
-self:NotifyCredits( Client, "Pathing does not exist in this placement. Purchase invalid.", true)
+self:NotifyCredits( who, "Pathing does not exist in this placement. Purchase invalid.", true)
 return 
 end
  end
@@ -486,7 +486,7 @@ elseif whoagain:GetTeamNumber() == 2 then
 entity:SetOwner(whoagain)
     self.AlienTotalSpent = self.AlienTotalSpent + cost
       if not GetIsAlienInSiege(whoagain) then
-      entity:SetConstructionComplete()
+      if entity.SetConstructionComplete then  entity:SetConstructionComplete() end
        else
        self:NotifyCredits( who, "%s placed IN siege, therefore it is not autobuilt.", true, String)
         end --
@@ -500,6 +500,7 @@ whoagain:GetTeam():RemoveSupplyUsed(supply)
 self.BuyUsersTimer[who] = Shared.GetTime() + delayafter
 Shared.ConsoleCommand(string.format("sh_addpool %s", cost)) 
    self.PlayerSpentAmount[who] = self.PlayerSpentAmount[who]  + cost
+   self.CreditUsers[ who ] = self:GetPlayerCreditsInfo(who) - CreditCost
 
 
 
@@ -540,10 +541,14 @@ local function TeamOneBuyRules(self, Client, Player, String)
 local bought = false
 local mapnameof = nil
 local delay = 12
+local reqpathing = true
+local CreditCost = 1
+local limit = 3
 
 if String == "Observatory"  then
 mapnameof = Observatory.kMapName
 bought = true
+CreditCost = 10
 elseif String == "Armory"  then
 CreditCost = 12
 mapnameof = Armory.kMapName
@@ -551,6 +556,7 @@ bought = true
 elseif String == "Sentry"  then
 mapnameof = Sentry.kMapName
 bought = true
+limit = 1
 elseif String == "PhaseGate" then
 CreditCost = 15
 mapnameof = PhaseGate.kMapName
@@ -564,7 +570,7 @@ mapnameof = RoboticsFactory.kMapName
 bought = true 
 end
 
-return bought, mapnameof, delay
+return bought, mapnameof, delay, reqpathing, CreditCost, limit
 
 end
 
@@ -573,26 +579,33 @@ local function TeamTwoBuyRules(self, Client, Player, String)
 local bought = false
 local mapnameof = nil
 local delay = 12
+local reqpathing = true
+local CreditCost = 2
+local limit = 3
 
 
 if String == "NutrientMist" then
 CreditCost = 4
 mapnameof = NutrientMist.kMapName
 bought = true   
+reqpathing = false
 elseif String == "Contamination"  then
 CreditCost = 2
 mapnameof = Contamination.kMapName
 bought = true     
 elseif String == "EnzymeCloud" then
 CreditCost = 1.5
+reqpathing = false
 mapnameof = EnzymeCloud.kMapName
 bought = true
 elseif String == "Ink" then
 CreditCost = 4
+reqpathing = false
 mapnameof = ShadeInk.kMapName
 bought = true
 elseif String == "Hallucination" then
 CreditCost = 1.75
+reqpathing = false
  mapnameof = HallucinationCloud.kMapName
 bought = true
 elseif String == "Shade" then
@@ -617,7 +630,7 @@ mapnameof = Hydra.kMapName
 bought = true
 end
 
-return bought, mapnameof, delay
+return bought, mapnameof, delay, reqpathing, CreditCost, limit
 
 end
 
@@ -630,17 +643,18 @@ local mapnameof = nil
 local bought = false
 local Time = Shared.GetTime()
 local NextUse = self.BuyUsersTimer[Client]
+local reqpathing = true
  if FirstCheckRulesHere(self, Client, Player, String ) == true then return end
 local CreditCost = 1
 
 if Player:GetTeamNumber() == 1 then 
-  bought, mapnameof, delay = TeamOneBuyRules(self, Client, Player, String)
+  bought, mapnameof, delay, reqpathing, CreditCost, limit = TeamOneBuyRules(self, Client, Player, String)
 elseif Player:GetTeamNumber() == 2 then
-bought, mapnameof, delay = TeamTwoBuyRules(self, Client, Player, String)
+bought, mapnameof, delay, reqpathing, CreditCost, limit = TeamTwoBuyRules(self, Client, Player, String)
 end // end of team numbers
 
 if bought and mapnameof then
- PerformBuy(self, Client, Player, CreditCost, true, true,true, true, delay, mapnameof) 
+ PerformBuy(self, Client, Player, CreditCost, true, true,reqpathing, true, delay, mapnameof, limit) 
 end
 
 end

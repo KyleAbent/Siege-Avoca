@@ -1,3 +1,20 @@
+--Kyle 'Avoca' Abent
+function ExploitCheck(who)
+
+  if who:isa("Cyst") then --Better than getentwithinrange because that returns a table regardless of these specifics of range and origin
+     local frontdoor = GetNearest(who:GetOrigin(), "FrontDoor", 0, function(ent) return who:GetDistance(ent) <= 12 and ent:GetOrigin() == ent.savedOrigin end)
+        if frontdoor  then who:Kill( )return end
+  end
+  
+  local location = GetLocationForPoint(who:GetOrigin())
+  local locationName = location and location:GetName() or ""
+  if string.find(locationName, "siege") or string.find(locationName, "Siege") then
+  
+    if not GetSandCastle():GetIsSiegeOpen() then who:Kill( )end
+  
+  end
+
+end
 function AddSiegeTime(seconds)
     local entityList = Shared.GetEntitiesWithClassname("SandCastle")
     if entityList:GetSize() > 0 then

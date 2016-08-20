@@ -98,6 +98,7 @@ function GUIInsight_TopBar:Initialize()
         
     local texSize = GUIScale(Vector(512,57,0))
     local texCoord = {0,0,512,57}
+    if self:isa("Commander") then texCoord = {0,0,412,57} end 
     local texPos = Vector(-texSize.x/2,0,0)
     background = GUIManager:CreateGraphicItem()
     background:SetAnchor(GUIItem.Middle, GUIItem.Top)
