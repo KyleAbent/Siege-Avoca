@@ -36,11 +36,13 @@ function SandCastle:OpenSiegeDoors()
               end 
 end
 function SandCastle:OpenFrontDoors()
+if Server then   self:AddTimedCallback(SandCastle.PickMainRoom, 16) end
       self.FrontTimer = 0
                for index, frontdoor in ientitylist(Shared.GetEntitiesWithClassname("FrontDoor")) do
                 frontdoor:Open()
                 frontdoor.isvisible = false
               end 
+              kBuildSpeed = 1
 end
 function SandCastle:GetIsSiegeOpen()
            local gamestarttime = GetGamerules():GetGameStartTime()
@@ -81,16 +83,104 @@ local function CloseDoors()
                  siegedoor:TrickedYou()
               end 
 end
+function SandCastle:PickMainRoom()
+       local location = self:GetLocationWithMostMixedPlayers()
+       if not location then return true end
+       self:SetMainRoom(location:GetOrigin(), location, opcyst) 
+       return true
+end
+local function CreateAlienMarker(where)
+             local nearestenemy = GetNearestMixin(where, "Combat", 1, function(ent) return ent:GetIsInCombat()  and not ent:isa("Commander") and ent:GetIsAlive()  end)
+             if not nearestenemy then return end -- hopefully not. Just for now this should be useful anyway.
+              local where = nearestenemy:GetOrigin()
+              CreatePheromone(kTechId.ThreatMarker,where, 2) 
+end
+local function SendMarineOrders(where)
+          for _, player in ipairs(GetEntitiesWithinRange("Marine", where, 999)) do
+                 if player:GetIsAlive() and not player:isa("Commander") then
+                  local nearestenemy = GetNearestMixin(where, "Combat", 2, function(ent) return ent:GetIsInCombat() and not ent:isa("Commander") and ent:GetIsAlive()  end)
+                    if not nearestenemy then return end 
+                     local where = nearestenemy:GetOrigin()
+                     player:GiveOrder(kTechId.Attack, nearestenemy:GetId(), nearestenemy:GetOrigin(), nil, true, true)
+                end
+          end
+end
+
+function SandCastle:SetMainRoom(where, which, opcyst)
+        CreateAlienMarker(where) 
+         --8.20 notes
+         --if not self:GetIsFrontOpen() then SendOrderFrontOrBuild?
+       -- if self:GetIsSiegeOpen() then return SendMarineDefOrdersSiege() end
+        SendMarineOrders(where)
+end
 function SandCastle:OnRoundStart() 
    self.SiegeTimer = kSiegeTimer
    self.FrontTimer = kFrontTimer
    CloseDoors()
            if Server then
+              kBuildSpeed = kSetupBuildSpeed
               self:AddTimedCallback(SandCastle.CountSTimer, 1)
               self:AddTimedCallback(SandCastle.FrontDoorTimer, 1)
             end
 end
+function SandCastle:GetLocationWithMostMixedPlayers()
+-- works good 2.15
+--so far v1.23 shows this works okay except for picking empty res rooms for some reason -.-
+//Print("GetLocationWithMostMixedPlayers")
 
+            for _, mainent in ientitylist(Shared.GetEntitiesWithClassname("CommandStructure")) do
+                    if mainent:GetIsInCombat() then return mainent end
+             end
+             
+local team1avgorigin = Vector(0, 0, 0)
+local marines = 1
+local team2avgorigin = Vector(0, 0, 0)
+local aliens = 1
+local neutralavgorigin = Vector(0, 0, 0)
+
+            for _, marine in ientitylist(Shared.GetEntitiesWithClassname("Marine")) do
+            if marine:GetIsAlive() and not marine:isa("Commander") then marines = marines + 1 team1avgorigin = team1avgorigin + marine:GetOrigin() end
+             end
+             
+           for _, alien in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do
+            if alien:GetIsAlive() and not alien:isa("Commander") then aliens = aliens + 1 team2avgorigin = team2avgorigin + alien:GetOrigin() end 
+             end
+             --v1.23 added check to make sure room isnt empty
+         neutralavgorigin =  team1avgorigin + team2avgorigin
+         neutralavgorigin =  neutralavgorigin / (marines+aliens) --better as a table i know
+     //    Print("neutralavgorigin is %s", neutralavgorigin)
+     local nearest = GetNearest(neutralavgorigin, "Location", nil, function(ent) local powerpoint = GetPowerPointForLocation(ent.name) return powerpoint ~= nil end)
+    if nearest then
+   // Print("nearest is %s", nearest.name)
+        return nearest
+    end
+
+end
+function SandCastle:GetCombatEntitiesCount()
+            local combatentities = 1
+            for _, entity in ipairs(GetEntitiesWithMixin("Combat")) do
+                --Though taken from combatmixin.lua :P
+             local inCombat = (entity.timeLastDamageDealt + math.random(4,8) > Shared.GetTime()) or (entity.lastTakenDamageTime + math.random(4,8) > Shared.GetTime())
+                  if inCombat then combatentities = combatentities + 1 end
+                  if entity.mainbattle == true then entity.mainbattle = false end
+             end
+             //     Print("combatentities %s", combatentities)
+            return combatentities
+end
+function SandCastle:GetCombatEntitiesCountInRoom(location)
+       local entities = location:GetEntitiesInTrigger()
+       local eligable = 0
+             for _, entity in ipairs(entities) do
+             if HasMixin(entity, "Combat") then
+                local inCombat = (entity.timeLastDamageDealt + math.random(4,8) > Shared.GetTime()) or (entity.lastTakenDamageTime + math.random(4,8) > Shared.GetTime())
+                  if inCombat then
+                  eligable = eligable + 1
+                 end
+             end
+            end
+       // Print("location %s, eligable %s", location, eligable)
+        return eligable
+end
 
 Shared.LinkClassToMap("SandCastle", SandCastle.kMapName, networkVars)
 

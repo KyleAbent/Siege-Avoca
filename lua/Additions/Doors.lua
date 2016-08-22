@@ -14,7 +14,6 @@ local networkVars =
 {
     scale = "vector",
     model = "string (128)",
-    isvisible = "boolean",
     savedOrigin = "vector",
 }
 
@@ -29,7 +28,6 @@ function SiegeDoor:OnCreate()
     InitMixin(self, BaseModelMixin)
     InitMixin(self, ModelMixin)
     InitMixin(self, TeamMixin)
-    self.isvisible = true
 end
 function SiegeDoor:OnInitialized()
 
@@ -76,8 +74,11 @@ end
 function SiegeDoor:GetIsOpen()    
 return (self:GetOrigin() - self.savedOrigin):GetLength() >= kDoorMoveUpVect
 end
+function SiegeDoor:HasOpened()    
+return (self:GetOrigin() - self.savedOrigin):GetLength() >= 1
+end
 function SiegeDoor:GetIsLocked()    
-return not self:GetIsOpen()
+return not self:HasOpened()
 end
 function SiegeDoor:MakeSurePlayersCanGoThroughWhenMoving()
                 self:UpdateModelCoords()

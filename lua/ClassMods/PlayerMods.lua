@@ -4,7 +4,7 @@ function Alien:OnCreate()
     if Server then
     -- self:AddTimedCallback(function() UpdateAvocaAvailability(self, self:GetTierOneTechId(), self:GetTierTwoTechId(), self:GetTierThreeTechId()) end, .8) 
     elseif Client then
-        GetGUIManager():CreateGUIScriptSingle("GUIInsight_TopBar")  
+       GetGUIManager():CreateGUIScriptSingle("GUIInsight_TopBar")  
     end
 end
 local orig_Marine_OnCreate = Marine.OnCreate
@@ -32,8 +32,8 @@ if Client then
         local player = Client.GetLocalPlayer()
         local now = Shared.GetTime()
         
-        if HasMixin(self, "Moveable") or self:isa("FuncDoor") then
-        visible = self.isvisible
+       if   ( self:isa("SiegeDoor") and self:GetIsLocked() ) then
+        visible = true
         end
         
         if Client.GetLocalClientTeamNumber() == kSpectatorIndex
@@ -101,7 +101,7 @@ if Client then
                                     ( ( Client.GetLocalClientTeamNumber() == kSpectatorIndex ) or 
                                       ( player:isa("MarineCommander") and self.catpackboost ) )
                                                             or
-                               ( HasMixin(self, "Moveable") and self.isvisible ) 
+                               ( self:isa("SiegeDoor") and self:GetIsLocked() )
                                     
             local outlineColor
             if self.catpackboost then

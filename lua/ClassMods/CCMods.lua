@@ -1,0 +1,1 @@
+SetCachedTechData(kTechId.CommandStation, kStructureAttachClass, false)

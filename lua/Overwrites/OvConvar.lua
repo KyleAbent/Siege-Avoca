@@ -12,3 +12,7 @@ kMetabolizeHealthResearchTime = 29
 kXenocideResearchTime = 39
 
 SentryBattery.kRange = 9999
+
+kBatteryPowerRange = 4
+kSentrySupply = 5
+kSentryDamage = 4

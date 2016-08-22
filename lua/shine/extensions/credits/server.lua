@@ -500,7 +500,7 @@ whoagain:GetTeam():RemoveSupplyUsed(supply)
 self.BuyUsersTimer[who] = Shared.GetTime() + delayafter
 Shared.ConsoleCommand(string.format("sh_addpool %s", cost)) 
    self.PlayerSpentAmount[who] = self.PlayerSpentAmount[who]  + cost
-   self.CreditUsers[ who ] = self:GetPlayerCreditsInfo(who) - CreditCost
+   self.CreditUsers[ who ] = self:GetPlayerCreditsInfo(who) - cost
 
 
 
@@ -553,10 +553,11 @@ elseif String == "Armory"  then
 CreditCost = 12
 mapnameof = Armory.kMapName
 bought = true
-elseif String == "Sentry"  then
-mapnameof = Sentry.kMapName
+elseif String == "SentryAvoca"  then
+mapnameof = SentryAvoca.kMapName
 bought = true
 limit = 1
+CreditCost = 8
 elseif String == "PhaseGate" then
 CreditCost = 15
 mapnameof = PhaseGate.kMapName

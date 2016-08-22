@@ -1,0 +1,13 @@
+Script.Load("lua/ClassMods/SentryAvoca.lua")
+Script.Load("lua/ClassMods/AntiExploit.lua")
+Script.Load("lua/ClassMods/PlayerMods.lua")
+Script.Load("lua/ClassMods/CragMod.lua")
+--Script.Load("lua/ClassMods/SpyderGorge.lua")
+Script.Load("lua/ClassMods/ClogMod.lua")
+--Script.Load("lua/ClassMods/LerkMod.lua") 
+Script.Load("lua/ClassMods/CCMods.lua") 
+--Script.Load("lua/ClassMods/AlienMods.lua") 
+Script.Load("lua/ClassMods/ObservatoryMod.lua") -- Though practically replaced overwrite atm
+--Script.Load("lua/ClassMods/RoboMod.lua") 
+Script.Load("lua/ClassMods/AlienCommMod.lua") 
+--Script.Load("lua/ClassMods/TeleportMixinMods.lua") 
