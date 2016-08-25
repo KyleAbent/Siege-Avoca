@@ -1,8 +1,3 @@
-Script.Load("lua/Overwrites/Overwrites.lua")
-Script.Load("lua/Overwrites/OvConvar.lua")
-Script.Load("lua/Overwrites/RoboticsFactory.lua")
-
-
 local function TimeUp(self)
     self:Kill()
     return false

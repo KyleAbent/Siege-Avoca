@@ -1,4 +1,4 @@
-// NS2 - Classic
+// NS2 - Classic -- Modified for siege ofc -- thanks dragon
 // lua\Weapons\Alien\Umbra.lua
 //
 
@@ -10,6 +10,9 @@ Shared.PrecacheSurfaceShader("materials/effects/mesh_effects/view_blood.surface_
 
 local kStructureHitEffect = PrecacheAsset("cinematics/alien/lerk/bite_view_structure.cinematic")
 local kMarineHitEffect = PrecacheAsset("cinematics/alien/lerk/bite_view_marine.cinematic")
+
+local kCinematic = PrecacheAsset("cinematics/alien/lerk/primal2.cinematic")
+local kSound = PrecacheAsset("sound/NS2.fev/alien/lerk/taunt")
 
 class 'Primal' (Ability)
 
@@ -30,22 +33,61 @@ local networkVars =
 }
 
 AddMixinNetworkVars(SpikesMixin, networkVars)
+local function GetWeaponEffects()
+local toreturn = {
 
-local function TriggerPrimal(self, lerk)
-
-    local players = GetEntitiesForTeam("Alien", lerk:GetTeamNumber())
-    for index, player in ipairs(players) do
-        if player:GetIsAlive() and ((player:GetOrigin() - lerk:GetOrigin()):GetLength() < kPrimalScreamRange) then //and not player:GetIsOnFire() then
-            if player ~= lerk then
-                player:AddEnergy(kPrimalScreamEnergyGain)
-                player.primaledID = self:GetParent():GetId()
+           primal_scream =
+    {
+        primalScreamEffects =
+        {
+            {cinematic = kCinematic},
+            {sound = "", silenceupgrade = true, done = true},
+            {player_sound = kSound},
+        },    
+    
+    },
+    
+    }
+    
+       return toreturn
+end
+local function PBAOEEnergize(self, lerk, extinguish)
+    local fireables = GetEntitiesWithMixinForTeamWithinRange("Fire", lerk:GetTeamNumber(), lerk:GetOrigin(), kPrimalScreamRange)
+    for index, fireable in ipairs(fireables) do
+        if fireable:GetIsAlive() then
+               if extinguish == true and  fireable:GetIsOnFire() then //and not player:GetIsOnFire() then
+               fireable.timeBurnInit  = 0 
+               fireable.isOnFire = false
+               fireable:SetGameEffectMask(kGameEffect.OnFire, false)
+               end
+            if fireable ~= lerk and HasMixin(fireable, "Energize") then
+                fireable:AddEnergy(kPrimalScreamEnergyGain)
+               -- player.primaledID = self:GetParent():GetId()
             end
-            if player.PrimalScream  then
-                player:PrimalScream(kPrimalScreamDuration)
-                player:TriggerEffects("primal")
-            end            
         end
     end
+end
+local function TriggerPrimal(self, lerk)
+
+     --  if lerk:GetIsOnFire() then
+     --  return  PBAOEEnergize(self, lerk, true) 
+     --  end
+      
+      local randomchoice = {}
+      if GetHasTech(lerk, kTechId.CragHive) then
+         table.insert(randomchoice, MucousMembrane.kMapName)
+      end
+      if GetHasTech(lerk, kTechId.ShadeHive) then
+         table.insert(randomchoice, HallucinationCloud.kMapName)
+       end
+      if GetHasTech(lerk, kTechId.ShiftHive) then
+        table.insert(randomchoice, EnzymeCloud.kMapName)
+      end
+      GetEffectManager():AddEffectData("AlienWeaponEffects", GetWeaponEffects()) --Ghetto alienweaponeffects.lua   
+      lerk:TriggerEffects("primal")
+     if Server then PBAOEEnergize(self, lerk, true) local mapname = table.random(randomchoice) if mapname ~= nil then CreateEntity(mapname, lerk:GetOrigin(), 2) end end
+      
+
     
 end
 

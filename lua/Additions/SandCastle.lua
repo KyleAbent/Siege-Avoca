@@ -42,7 +42,10 @@ if Server then   self:AddTimedCallback(SandCastle.PickMainRoom, 16) end
                 frontdoor:Open()
                 frontdoor.isvisible = false
               end 
-              kBuildSpeed = 1
+              if Server then
+           Script.Load("lua/Modifications/FrontDoorOpenConvars.lua")
+          end
+
 end
 function SandCastle:GetIsSiegeOpen()
            local gamestarttime = GetGamerules():GetGameStartTime()
@@ -105,18 +108,42 @@ local function SendMarineOrders(where)
                 end
           end
 end
-
+local function CoordinateWithPowerNode(locationname)
+                 local powernode = GetPowerPointForLocation(locationname)
+                    if powernode then
+                    powernode:SetLightMode(kLightMode.MainRoom)
+                    powernode:AddTimedCallback(function() powernode:SetLightMode(kLightMode.Normal) end, 10)
+                    end
+end
 function SandCastle:SetMainRoom(where, which, opcyst)
         CreateAlienMarker(where) 
+        CoordinateWithPowerNode(which.name)
          --8.20 notes
          --if not self:GetIsFrontOpen() then SendOrderFrontOrBuild?
        -- if self:GetIsSiegeOpen() then return SendMarineDefOrdersSiege() end
         SendMarineOrders(where)
 end
+function SandCastle:OnPreGame()
+   for i = 1, 4 do
+     Print("SandCastle OnPreGame")
+   end
+   
+   if Server then
+  Script.Load("lua/Modifications/PreGameConvars.lua")
+  end
+   
+end
 function SandCastle:OnRoundStart() 
+if Server then
+  Script.Load("lua/Modifications/RoundStartConvars.lua")
+end
+
+
    self.SiegeTimer = kSiegeTimer
    self.FrontTimer = kFrontTimer
    CloseDoors()
+  -- self:AutoBioMass()
+
            if Server then
               kBuildSpeed = kSetupBuildSpeed
               self:AddTimedCallback(SandCastle.CountSTimer, 1)

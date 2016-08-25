@@ -1,9 +1,5 @@
+--SentryBattery.kRange = 9999
 
-SetCachedTechData(kTechId.Sentry, kStructureBuildNearClass, false)
-SetCachedTechData(kTechId.Sentry, kStructureAttachRange, 999)
-SetCachedTechData(kTechId.Sentry, kTechDataSpecifyOrientation, false)
-SetCachedTechData(kTechId.SentryBattery, kTechDataHint, "Powers structures without power!")
-SetCachedTechData(kTechId.SentryBattery,kTechDataDisplayName, "Backup Battery")
 
 Script.Load("lua/Additions/LevelsMixin.lua")
 
@@ -33,6 +29,9 @@ end
         InitMixin(self, LevelsMixin)
           self:AdjustMaxHealth(self:GetMaxHealth())
          self:AdjustMaxArmor(self:GetMaxArmor())
+    end
+        function SentryAvoca:GetTechId()
+         return kTechId.Sentry
     end
     function SentryAvoca:GetMaxHealth()
     return kSentryHealth

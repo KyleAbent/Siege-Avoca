@@ -1,6 +1,32 @@
 --Kyle 'Avoca' Abent
-function ExploitCheck(who)
 
+function GetGameStarted()
+     local gamestarted = false
+   if GetGamerules():GetGameState() == kGameState.Started or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end
+   return gamestarted
+end
+function GetIsPointWithinHiveRadius(point)     
+    /*
+    local hivesnearby = GetEntitiesWithinRange("Hive", point, ARC.kFireRange)
+      for i = 1, #hivesnearby do
+           local ent = hivesnearby[i]
+           if ent == GetClosestHiveFromCC(point) then return true end
+              return false   
+     end
+   */
+  
+   local hive = GetEntitiesWithinRange("Hive", point, ARC.kFireRange)
+   if #hive >= 1 then return true end
+
+   return false
+end
+function ExploitCheck(who)
+local gamestarted = false
+if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true end
+
+ if not gamestarted then return end 
+ 
+ 
   if who:isa("Cyst") then --Better than getentwithinrange because that returns a table regardless of these specifics of range and origin
      local frontdoor = GetNearest(who:GetOrigin(), "FrontDoor", 0, function(ent) return who:GetDistance(ent) <= 12 and ent:GetOrigin() == ent.savedOrigin end)
         if frontdoor  then who:Kill( )return end
@@ -23,6 +49,14 @@ function AddSiegeTime(seconds)
                 sandcastle:AddTime(seconds) 
     end    
 end
+function GetRandomChair()
+    local entityList = Shared.GetEntitiesWithClassname("CommandStation")
+    if entityList:GetSize() > 0 then
+                 local cc = entityList:GetEntityAtIndex(0) 
+                 return cc
+    end    
+    return nil
+end
 function AddFrontTime(seconds)
     local entityList = Shared.GetEntitiesWithClassname("SandCastle")
     if entityList:GetSize() > 0 then
@@ -30,6 +64,9 @@ function AddFrontTime(seconds)
                 sandcastle:SendNotification(seconds)
                 sandcastle:AddTime(seconds) 
     end    
+end
+function GetFrontDoorOpen()
+   return GetSandCastle():GetIsFrontOpen()
 end
 function GetSandCastle() --it washed away
     local entityList = Shared.GetEntitiesWithClassname("SandCastle")
@@ -39,9 +76,39 @@ function GetSandCastle() --it washed away
     end    
     return nil
 end
+function GetImaginator() 
+    local entityList = Shared.GetEntitiesWithClassname("Imaginator")
+    if entityList:GetSize() > 0 then
+                 local imaginator = entityList:GetEntityAtIndex(0) 
+                 return imaginator
+    end    
+    return nil
+end
+function GetResearcher() 
+    local entityList = Shared.GetEntitiesWithClassname("Researcher")
+    if entityList:GetSize() > 0 then
+                 local researcher = entityList:GetEntityAtIndex(0) 
+                 return researcher
+    end    
+    return nil
+end
 function GetIsPointInMarineBase(where)    
     local cclocation = nil
            for _, cc in ientitylist(Shared.GetEntitiesWithClassname("CommandStation")) do
+        cclocation = GetLocationForPoint(cc:GetOrigin())
+        cclocation = cclocation.name
+             break
+          end
+    
+    local pointlocation = GetLocationForPoint(where)
+          pointlocation = pointlocation and pointlocation.name or nil
+          
+          return pointlocation == cclocation
+    
+end
+function GetIsPointInAlienBase(where)    
+    local cclocation = nil
+           for _, cc in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
         cclocation = GetLocationForPoint(cc:GetOrigin())
         cclocation = cclocation.name
              break

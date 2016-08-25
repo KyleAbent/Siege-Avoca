@@ -1,3 +1,4 @@
+--thank you last stand
 local gTechIdToString = {}
 
 local function createTechIdEnum(table)
@@ -31,7 +32,8 @@ local kSiege_TechIds =
     'ArcSpawnOff',
     'EggBeacon',
     'StructureBeacon',
-    --'LerkMod',
+    'PrimalScream',
+    'FadeWall',
 
 }
 

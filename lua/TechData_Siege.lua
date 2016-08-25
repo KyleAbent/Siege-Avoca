@@ -1,6 +1,78 @@
+
+
+
+
+
+function GetCheckShellLimit(techId, origin, normal, commander)
+    local num = 0
+
+        
+        for index, shell in ientitylist(Shared.GetEntitiesWithClassname("Shell")) do
+        
+           -- if not spur:isa("StructureBeacon") then 
+                num = num + 1
+          --  end
+            
+    end
+    
+    return num < 4
+    
+end
+function GetCheckVeilLimit(techId, origin, normal, commander)
+    local num = 0
+
+        
+        for index, veil in ientitylist(Shared.GetEntitiesWithClassname("Veil")) do
+        
+           -- if not spur:isa("StructureBeacon") then 
+                num = num + 1
+          --  end
+            
+    end
+    
+    return num < 4
+    
+end
+function GetCheckSpurLimit(techId, origin, normal, commander)
+    local num = 0
+
+        
+        for index, spur in ientitylist(Shared.GetEntitiesWithClassname("Spur")) do
+        
+            if not spur:isa("StructureBeacon") then 
+                num = num + 1
+            end
+            
+    end
+    
+    return num < 4
+    
+end
+
+
+SetCachedTechData(kTechId.Sentry, kStructureBuildNearClass, false)
+SetCachedTechData(kTechId.Sentry, kStructureAttachRange, 999)
+SetCachedTechData(kTechId.Sentry, kTechDataSpecifyOrientation, false)
+SetCachedTechData(kTechId.SentryBattery, kTechDataHint, "Powers structures without power!")
+SetCachedTechData(kTechId.SentryBattery,kTechDataDisplayName, "Backup Battery")
+
+
+SetCachedTechData(kTechId.Spur, kTechDataBuildMethodFailedMessage, "Trying to crash the server?")
+SetCachedTechData(kTechId.Veil, kTechDataBuildMethodFailedMessage, "Trying to crash the server?")
+SetCachedTechData(kTechId.Shell, kTechDataBuildMethodFailedMessage, "Trying to crash the server?")
+
+SetCachedTechData(kTechId.CommandStation, kStructureAttachClass, false)
+SetCachedTechData(kTechId.Spur, kTechDataBuildRequiresMethod, GetCheckSpurLimit)
+SetCachedTechData(kTechId.Veil, kTechDataBuildRequiresMethod, GetCheckVeilLimit)
+SetCachedTechData(kTechId.Shell, kTechDataBuildRequiresMethod, GetCheckShellLimit)
+
+
+Script.Load("lua/Additions/Convars.lua")
 Script.Load("lua/Additions/EggBeacon.lua")
 Script.Load("lua/Additions/StructureBeacon.lua")
-Script.Load("lua/Additions/Convars.lua")
+Script.Load("lua/Additions/PrimalScream.lua")
+Script.Load("lua/Additions/FadeWall.lua")
+
 local kSiege_TechData =
 {        
 
@@ -61,22 +133,28 @@ local kSiege_TechData =
          [kVisualRange] = 7,
 [kTechDataMaxHealth] = kShiftHealth, [kTechDataMaxArmor] = kShiftArmor},
 
-       /*
-           { [kTechDataId] = kTechId.LerkMod,
-    [kTechDataUpgradeCost] = kLerkUpgradeCost, 
-    [kTechDataMapName] = LerkMod.kMapName, 
-   [kTechDataGestateName] = LerkMod.kMapName, 
-   [kTechDataGestateTime] = kLerkGestateTime, 
-   [kTechDataDisplayName] = "LERK",   
-   [kTechDataTooltipInfo] = "LERK_TOOLTIP",     
-      [kTechDataModel] = Lerk.kModelName,
- [kTechDataCostKey] = kLerkCost, 
- [kTechDataMaxHealth] = kLerkHealth, 
- [kTechDataMaxArmor] = kLerkArmor, 
-   [kTechDataEngagementDistance] = kPlayerEngagementDistance, 
-  [kTechDataMaxExtents] = Vector(Lerk.XZExtents, Lerk.YExtents, Lerk.XZExtents), 
-  [kTechDataPointValue] = kLerkPointValue},
-  */
+                  --Thanks dragon ns2c
+       { [kTechDataId] = kTechId.PrimalScream,  
+         [kTechDataCategory] = kTechId.Lerk,
+       [kTechDataDisplayName] = "Primal Scream",
+        [kTechDataMapName] =  Primal.kMapName,
+         --[kTechDataCostKey] = kPrimalScreamCostKey, 
+       -- [kTechDataResearchTimeKey] = kPrimalScreamTimeKey, 
+ [kTechDataTooltipInfo] = "Season 3 - More Exciting. PBAOE Extinguish Fire, +Energy to teammates, random drifter buff (hallucinate/enzyme/mucous)"},
+ 
+ 
+     
+  { [kTechDataId] = kTechId.FadeWall,        
+  [kTechDataCategory] = kTechId.Fade,   
+     [kTechDataMapName] = FadeWall.kMapName,  
+[kTechDataCostKey] = kStabResearchCost,
+ [kTechDataResearchTimeKey] = kStabResearchTime, 
+ --   [kTechDataDamageType] = kStabDamageType,  
+     [kTechDataDisplayName] = "FadeWall",
+ [kTechDataTooltipInfo] = "wip"},
+  
+
+ 
 
 }   
 
@@ -136,3 +214,4 @@ function BuildTechData()
     return moddedTechData
 
 end
+

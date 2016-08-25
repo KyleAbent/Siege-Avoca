@@ -1,21 +1,4 @@
-local orig_Alien_OnCreate = Alien.OnCreate
-function Alien:OnCreate()
-    orig_Alien_OnCreate(self)
-    if Server then
-    -- self:AddTimedCallback(function() UpdateAvocaAvailability(self, self:GetTierOneTechId(), self:GetTierTwoTechId(), self:GetTierThreeTechId()) end, .8) 
-    elseif Client then
-       GetGUIManager():CreateGUIScriptSingle("GUIInsight_TopBar")  
-    end
-end
-local orig_Marine_OnCreate = Marine.OnCreate
-function Marine:OnCreate()
-    orig_Marine_OnCreate(self)
-    if Server then
-    elseif Client then
-        GetGUIManager():CreateGUIScriptSingle("GUIInsight_TopBar")  
-    end
-end
-    local function GetMaxDistanceFor(player)
+   local function GetMaxDistanceFor(player)
     
         if player:isa("AlienCommander") then
             return 63
@@ -89,43 +72,4 @@ if Client then
         end
             
     end
-    
-  function MarineOutlineMixin:OnUpdate(deltaTime)   
-        PROFILE("MarineOutlineMixin:OnUpdate")
-        local player = Client.GetLocalPlayer()
-        
-        local model = self:GetRenderModel()
-        if model ~= nil then 
-        
-            local outlineModel = Client.GetOutlinePlayers() and 
-                                    ( ( Client.GetLocalClientTeamNumber() == kSpectatorIndex ) or 
-                                      ( player:isa("MarineCommander") and self.catpackboost ) )
-                                                            or
-                               ( self:isa("SiegeDoor") and self:GetIsLocked() )
-                                    
-            local outlineColor
-            if self.catpackboost then
-                outlineColor = kEquipmentOutlineColor.Fuchsia
-            elseif HasMixin(self, "ParasiteAble") and self:GetIsParasited() then
-                outlineColor = kEquipmentOutlineColor.Yellow
-            else
-                outlineColor = kEquipmentOutlineColor.TSFBlue
-            end
-
-            if outlineModel ~= self.marineOutlineVisible or outlineColor ~= self.marineOutlineColor then
-
-                EquipmentOutline_RemoveModel( model )
-                if outlineModel then
-                    EquipmentOutline_AddModel( model, outlineColor )
-                    self.marineOutlineColor = outlineColor
-                end
-
-                self.marineOutlineVisible = outlineModel
-            end
-
-        end
-            
-    end
-
-
 end

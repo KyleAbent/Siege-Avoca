@@ -373,9 +373,11 @@ local function Destroy( Client, String, StringTwo  )
         local player = Client:GetControllingPlayer()
         for _, entity in ipairs( GetEntitiesWithMixin( "Live" ) ) do
        // self:NotifyGeneric( Client, "Entities on map %s", true, entity:GetMapName())
-            if string.find(entity:GetMapName(), String) and entity.GetLocationName then
+            if string.find(entity:GetMapName(), String) then
          //   self:NotifyGeneric( Client, "Matching entities with string #1 and string#2(location name): %s, %s", true, entity:GetMapName(), String)
-                if string.find(entity:GetLocationName(), StringTwo) then
+                local location = GetLocationForPoint(entity:GetOrigin())
+                local locationName = location and location:GetName() or ""
+                if string.find(locationName, StringTwo) then
                   self:NotifyGeneric( nil, "destroyed %s in %s", true, entity:GetMapName(), entity:GetLocationName())
                   DestroyEntity(entity) 
                  end

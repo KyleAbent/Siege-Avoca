@@ -14,19 +14,32 @@ end
 
 function Plugin:MapPostLoad()
       Server.CreateEntity(SandCastle.kMapName)
-
+      Server.CreateEntity(Imaginator.kMapName)
+      --Server.CreateEntity(Researcher.kMapName)
 end
 
 
 function Plugin:SetGameState( Gamerules, State, OldState )
            if State == kGameState.Countdown then
-       self:SimpleTimer( 8, function() 
-          for _, sandcastle in ientitylist(Shared.GetEntitiesWithClassname("SandCastle")) do
-             sandcastle:OnRoundStart()
-             break
+           
+           
+             GetSandCastle():OnRoundStart()
+           -- GetImaginator():OnRoundStart()
+           --  DestroyEntity(GetImaginator())
+             --GetResearcher():OnRoundStart()
+       
+       
+       elseif State == kGameState.NotStarted then
+             GetSandCastle():OnPreGame()
+             GetImaginator():OnPreGame()
+            -- GetResearcher():OnPreGame()
+         --elseif State == kGameState.Team1Won or state == kGameState.Team2Won then    
+
+       
           end
-       end)   
-          end
+          
+
+              
 end
 function Plugin:ClientConnect(client)
      if client:GetUserId() == 22542592 or client:GetUserId() == 8086089 then

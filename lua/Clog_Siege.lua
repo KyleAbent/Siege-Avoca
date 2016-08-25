@@ -1,5 +1,6 @@
 Script.Load("lua/InfestationMixin.lua")
 
+
 class 'ClogMod' (Clog)
 ClogMod.kMapName = "clogmod"
 
@@ -31,4 +32,26 @@ end
 function Clog:GetAttached()
 return false
 end
+
+
+
+
+local originit = Clog.PreOnKill
+function Clog:PreOnKill(attacker, doer, point, direction)
+    --for i = 1, 8 do
+     --Print("Clog on kill")
+    --end
+    // trigger receed
+ if self:isa("ClogMod") then
+    self:SetDesiredInfestationRadius(0)
+    
+      for _, structure in ipairs(GetEntitiesWithMixinForTeamWithinRange("InfestationTracker", 1, self:GetOrigin(), 8)) do
+      structure:AddTimedCallback(function() structure:SetGameEffectMask(kGameEffect.OnInfestation, false) end, 4)
+      end
+      
+      end
+      
+      if Server and originit ~= nil  then originit(self, attacker, doer, point, direction) end
+end
+
 Shared.LinkClassToMap("ClogMod", ClogMod.kMapName, networkVars)

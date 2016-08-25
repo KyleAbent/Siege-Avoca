@@ -8,6 +8,7 @@ local networkVars =
 {
 wallWalking = "compensated boolean",
 timeLastWallWalkCheck = "private compensated time",
+    timeLastWallJump = "private compensated time",
 }
 
 local kNormalWallWalkFeelerSize = 0.25
@@ -22,10 +23,14 @@ local kVerticalWallJumpForce = 4.3
 local origgorge = Gorge.OnInitialized
 function Gorge:OnInitialized()
  Print("Derpdsdsdsds")
-  origgorge(self)
     if not self:isa("SpyderGorge") then
-    self:AddTimedCallback( function () if Server and self then self:Replace(SpyderGorge.kMapName)  return false end end, 1)
+    self:AddTimedCallback( function () if Server then self:Replace(SpyderGorge.kMapName)  return false end end, 1)
+    else
+    self.currentWallWalkingAngles = Angles(0.0, 0.0, 0.0)
     end
+    
+      origgorge(self)
+    
 end
 function SpyderGorge:OnCreate()
 Gorge.OnCreate(self)
@@ -34,7 +39,6 @@ end
 function SpyderGorge:GetClassName()
 return "Gorge"
 end
-
 function SpyderGorge:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined
@@ -49,12 +53,17 @@ function SpyderGorge:OnGetMapBlipInfo()
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
 
+function SpyderGorge:OnUpdateAnimationInput(modelMixin)
 
-function SpyderGorge:OnCreate()
-Gorge.OnCreate(self)
-InitMixin(self, WallMovementMixin)
+    PROFILE("SpyderGorge:OnUpdateAnimationInput")
+    
+    Gorge.OnUpdateAnimationInput(self, modelMixin)
+    
+    if self:GetIsBellySliding() or self:GetIsWallWalking() then
+        modelMixin:SetAnimationInput("move", "belly")
+    end
+
 end
-
 function SpyderGorge:OnInitialized()
 Gorge.OnInitialized(self)
     self.currentWallWalkingAngles = Angles(0.0, 0.0, 0.0)
@@ -210,6 +219,7 @@ end
 function SpyderGorge:OverrideUpdateOnGround(onGround)
     return onGround or self:GetIsWallWalking()
 end
+local kMaxSlideRoll = math.rad(20)
 function SpyderGorge:GetDesiredAngles()
 
     local desiredAngles = Alien.GetDesiredAngles(self)
@@ -308,4 +318,8 @@ end
 function SpyderGorge:GetCanStep()
     return not self:GetIsWallWalking()
 end
+
+
+
+
 Shared.LinkClassToMap("SpyderGorge", SpyderGorge.kMapName, networkVars)
