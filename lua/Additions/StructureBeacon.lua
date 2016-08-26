@@ -4,7 +4,7 @@ class 'StructureBeacon' (Spur)
 
 StructureBeacon.kMapName = "structurebeacon"
 
-local kLifeSpan = 8
+local kLifeSpan = 12
 
 local networkVars = { }
 
@@ -32,7 +32,7 @@ if Server then
     function StructureBeacon:OnConstructionComplete()
         self:AddTimedCallback(TimeUp, kLifeSpan + 0.5)  
         self:TeleportFractionHere()
-         self:AddTimedCallback(StructureBeacon.TeleportFractionHere, 1)
+         self:AddTimedCallback(StructureBeacon.TeleportFractionHere, 2)
     end
     function StructureBeacon:TeleportFractionHere()
       local eligable = {}

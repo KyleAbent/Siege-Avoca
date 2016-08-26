@@ -6,6 +6,8 @@ Researcher.kMapName = "researcher"
 
 local networkVars = 
 {
+ alienenabled = "boolean",
+ marineenabled = "boolean",
 }
 local function TresCheck(cost)
 if GetGamerules().team1:GetTeamResources() >= cost then return true end
@@ -20,6 +22,8 @@ function Researcher:OnCreate()
      Print("Researcher created")
    end
    
+   self.marineenabled = false
+   self.alienenabled = false
 end
 local function NotBeingResearched(techId, who)   
 for _, structure in ientitylist(Shared.GetEntitiesWithClassname( string.format("%s", who:GetClassName()) )) do
@@ -63,14 +67,15 @@ function Researcher:Calculate()
 local gamestarted = false
 if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true end
 local team1Commander = GetGamerules().team1:GetCommander()
+local team2Commander = GetGamerules().team1:GetCommander()
 
-         if gamestarted and not team1Commander then
+            if not gamestarted  or (self.marineenabled and not team1Commander) then
             for _, researchable in ipairs(GetEntitiesWithMixinForTeam("Research", 1)) do
                  ResearchEachTechButton(researchable) 
              end
          end
          
-                       self:UpdateHivesManually()
+                if  not gamestarted or ( self.alienenabled and not team2Commander ) then  self:UpdateHivesManually()  end
                        
               return true
               
@@ -172,6 +177,16 @@ if hasshift == false then table.insert(techids, kTechId.ShiftHive) end
     
     who:UpgradeToTechId(random) 
     who:GetTeam():GetTechTree():SetTechChanged()
+
+end
+function Researcher:SetResearchification(boolean, team)
+
+  if team == 1 then
+  self.marineenabled = boolean
+  elseif Team == 2 then
+  self.alienenabled = boolean
+  end
+
 
 end
 function Researcher:UpdateHivesManually()

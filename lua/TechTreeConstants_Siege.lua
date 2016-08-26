@@ -34,6 +34,8 @@ local kSiege_TechIds =
     'StructureBeacon',
     'PrimalScream',
     'FadeWall',
+    'OnoLow',
+    'OnoGrow',
 
 }
 

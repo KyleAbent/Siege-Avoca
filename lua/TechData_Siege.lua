@@ -72,6 +72,8 @@ Script.Load("lua/Additions/EggBeacon.lua")
 Script.Load("lua/Additions/StructureBeacon.lua")
 Script.Load("lua/Additions/PrimalScream.lua")
 Script.Load("lua/Additions/FadeWall.lua")
+Script.Load("lua/Additions/OnoLow.lua")
+Script.Load("lua/Additions/OnoGrow.lua")
 
 local kSiege_TechData =
 {        
@@ -151,6 +153,24 @@ local kSiege_TechData =
  [kTechDataResearchTimeKey] = kStabResearchTime, 
  --   [kTechDataDamageType] = kStabDamageType,  
      [kTechDataDisplayName] = "FadeWall",
+ [kTechDataTooltipInfo] = "Spawns bonewall @ origin. try blocking marines with it. Be careful you dont get stuck, or block your own team."},
+ 
+   { [kTechDataId] = kTechId.OnoLow,        
+  [kTechDataCategory] = kTechId.Onos,   
+     [kTechDataMapName] = OnoLow.kMapName,  
+[kTechDataCostKey] = kStabResearchCost,
+ [kTechDataResearchTimeKey] = kStabResearchTime, 
+ --   [kTechDataDamageType] = kStabDamageType,  
+     [kTechDataDisplayName] = "OnoLow",
+ [kTechDataTooltipInfo] = "wip"},
+ 
+   { [kTechDataId] = kTechId.OnoGrow,        
+  [kTechDataCategory] = kTechId.Onos,   
+     [kTechDataMapName] = OnoGrow.kMapName,  
+[kTechDataCostKey] = kStabResearchCost,
+ [kTechDataResearchTimeKey] = kStabResearchTime, 
+ --   [kTechDataDamageType] = kStabDamageType,  
+     [kTechDataDisplayName] = "OnoGrow",
  [kTechDataTooltipInfo] = "wip"},
   
 

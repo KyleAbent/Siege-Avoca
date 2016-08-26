@@ -5,7 +5,7 @@ class 'EggBeacon' (Shell)
 EggBeacon.kMapName = "eggbeacon"
 
 
-local kLifeSpan = 8
+local kLifeSpan = 12
 
 local networkVars = { }
 
@@ -45,7 +45,6 @@ function EggBeacon:OnConstructionComplete()
        commander:AddScore(5) 
        end
         self:AddTimedCallback(TimeUp, kLifeSpan)  
-        self:GenerateRandomNumberofEggsNearbyDerpHead()
         self:AddTimedCallback(EggBeacon.GenerateRandomNumberofEggsNearbyDerpHead, 1)
   end
 function EggBeacon:GenerateRandomNumberofEggsNearbyDerpHead()

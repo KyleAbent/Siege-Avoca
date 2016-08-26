@@ -1,5 +1,32 @@
 --Kyle 'Avoca' Abent
-
+       function FindArcHiveSpawn(where)    
+        for index = 1, 8 do
+           local extents = LookupTechData(kTechId.Skulk, kTechDataMaxExtents, nil)
+           local capsuleHeight, capsuleRadius = GetTraceCapsuleFromExtents(extents)  
+           local spawnPoint = GetRandomSpawnForCapsule(capsuleHeight, capsuleRadius, where, .5, 48, EntityFilterAll())
+        
+           if spawnPoint ~= nil then
+             spawnPoint = GetGroundAtPosition(spawnPoint, nil, PhysicsMask.AllButPCs, extents)
+           end
+        
+           local location = spawnPoint and GetLocationForPoint(spawnPoint)
+           local locationName = location and location:GetName() or ""
+           local wherelocation = GetLocationForPoint(where)
+           wherelocation = wherelocation and wherelocation.name or nil
+           local sameLocation = spawnPoint ~= nil and locationName == wherelocation
+        
+           if spawnPoint ~= nil and sameLocation and GetIsPointWithinHiveRadius(spawnPoint) then
+           return spawnPoint
+           end
+       end
+           Print("No valid spot found for FindArcHiveSpawn")
+           return nil
+    end
+    function GetIsPointWithinHiveRadius(point)
+      local techpoints = GetEntitiesWithinRange("Hive", point, ARC.kFireRange)
+   if #techpoints == 2 then return true end
+   return false
+end
 function GetGameStarted()
      local gamestarted = false
    if GetGamerules():GetGameState() == kGameState.Started or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end

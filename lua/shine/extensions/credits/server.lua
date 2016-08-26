@@ -96,9 +96,23 @@ function Plugin:LoadBadges()
         self.BadgeFile = BadgeFiley
         HTTPRequest( self.BadgeFile.LinkToBadges, "GET", UsersResponse)
 end
+local function AddOneScore(Player,Points,Res, WasKill)
+            local points = Points
+            local wasKill = WasKill
+            local displayRes = ConditionalValue(type(res) == "number", res, 0)
+            Server.SendNetworkMessage(Server.GetOwner(Player), "ScoreUpdate", { points = points, res = displayRes, wasKill = wasKill == true }, true)
+            Player.score = Clamp(Player.score + points, 0, 100)
 
+            if not Player.scoreGainedCurrentLife then
+                Player.scoreGainedCurrentLife = 0
+            end
+
+            Player.scoreGainedCurrentLife = Player.scoreGainedCurrentLife + points   
+
+end
 function Plugin:OnScore( Player, Points, Res, WasKill )
 if Points ~= nil and Points ~= 0 and Player then
+   if not self.GameStarted then Points = 1  AddOneScore(Player,Points,Res, WasKill) end
  local client = Player:GetClient()
  if not client then return end
          

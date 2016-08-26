@@ -7,6 +7,8 @@ Imaginator.kMapName = "imaginator"
 local networkVars = 
 
 {
+ alienenabled = "boolean",
+ marineenabled = "boolean",
 }
 
 local function BuildPowerNodes()
@@ -36,7 +38,8 @@ function Imaginator:OnCreate()
      Print("Imaginator created")
    end
    */
-
+   self.marineenabled = false
+   self.alienenabled = false
 end
 function Imaginator:OnInitialized()
 
@@ -62,12 +65,28 @@ function Imaginator:OnRoundStart()
    for i = 1, 4 do
      Print("Imaginator OnRoundStart")
    end
+   
+      self.marineenabled = false
+   self.alienenabled = false
+   
         local team2Commander = GetGamerules().team2:GetCommander()
     if not team2Commander then 
    BuildKill()
    end
 
             
+end
+function Imaginator:SetImagination(boolean, team)
+
+if boolean == true and team == 2 and not GetSandCastle():GetIsFrontOpen() then BuildKill() end
+
+  if team == 1 then
+  self.marineenabled = boolean
+  elseif Team == 2 then
+  self.alienenabled = boolean
+  end
+
+
 end
 local function GetDisabledPowerPoints()
  local nodes = {}
@@ -123,8 +142,7 @@ local function AutoDrop(self,who)
   if which ~= 0 then Envision(who, which) end
 end
 function Imaginator:Automations() 
-  local gamestarted = false 
-   if GetGamerules():GetGameState() == kGameState.Started or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end
+  local gamestarted = not GetGameInfoEntity():GetWarmUpActive() 
    
      if gamestarted then
               self:AutoBuildResTowers()
@@ -135,24 +153,28 @@ function Imaginator:Automations()
       
               return true
 end
-function Imaginator:Imaginations() --Tres spending WIP
-  local gamestarted = false 
-   if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true end
+function Imaginator:Imaginations() 
+  local gamestarted = not  GetGameInfoEntity():GetWarmUpActive()
   local team1Commander = GetGamerules().team1:GetCommander()
   local team2Commander = GetGamerules().team2:GetCommander()
   
-            if not gamestarted  then --or not team1Commander then
+            if not gamestarted  or (self.marineenabled and not team1Commander) then 
               self:MarineConstructs()
-        --   end
+           end
             
-           -- if not gamestarted or not team2Commander then
+            if not gamestarted  or (self.alienenabled and not team2Commander) then
               self:AlienConstructs(false)
            end
            
               return true
 end
 function Imaginator:CystTimer()
+  local gamestarted = false 
+   if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true end
+  local team2Commander = GetGamerules().team2:GetCommander()
+              if not gamestarted  or (self.alienenabled and not team2Commander) then
               self:AlienConstructs(true)
+           end
               return true
 end
 local function FindMarine(location, powerpoint)
@@ -178,7 +200,7 @@ local origin = nil
 return origin
   
 end
-/*
+
 local function FindAlien(location, powerpoint)
   if #location == 0  then return end
   local origin = nil
@@ -197,7 +219,8 @@ local function FindAlien(location, powerpoint)
 
 
  return origin
-en*/
+end
+/*
 local function FindAlien(location, powerpoint)
   local ents = location:GetEntitiesInTrigger()
   
@@ -210,6 +233,7 @@ local function FindAlien(location, powerpoint)
 
  return powerpoint:GetOrigin()
 end
+*/
 local function GetRange(who, where)
     local ArcFormula = (where - who:GetOrigin()):GetLengthXZ()
     return ArcFormula
@@ -265,6 +289,13 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
       local  ArmsLabs = #GetEntitiesForTeam( "ArmsLab", 1 )
       local  InfantryPortal = #GetEntitiesForTeam( "InfantryPortal", 1 )
       local  CommandStation = #GetEntitiesForTeam( "CommandStation", 1 )
+      
+
+      
+      
+      if ArmsLabs < 2 then
+      table.insert(tospawn, kTechId.ArmsLab)
+      end
       
       if ArmsLabs < 2 then
       table.insert(tospawn, kTechId.ArmsLab)
@@ -344,9 +375,29 @@ local function GetScanMinRangeReq(where)
 end
 local function BuildNotificationMessage(where, self, mapname)
 end
+local function FuckShitUp()
+
+      local  AvocaArcCount = #GetEntitiesForTeam( "AvocaArc", 1 )
+      local  SiegeArcCount = #GetEntitiesForTeam( "SiegeArc", 1 )
+      local  CommandStation = GetEntitiesForTeam( "CommandStation", 1 )
+      CommandStation = table.random(CommandStation)
+      
+      
+            if AvocaArcCount < 1 then
+              CreateEntity(AvocaArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
+              CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
+      end
+      
+            if SiegeArcCount < 4 then
+              CreateEntity(SiegeArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
+      end
+      
+
+end
 function Imaginator:ActualFormulaMarine()
 
-    
+    if GetSandCastle():GetIsSiegeOpen() then FuckShitUp() end
+   -- SpawnBigMac()
       
 --Print("AutoBuildConstructs")
 local randomspawn = nil
@@ -498,8 +549,8 @@ local success = false
 
      if powerPoints and tospawn then
                 local powerpoint = table.random(powerPoints)
-             if powerpoint then                        --(GetAllLocationsWithSameName(powerpoint:GetOrigin(), tospawn == kTechId.Clog)
-                 randomspawn = FindFreeSpace(FindAlien(GetLocationForPoint(powerpoint:GetOrigin()), powerpoint))
+             if powerpoint then                      
+                 randomspawn = FindFreeSpace(FindAlien(GetAllLocationsWithSameName(powerpoint:GetOrigin(), tospawn == kTechId.Clog), powerpoint))
             if randomspawn then
                 local nearestof = GetNearestMixin(randomspawn, "Construct", 2, function(ent) return ent:GetTechId() == tospawn end)
                 if tospawn == kTechId.Clog then  nearestof = GetNearest(randomspawn, "Clog", 2) end

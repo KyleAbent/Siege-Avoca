@@ -12,7 +12,7 @@ ModLoader.SetupFileHook( "lua/TechTreeConstants.lua", "lua/TechTreeConstants_Sie
 ModLoader.SetupFileHook( "lua/TechData.lua", "lua/TechData_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/MarineTeam.lua", "lua/MarineTeam_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/AlienTeam.lua", "lua/AlienTeam_Siege.lua", "post" )
-ModLoader.SetupFileHook( "lua/ConstructMixin.lua", "lua/ConstructMixin_Siege.lua", "post" )
+--ModLoader.SetupFileHook( "lua/ConstructMixin.lua", "lua/ConstructMixin_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/Lerk.lua", "lua/Additions/PrimalScream.lua", "pre" ) 
 ModLoader.SetupFileHook( "lua/Crag.lua", "lua/Crag_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Clog.lua", "lua/Clog_Siege.lua", "post" ) 
@@ -23,17 +23,18 @@ ModLoader.SetupFileHook( "lua/Armory.lua", "lua/Armory_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/Lerk.lua", "lua/Lerk_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Fade.lua", "lua/Fade_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Gorge.lua", "lua/Gorge_Siege.lua", "post" ) --includes server
+ModLoader.SetupFileHook( "lua/Onos.lua", "lua/Onos_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Sentry.lua", "lua/Sentry_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/AlienCommander.lua", "lua/AlienCommander_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Alien.lua", "lua/Alien_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Hive.lua", "lua/Hive_Siege.lua", "post" ) --lulz
 ModLoader.SetupFileHook( "lua/Skulk.lua", "lua/Skulk_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Marine.lua", "lua/Marine_Siege.lua", "post" ) --lulz, hive siege
-ModLoader.SetupFileHook( "lua/MarineOutlineMixin.lua", "lua/MarineOutlineMixin_Siege.lua", "post" )
-ModLoader.SetupFileHook( "lua/HiveVisionMixin.lua", "lua/HiveVisionMixin_Siege.lua", "post" )
+--ModLoader.SetupFileHook( "lua/MarineOutlineMixin.lua", "lua/MarineOutlineMixin_Siege.lua", "post" )
+--ModLoader.SetupFileHook( "lua/HiveVisionMixin.lua", "lua/HiveVisionMixin_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/RoboticsFactory.lua", "lua/RoboticsFactory_Siege.lua", "replace" ) -- for now anyway
 --ModLoader.SetupFileHook( "lua/PowerPointLightHandler.lua", "lua/PowerPointLightHandler_Siege.lua", "post" ) -- for now anyway
-ModLoader.SetupFileHook( "lua/AchievementReceiverMixin.lua", "lua/AchievementReceiverMixin_Siege.lua", "post" )
+--ModLoader.SetupFileHook( "lua/AchievementReceiverMixin.lua", "lua/AchievementReceiverMixin_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/Balance.lua", "lua/Balance_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/PowerPoint.lua", "lua/PowerPoint_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/NS2Utility.lua", "lua/NS2Utility_Siege.lua", "post" ) --includes server

@@ -13,7 +13,9 @@ function AlienTeam:InitTechTree()
 self.techTree:AddBuildNode(kTechId.EggBeacon, kTechId.CragHive)
 self.techTree:AddBuildNode(kTechId.StructureBeacon, kTechId.ShiftHive)
 self.techTree:AddResearchNode(kTechId.PrimalScream,              kTechId.Spores, kTechId.None, kTechId.AllAliens) -- though linking
-self.techTree:AddResearchNode(kTechId.FadeWall,              kTechId.Spores, kTechId.None, kTechId.AllAliens) -- though linking
+self.techTree:AddResearchNode(kTechId.FadeWall,              kTechId.Stab, kTechId.None, kTechId.AllAliens) -- though linking
+self.techTree:AddResearchNode(kTechId.OnoLow,              kTechId.Stomp, kTechId.None, kTechId.AllAliens) -- though linking
+self.techTree:AddResearchNode(kTechId.OnoGrow,              kTechId.Stomp, kTechId.None, kTechId.AllAliens) -- though linking
     
     
     

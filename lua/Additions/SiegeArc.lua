@@ -1,36 +1,35 @@
 --Kyle 'Avoca' Abent
-class 'AvocaArc' (ARC)
-AvocaArc.kMapName = "avocaarc"
+class 'SiegeArc' (ARC)
+SiegeArc.kMapName = "siegearc"
 local kNanoshieldMaterial = PrecacheAsset("cinematics/vfx_materials/nanoshield.material")
 local kPhaseSound = PrecacheAsset("sound/NS2.fev/marine/structures/phase_gate_teleport")
 
 local kMoveParam = "move_speed"
 local kMuzzleNode = "fxnode_arcmuzzle"
 
-function AvocaArc:OnCreate()
+function SiegeArc:OnCreate()
  ARC.OnCreate(self)
  self:AdjustMaxHealth(self:GetMaxHealth())
  self:AdjustMaxArmor(self:GetMaxArmor())
   if Server then  self:LameFixATM() end
 end
-function AvocaArc:OnInitialized()
+function SiegeArc:OnInitialized()
  ARC.OnInitialized(self)
    if Server then
- self:AddTimedCallback(AvocaArc.Instruct, 2.5)
- self:AddTimedCallback(AvocaArc.Waypoint, 16)
-  self:AddTimedCallback(AvocaArc.Scan, 6)
+ self:AddTimedCallback(SiegeArc.Instruct, 2.5)
+ self:AddTimedCallback(SiegeArc.Waypoint, 16)
  end
 
 end
 
-function AvocaArc:GetMaxHealth()
+function SiegeArc:GetMaxHealth()
     return 4000
 end
-function AvocaArc:GetMaxArmor()
+function SiegeArc:GetMaxArmor()
     return 1200
 end
 local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
-   local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange)
+   local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), 24)
    if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
 end
 local function CheckHivesForScan()
@@ -48,10 +47,10 @@ end
 function ARC:GetShowDamageIndicator()
     return true
 end
-function AvocaArc:LameFixATM()
-self:AddTimedCallback(AvocaArc.Check, 8)
+function SiegeArc:LameFixATM()
+self:AddTimedCallback(SiegeArc.Check, 8)
 end
-function AvocaArc:Check()
+function SiegeArc:Check()
   local gamestarted = false 
    if GetGamerules():GetGameState() == kGameState.Started or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end
    if gamestarted then 
@@ -60,30 +59,31 @@ function AvocaArc:Check()
     end
    return true
 end
-local function MoveToHives(who) --Closest hive from origin
-local where = who:GetOrigin()
- local hive =  GetNearest(where, "Hive", 2, function(ent) return not ent:GetIsDestroyed() end)
 
- 
-               if hive then
-        local origin = hive:GetOrigin() -- The arc should auto deploy beforehand
-        who:GiveOrder(kTechId.Move, nil, origin, nil, true, true)
+local function GetSiegeLocation()
+--local locations = {}
+local siege = nil
+ for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
+               if string.find(location.name, "siege") or string.find(location.name, "Siege") then
+         -- table.insert(locations, location)
+             siege = location
+             break
+         end
+    end
+    return siege --locations
+end
+local function MoveToHives(who) --Closest hive from origin
+local siegelocation = GetSiegeLocation()
+local siegepower = GetPowerPointForLocation(siegelocation.name)
+local inradiusofhive = FindArcHiveSpawn(siegepower:GetOrigin())
+local where = inradiusofhive
+               if where then
+        who:GiveOrder(kTechId.Move, nil, where, nil, true, true)
                     return
                 end  
     -- Print("No closest hive????")    
 end
 
-local function CheckForAndActAccordingly(who)
-local stopanddeploy = false
-          for _, enemy in ipairs(GetEntitiesWithMixinForTeamWithinRange("Live", 2, who:GetOrigin(), kARCRange)) do
-             if who:GetCanFireAtTarget(enemy, enemy:GetOrigin()) then
-             stopanddeploy = true
-             break
-             end
-          end
-        --Print("stopanddeploy is %s", stopanddeploy)
-       return stopanddeploy
-end
 
 local function FindNewParent(who)
     local where = who:GetOrigin()
@@ -104,46 +104,56 @@ local function GiveUnDeploy(who)
      who:TriggerEffects("arc_stop_charge")
      who:TriggerEffects("arc_undeploying")
 end
-local function BuffPlayersNearby(who)
+local function PlayersNearby(who)
 
 local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 5.5)
 local alive = false
+    if not who:GetInAttackMode() and #players >= 1 then
          for i = 1, #players do
             local player = players[i]
             if player:GetIsAlive() and alive == false then alive = true end
             if ( player:GetIsAlive() and  player.GetIsNanoShielded and not player:GetIsNanoShielded()) then player:ActivateNanoShield() end
            if player:isa("Marine") and( player:GetHealth() == player:GetMaxHealth() ) then
-           local addarmoramount = 8 
+           local addarmoramount = kArmoryAvoArcAddArmrAmt * player:GetArmorLevel()
            addarmoramount = who:GetInAttackMode() and addarmoramount * 1.5 or addarmoramount
            player:AddHealth(addarmoramount, false, not true, nil, nil, true)
            else
            player:AddHealth(Armory.kHealAmount, false, false, nil, nil, true)   
            end
          end
+    end
 return alive
-
 end
 local function ShouldStop(who)
 local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
 if #players >=1 then return false end
 return true
 end
-function AvocaArc:SpecificRules()
+function SiegeArc:SpecificRules()
 local moving = self.mode == ARC.kMode.Moving     
+--Print("moving is %s", moving) 
         
 local attacking = self.deployMode == ARC.kDeployMode.Deployed
-local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingly(self)  
-local shouldstop = ShouldStop(self)
+--Print("attacking is %s", moving) 
+local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) 
+--Print("inradius is %s", inradius) 
+
+local shouldstop = not PlayersNearby(self)
+--Print("shouldstop is %s", shouldstop) 
 local shouldmove = not shouldstop and not moving and not inradius
-local shouldstop = moving and ShouldStop(self)
+--Print("shouldmove is %s", shouldmove) 
+local shouldstop = moving and not PlayersNearby(self)
+--Print("shouldstop is %s", shouldstop) 
 local shouldattack = inradius and not attacking 
+--Print("shouldattack is %s", shouldattack) 
 local shouldundeploy = attacking and not inradius and not moving
+--Print("shouldundeploy is %s", shouldundeploy) 
   
   if moving then
     
     if shouldstop or shouldattack then 
-           FindNewParent(self)
        --Print("StopOrder")
+       FindNewParent(self)
        self:ClearOrders()
        self:SetMode(ARC.kMode.Stationary)
       end 
@@ -151,14 +161,15 @@ local shouldundeploy = attacking and not inradius and not moving
       
     if shouldmove and not shouldattack  then
         if shouldundeploy then
-      
+         --Print("ShouldUndeploy")
          GiveUnDeploy(self)
-       else 
+       else --should move
+       --Print("GiveMove")
        MoveToHives(self)
        end
        
    elseif shouldattack then
-   
+     --Print("ShouldAttack")
      GiveDeploy(self)
     return true
     
@@ -166,26 +177,15 @@ local shouldundeploy = attacking and not inradius and not moving
  
     end
 end
-function AvocaArc:GetDeathIconIndex()
+function SiegeArc:GetDeathIconIndex()
     return kDeathMessageIcon.ARC
 end
 
-function AvocaArc:ModifyDamageTaken(damageTable, attacker, doer, damageType)
-local damagemult = .25 
-        if doer then 
-          if attacker:isa("Bomb") then
-           damagemult = .45
-           end
-         end
-        damageTable.damage = damageTable.damage * damagemult
-
-end
-
-function AvocaArc:GetDamageType()
+function SiegeArc:GetDamageType()
 return kDamageType.StructuresOnly
 end
 
-function AvocaArc:OnGetMapBlipInfo()
+function SiegeArc:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined
     local blipTeam = -1
@@ -199,7 +199,7 @@ function AvocaArc:OnGetMapBlipInfo()
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
 if Server then
-function AvocaArc:Waypoint()
+function SiegeArc:Waypoint()
     for _, marine in ipairs(GetEntitiesWithinRange("Marine", self:GetOrigin(), 9999)) do
                      if marine:GetIsAlive() and not marine:isa("Commander") then
                      marine:GiveOrder(kTechId.Defend, self:GetId(), self:GetOrigin(), nil, true, true)
@@ -207,27 +207,22 @@ function AvocaArc:Waypoint()
     end
     return true
 end
-function AvocaArc:Scan()
-  if not GetIsPointWithinHiveRadius(self:GetOrigin()) then CreateEntity(Scan.kMapName, self:GetOrigin(), 1) end
-    return true
-end
-function AvocaArc:Instruct()
+function SiegeArc:Instruct()
    CheckHivesForScan()
    self:SpecificRules()
-   BuffPlayersNearby(self)
    return true
 end
 
 
-function AvocaArc:PreOnKill(attacker, doer, point, direction)
+function SiegeArc:PreOnKill(attacker, doer, point, direction)
      if Server then
       local nearestcc = GetNearest(self:GetOrigin(), "CommandStation", 1)
       if nearestcc then
-       CreateEntity(AvocaArc.kMapName, FindFreeSpace(nearestcc:GetOrigin()), 1)
+       CreateEntity(SiegeArc.kMapName, FindFreeSpace(nearestcc:GetOrigin()), 1)
        end
      end
 end 
-function AvocaArc:UpdateMoveOrder(deltaTime)
+function SiegeArc:UpdateMoveOrder(deltaTime)
 
     local currentOrder = self:GetCurrentOrder()
     ASSERT(currentOrder)
@@ -297,7 +292,7 @@ end
 
 --all this just to modify damage -.-
 
-function AvocaArc:OnTag(tagName)
+function SiegeArc:OnTag(tagName)
 
     PROFILE("ARC:OnTag")
     
@@ -340,7 +335,7 @@ end
 
 if Client then
 
-    function AvocaArc:OnUpdateRender()
+    function SiegeArc:OnUpdateRender()
           local showMaterial = not self:GetInAttackMode()
     
         local model = self:GetRenderModel()
@@ -372,4 +367,4 @@ end //up render
 end -- client
 
 
-Shared.LinkClassToMap("AvocaArc", AvocaArc.kMapName, networkVars)
+Shared.LinkClassToMap("SiegeArc", SiegeArc.kMapName, networkVars)

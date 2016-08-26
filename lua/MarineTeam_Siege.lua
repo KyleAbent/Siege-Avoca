@@ -5,8 +5,12 @@ local function OnlyPregame(self, techPoint)
  local avocaarc = CreateEntity(AvocaArc.kMapName, FindFreeSpace(techPoint:GetOrigin()), 1)
   local phaseavo  = CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(techPoint:GetOrigin()), 1)
   local bigmac  = CreateEntity(BigMac.kMapName, FindFreeSpace(techPoint:GetOrigin()), 1)
+  
+  for i = 1, 4 do
+    local siegearc  = CreateEntity(SiegeArc.kMapName, FindFreeSpace(techPoint:GetOrigin()), 1)
+  end 
   phaseavo:LameFixATM()
-  avocaarc:LameFixATM()
+  --avocaarc:LameFixATM()
   bigmac:LameFixATM()
   
   return false

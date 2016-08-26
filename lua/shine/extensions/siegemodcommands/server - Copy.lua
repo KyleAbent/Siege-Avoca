@@ -190,6 +190,13 @@ end
 local FirstPersonCommand = self:BindCommand( "sh_firstperson", { "firstperson", "1stperson" }, FirstPerson, true)
 FirstPersonCommand:Help( "Triggers first person view" )
 
+local function MainRoom( Client )
+local Gamerules = GetGamerules()
+Gamerules:PickMainRoom(true)
+end
+
+local MainRoomCommand = self:BindCommand( "sh_mainroom","mainroom", MainRoom)
+MainRoomCommand:Help( "selects main room" )
 
 local function GiveRes( Client, TargetClient, Number )
 local Giver = Client:GetControllingPlayer()
@@ -415,7 +422,7 @@ PlayerGravityCommand:Help( "sh_playergravity <player> <number> works differently
 
 local function BuildSpeed( Client, Number )
 
-kDynamicBuildSpeed = Number
+kBuildSpeed = Number
 //self:NotifySiege( nil, "Adjusted Marine Construct Speed to %s percent (1 - (marineplayercount/12) + 1)", true, Number * 100)
 end
 
@@ -453,7 +460,7 @@ local function BringAll( Client )
               for i = 1, #Players do
               local Player = Players[ i ]
                   if Player and not Player:isa("Commander") and not Player:isa("Spectator") then
-                       Player:SetOrigin(Client:GetControllingPlayer():GetOrigin())
+                       Player:SetOrigin(FindFreeSpace(Client:GetControllingPlayer():GetOrigin()))
                   end
               end
 end

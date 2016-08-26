@@ -1,4 +1,7 @@
 --Kyle 'Avoca' Abent
+-- if you want to use this, that's fine. 
+-- just put my name on it like i attempt to do with dragon, ns2c, modular, last stand, eem,etc.AddEnergy
+-- thanks
 
 Script.Load("lua/Weapons/Alien/Ability.lua")
 Script.Load("lua/Weapons/Alien/Blink.lua")

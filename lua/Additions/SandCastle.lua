@@ -11,13 +11,15 @@ local networkVars =
 
 {
    SiegeTimer = "float",
-   FrontTimer = "float"
+   FrontTimer = "float",
+   mainroom = "boolean",
 }
 
 
 function SandCastle:OnCreate() 
    self.SiegeTimer = kSiegeTimer
    self.FrontTimer = kFrontTimer
+   self.mainroom = false
 end
 function SandCastle:GetIsMapEntity()
 return true
@@ -87,9 +89,11 @@ local function CloseDoors()
               end 
 end
 function SandCastle:PickMainRoom()
+   if self.mainroom then
        local location = self:GetLocationWithMostMixedPlayers()
        if not location then return true end
        self:SetMainRoom(location:GetOrigin(), location, opcyst) 
+   end
        return true
 end
 local function CreateAlienMarker(where)

@@ -1,9 +1,9 @@
--- For now just overwriting PowerPointLightHandler the hackish way sorry
+-- For now just overwriting PowerPointLightHandler the messy way sorry
 
 kLightMode = enum( {'Normal', 'NoPower', 'LowPower', 'Damaged', 'MainRoom', } )
 
 // ======= Copyright (c) 2003-2011, Unknown Worlds Entertainment, Inc. All rights reserved. =======
-//
+//my mOUSE WHEEL IS BROKEN
 // lua\PowerPointLightHandler.lua
 //
 //    Created by:   Mats Olsson (mats.olsson@matsotech.se)
@@ -295,11 +295,12 @@ function DamagedLightWorker:Run()
     local timeOfChange = self.handler.powerPoint:GetTimeOfLightModeChange()
     local time = Shared.GetTime()
     local timePassed = time - timeOfChange
-    local scalar = Clamp(self.handler.powerPoint:GetHealthScalar(), 0.1, 1)
+    
+    local scalar = math.sin(Clamp(timePassed / kDamagedCycleTime, 0, 1) * math.pi)
     
     for renderLight, _ in pairs(self.activeLights) do
     
-        local intensity = renderLight.originalIntensity * scalar
+        local intensity = renderLight.originalIntensity * (1 - scalar * (1 - kDamagedMinIntensity))
         SetLight(renderLight, intensity, nil)
         
     end
@@ -311,8 +312,8 @@ function DamagedLightWorker:Run()
     
 end
 
-// Handles LowPower warning.
-// This cycles the light constantly 
+-- Handles LowPower warning.
+-- This cycles the light constantly
 class 'LowPowerLightWorker' (BaseLightWorker)
 
 function LowPowerLightWorker:Run()
@@ -322,21 +323,24 @@ function LowPowerLightWorker:Run()
     local timeOfChange = self.handler.powerPoint:GetTimeOfLightModeChange()
     local time = Shared.GetTime()
     local timePassed = time - timeOfChange 
-    local scalar = Clamp(self.handler.powerPoint:GetHealthScalar(), 0.1, 1)
     
+    local scalar = math.cos((timePassed / (kLowPowerCycleTime / 2)) * math.pi / 2)
+    local minIntensity = kLowPowerMinIntensity
+    local halfIntensity = (1 - minIntensity) / 2
     
     for renderLight,_ in pairs(self.activeLights) do
     
-         // Cycle lights up and down telling everyone that there's an imminent threat
-        local intensity = renderLight.originalIntensity * scalar
+         -- Cycle lights up and down telling everyone that there's an imminent threat
+        local intensity = renderLight.originalIntensity * minIntensity + halfIntensity + scalar * halfIntensity
         SetLight(renderLight, intensity, nil)
+        
     end
     
 end
 
 
-// Handles NoPower. This is a bit complex, as we end up in a continouosly varying light
-// state, where the auxilary light cycles now and then. To 
+-- Handles NoPower. This is a bit complex, as we end up in a continouosly varying light
+-- state, where the auxilary light cycles now and then. To
 class 'NoPowerLightWorker' (BaseLightWorker)
 
 NoPowerLightWorker.kNumGroups = 10
@@ -376,15 +380,40 @@ end
 function NoPowerLightWorker:Run()
 
     PROFILE("NoPowerLightWorker:Run")
-    
-        local timeOfChange = self.handler.powerPoint:GetTimeOfLightModeChange()
+
+    local timeOfChange = self.handler.powerPoint:GetTimeOfLightModeChange()
     local time = Shared.GetTime()
     local timePassed = time - timeOfChange    
     
+    local startAuxLightTime = kPowerDownTime + kOffTime
+    local fullAuxLightTime = startAuxLightTime + kAuxPowerCycleTime
+    local startAuxLightFailTime = fullAuxLightTime + PowerPoint.kAuxLightSafeTime
+    local totalAuxLightFailTime = startAuxLightFailTime + PowerPoint.kAuxLightDyingTime
     
-        probeTint = Color(127/255, 255/255, 0/255, 1)
+    local probeTint
+    
+    if timePassed < kPowerDownTime then
+        local intensity = math.sin(Clamp(timePassed / kPowerDownTime, 0, 1) * math.pi / 2)
+        probeTint = Color(intensity, intensity, intensity, 1)
+    elseif timePassed < startAuxLightTime then
+        probeTint = Color(0, 0, 0, 1)
+    elseif timePassed < fullAuxLightTime then
+    
+        -- Fade red in smoothly. t will stay at zero during the individual delay time
+        local t = timePassed - startAuxLightTime
+        -- angle goes from zero to 90 degres in one kAuxPowerCycleTime
+        local angleRad = (t / kAuxPowerCycleTime) * math.pi / 2
+        -- and scalar goes 0->1
+        local scalar = math.sin(angleRad)
+
+        probeTint = Color(PowerPoint.kDisabledColor.r * scalar,
+                          PowerPoint.kDisabledColor.g * scalar,
+                          PowerPoint.kDisabledColor.b * scalar,
+                          1)
  
+    else
         self.activeProbes = false
+    end
 
     if self.activeProbes then    
         for probe,_ in pairs(self.handler.probeTable) do
@@ -394,24 +423,84 @@ function NoPowerLightWorker:Run()
 
     
     for renderLight,_ in pairs(self.activeLights) do
+        
+        local randomValue = renderLight.randomValue
+        -- aux light starting to come on
+        local startAuxLightTime = kPowerDownTime + kOffTime + randomValue * PowerPoint.kMaxAuxLightDelay 
+        -- ... fully on
+        local fullAuxLightTime = startAuxLightTime + kAuxPowerCycleTime
+        -- aux lights starts to fade
+        local startAuxLightFailTime = fullAuxLightTime + PowerPoint.kAuxLightSafeTime + randomValue * PowerPoint.kAuxLightFailTime
+        -- ... and dies completly
+        local totalAuxLightFailTime = startAuxLightFailTime + PowerPoint.kAuxLightDyingTime
+        
         local intensity = nil
         local color = nil
+        
         local showCommanderLight = false
+        
         local player = Client.GetLocalPlayer()
         if player and player:isa("Commander") then
             showCommanderLight = true
         end
-          color = PowerPoint.kDisabledColor
-            // Deactivate from initial state
+        
+        if timePassed < kPowerDownTime then
+        
+            local scalar = math.sin(Clamp(timePassed / kPowerDownTime, 0, 1) * math.pi / 2)
+            scalar = (1 - scalar)
+            if showCommanderLight then
+                scalar = math.max(kMinCommanderLightIntensityScalar, scalar)
+            end
+            intensity = renderLight.originalIntensity * (1 - scalar)
+
+        elseif timePassed < startAuxLightTime then
+        
+            if showCommanderLight then
+                intensity = renderLight.originalIntensity * kMinCommanderLightIntensityScalar
+            else
+                intensity = 0  
+            end     
+            
+        elseif timePassed < fullAuxLightTime then
+        
+            -- Fade red in smoothly. t will stay at zero during the individual delay time
+            local t = timePassed - startAuxLightTime
+            -- angle goes from zero to 90 degres in one kAuxPowerCycleTime
+            local angleRad = (t / kAuxPowerCycleTime) * math.pi / 2
+            -- and scalar goes 0->1
+            local scalar = math.sin(angleRad)
+            
+            if showCommanderLight then
+                scalar = math.max(kMinCommanderLightIntensityScalar, scalar)
+            end
+            
+            intensity = scalar * renderLight.originalIntensity
+
+            intensity = intensity * self:CheckFlicker(renderLight,PowerPoint.kAuxFlickerChance, scalar)
+            
+            if showCommanderLight then
+                color = PowerPoint.kDisabledCommanderColor
+            else
+                color = PowerPoint.kDisabledColor
+            end
+     
+        else
+        
+            -- Deactivate from initial state
             self.activeLights[renderLight] = nil
-            // in steady state, we shift lights between a constant state and a varying state.
-            // We assign each light to one of several groups, and then randomly start/stop cycling for each group. 
+            
+            -- in steady state, we shift lights between a constant state and a varying state.
+            -- We assign each light to one of several groups, and then randomly start/stop cycling for each group.
             local lightGroupIndex = math.floor(math.random() * NoPowerLightWorker.kNumGroups)
             self.lightGroups[lightGroupIndex].lights[renderLight] = true
-            SetLight(renderLight, 1, color)
+
+        end
+        
+        SetLight(renderLight, intensity, color)
+        
     end
 
-    // handle the light-cycling groups.
+    -- handle the light-cycling groups.
     for _,lightGroup in pairs(self.lightGroups) do
         lightGroup:Run(timePassed)
     end
@@ -458,7 +547,7 @@ function MainRoomLightWorker:Run()
              for renderLight,_ in pairs(self.activeLights) do
             local color = nil
               color = randomcolor
-             SetLight(renderLight, math.random(4,8), color)
+             SetLight(renderLight, math.random(8,25), color)
               end
     self.timeofdisco = Shared.GetTime()
     end
@@ -504,16 +593,16 @@ function LightGroup:RunCycle(time)
 
     if time > self.cycleEndTime then
     
-        // end varying cycle and fix things for a while. Note that the intensity will
-        // stay a bit random, which is all to the good.
+        -- end varying cycle and fix things for a while. Note that the intensity will
+        -- stay a bit random, which is all to the good.
         self.stateFunction = LightGroup.RunFixed
         self.nextThinkTime = time + math.random(10)
         self.cycleUsedTime = self.cycleUsedTime + (time - self.cycleStartTime)
         
     else
     
-        // this is the time used to calc intensity. This is calculated so that when
-        // we restart after a pause, we continue where we left off.
+        -- this is the time used to calc intensity. This is calculated so that when
+        -- we restart after a pause, we continue where we left off.
         local t = time - self.cycleStartTime + self.cycleUsedTime 
         
         local showCommanderLight = false
@@ -524,25 +613,27 @@ function LightGroup:RunCycle(time)
         
         for renderLight,_ in pairs(self.lights) do
         
-            // Fade disabled color in and out to make it very clear that the power is out        
-            local scalar = 1
+            -- Fade disabled color in and out to make it very clear that the power is out
+            local scalar = math.cos((t / (kAuxPowerCycleTime / 2)) * math.pi / 2)
+            local halfAmplitude = (1 - kAuxPowerMinIntensity) / 2
             
-            local minIntensity = scalar
-            color = Color(18/255, 231/255, 22/255, 0.05)//PowerPoint.kDisabledColor
+            local minIntensity = kAuxPowerMinIntensity
+            color = PowerPoint.kDisabledColor
             
             if showCommanderLight then
             
                 minIntensity = kAuxPowerMinCommanderIntensity
-                color = Color(18/255, 231/255, 22/255, 0.05)
+                color = PowerPoint.kDisabledCommanderColor
                 
             end
             
-            intensity = renderLight.originalIntensity * scalar
+            local disabledIntensity = (kAuxPowerMinIntensity + halfAmplitude + scalar * halfAmplitude)
+            intensity = renderLight.originalIntensity * disabledIntensity
             
             SetLight(renderLight, intensity, color)
             
         end
         
-    end
-    
 end
+    
+    end
