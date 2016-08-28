@@ -5,6 +5,7 @@ Script.Load("lua/Modifications/WelderMod.lua")
 Script.Load("lua/Modifications/CustomLightRules.lua")
 Script.Load("lua/Modifications/FastBuildSpeed.lua")
 
+
 function LeapMixin:GetHasSecondary(player)
     return GetHasTech(player, kTechId.Leap)
 end
@@ -139,3 +140,57 @@ function MarineOutlineMixin:OnUpdate(deltaTime)
 
 
 end
+/*
+local function CorrodeOnInfestation(self)
+
+    if self:GetMaxArmor() == 0 then
+        return false
+    end
+
+    if self.updateInitialInfestationCorrodeState and GetIsPointOnInfestation(self:GetOrigin()) then
+    
+        self:SetGameEffectMask(kGameEffect.OnInfestation, true)
+        self.updateInitialInfestationCorrodeState = false
+        
+    end
+
+    if self:GetGameEffectMask(kGameEffect.OnInfestation) and self:GetCanTakeDamage() and (not HasMixin(self, "GhostStructure") or not self:GetIsGhostStructure()) then
+        
+        self:SetCorroded()
+        
+        if self:isa("PowerPoint") and self:GetArmor() == 0 then
+            self:DoDamageLighting()
+        end
+        
+        if not self:isa("PowerPoint") or self:GetArmor() > 0 then
+            -- stop damaging power nodes when armor reaches 0... gets annoying otherwise.
+            local armoronly = not GetIsRoomPowerDown(self)
+            local damage = kInfestationCorrodeDamagePerSecond
+             damage = (GetIsMarineImaginatorActive() and armoronly == false and damage * 4) or damage
+            self:DeductHealth(damage, nil, nil, false, armoronly, true)
+        end
+        
+    end
+
+    return true
+
+end
+
+function CorrodeMixin:__initmixin()
+
+    if Server then
+        
+        self.isCorroded = false
+        self.timeCorrodeStarted = 0
+        
+        if not self:isa("Player") and not self:isa("MAC") and not self:isa("Exosuit") and kCorrodeMarineStructureArmorOnInfestation then
+        
+            self:AddTimedCallback(CorrodeOnInfestation, 1)
+            self.updateInitialInfestationCorrodeState = true
+            
+        end
+        
+    end
+    
+end
+*/

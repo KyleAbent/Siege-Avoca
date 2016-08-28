@@ -25,6 +25,8 @@ ModLoader.SetupFileHook( "lua/Fade.lua", "lua/Fade_Siege.lua", "post" ) --includ
 ModLoader.SetupFileHook( "lua/Gorge.lua", "lua/Gorge_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Onos.lua", "lua/Onos_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Sentry.lua", "lua/Sentry_Siege.lua", "post" ) 
+ModLoader.SetupFileHook( "lua/Hydra.lua", "lua/Hydra_Siege.lua", "post" ) 
+ModLoader.SetupFileHook( "lua/ARC.lua", "lua/ARC_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/AlienCommander.lua", "lua/AlienCommander_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Alien.lua", "lua/Alien_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Hive.lua", "lua/Hive_Siege.lua", "post" ) --lulz

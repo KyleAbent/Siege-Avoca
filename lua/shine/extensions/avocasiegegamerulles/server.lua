@@ -42,7 +42,7 @@ function Plugin:MapPostLoad()
       Server.CreateEntity(Researcher.kMapName)
 end
 
-
+/*
 function Plugin:CommLoginPlayer(Building, Player)
   if not  GetGameInfoEntity():GetWarmUpActive() then 
 if Building:GetTeamNumber() == 1 then
@@ -74,7 +74,7 @@ self:NotifyGeneric( nil, "Aliens Imaginator set to true (No Comm Required)", tru
 end
   end
 end
-
+*/
 function Plugin:NotifyGeneric( Player, String, Format, ... )
 Shine:NotifyDualColour( Player, 255, 165, 0,  "[Season 3]",  255, 0, 0, String, Format, ... )
 end

@@ -115,8 +115,9 @@ self:AddTimedCallback(BigMac.Check, 8)
 end
 function BigMac:Check()
   local gamestarted = false 
+    local team1Commander = GetGamerules().team1:GetCommander()
    if GetGamerules():GetGameState() == kGameState.Started or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end
-   if gamestarted then DestroyEntity(self) end
+   if gamestarted and team1Commander then DestroyEntity(self) end
    return false
 end
 function BigMac:OnUpdate(deltaTime)

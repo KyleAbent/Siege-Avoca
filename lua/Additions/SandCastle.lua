@@ -16,10 +16,9 @@ local networkVars =
 }
 
 
-function SandCastle:OnCreate() 
+function SandCastle:OnReset() 
    self.SiegeTimer = kSiegeTimer
    self.FrontTimer = kFrontTimer
-   self.mainroom = false
 end
 function SandCastle:GetIsMapEntity()
 return true
@@ -38,7 +37,7 @@ function SandCastle:OpenSiegeDoors()
               end 
 end
 function SandCastle:OpenFrontDoors()
-if Server then   self:AddTimedCallback(SandCastle.PickMainRoom, 16) end
+
       self.FrontTimer = 0
                for index, frontdoor in ientitylist(Shared.GetEntitiesWithClassname("FrontDoor")) do
                 frontdoor:Open()
@@ -102,7 +101,9 @@ local function CreateAlienMarker(where)
               local where = nearestenemy:GetOrigin()
               CreatePheromone(kTechId.ThreatMarker,where, 2) 
 end
-local function SendMarineOrders(where)
+local function SendMarineOrders(self,where)
+
+   if not self:GetIsSiegeOpen( )  then
           for _, player in ipairs(GetEntitiesWithinRange("Marine", where, 999)) do
                  if player:GetIsAlive() and not player:isa("Commander") then
                   local nearestenemy = GetNearestMixin(where, "Combat", 2, function(ent) return ent:GetIsInCombat() and not ent:isa("Commander") and ent:GetIsAlive()  end)
@@ -111,6 +112,7 @@ local function SendMarineOrders(where)
                      player:GiveOrder(kTechId.Attack, nearestenemy:GetId(), nearestenemy:GetOrigin(), nil, true, true)
                 end
           end
+     end     
 end
 local function CoordinateWithPowerNode(locationname)
                  local powernode = GetPowerPointForLocation(locationname)
@@ -125,9 +127,10 @@ function SandCastle:SetMainRoom(where, which, opcyst)
          --8.20 notes
          --if not self:GetIsFrontOpen() then SendOrderFrontOrBuild?
        -- if self:GetIsSiegeOpen() then return SendMarineDefOrdersSiege() end
-        SendMarineOrders(where)
+        SendMarineOrders(self,where)
 end
 function SandCastle:OnPreGame()
+if Server then   self:AddTimedCallback(SandCastle.PickMainRoom, 16) end
    for i = 1, 4 do
      Print("SandCastle OnPreGame")
    end

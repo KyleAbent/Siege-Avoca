@@ -1,4 +1,50 @@
 --Kyle 'Avoca' Abent
+function GetIsMarineImaginatorActive()
+  local gamestarted = not  GetGameInfoEntity():GetWarmUpActive()
+   local team1Commander = GetGamerules().team1:GetCommander()
+   return true --not gamestarted and not team1Commander and GetImaginator().marineenabled == true
+end
+function GetIsRoomPowerDown(who)
+ local location = GetLocationForPoint(who:GetOrigin())
+ local powernode = GetPowerPointForLocation(location.name)
+ if powernode and powernode:GetIsDisabled()  then return true end
+ return false
+end
+function GetEntitiesInHiveRoom(who)
+local hiventity = nil
+local hitentities = {}
+            for index, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
+                   if hive then
+                     hiventity = hive
+                     break
+                   end
+                end 
+    -- Print("hivelocation is %s", hivelocation)
+    if hiventity ~= nil then
+    local entities = GetEntitiesWithMixinForTeamWithinRange("Live", 2, hiventity:GetOrigin(), ARC.kFireRange)
+          table.insert(hitentities,hiventity)
+      
+           if #entities == 0 then return end
+           for i = 1, #entities do
+             local possibletarget = entities[i]
+                 if who:GetCanFireAtTarget(possibletarget) then
+                   table.insert(hitentities,possibletarget)
+                 end
+           end
+    end
+    
+    return hitentities 
+    
+end
+local function GetLocationName(who)
+        local location = GetLocationForPoint(who:GetOrigin())
+        local locationName = location and location:GetName() or ""
+        return locationName
+end
+function GetIsInSiege(who)
+if string.find(GetLocationName(who), "siege") or string.find(GetLocationName(who), "Siege") then return true end
+return false
+end
        function FindArcHiveSpawn(where)    
         for index = 1, 8 do
            local extents = LookupTechData(kTechId.Skulk, kTechDataMaxExtents, nil)
@@ -94,6 +140,9 @@ function AddFrontTime(seconds)
 end
 function GetFrontDoorOpen()
    return GetSandCastle():GetIsFrontOpen()
+end
+function GetSiegeDoorOpen()
+   return GetSandCastle():GetIsSiegeOpen()
 end
 function GetSandCastle() --it washed away
     local entityList = Shared.GetEntitiesWithClassname("SandCastle")

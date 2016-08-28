@@ -117,6 +117,7 @@ self:AddTimedCallback(SiegeDoor.NoReallyIDid, 4)
 end
 function SiegeDoor:NoReallyIDid()
  self:SetOrigin(self.savedOrigin )
+ self:MakeSurePlayersCanGoThroughWhenMoving()
  return self:GetOrigin() ~= self.savedOrigin
 end
 function SiegeDoor:OnAdjustModelCoords(modelCoords)

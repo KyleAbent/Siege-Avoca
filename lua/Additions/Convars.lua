@@ -32,5 +32,22 @@ kAcidRocketFireDelay = 0.5
 kAcidRocketEnergyCost = 10
 kAcidRocketRadius = 6
 
-
 kArmoryAvoArcAddArmrAmt = 4 
+
+
+
+
+
+/*
+kCreditMineCost = 1.5
+kCreditSGCost = 
+kCreditJPCost =
+kCreditMiniCost = 
+kCreditRailCost = 
+kCreditOnosCost = 
+kCreditLerkCost  =
+kCreditFadeCost = 
+kCreditGorgeCost = 
+kCreditFTCost =
+kCreditFGCost =
+*/

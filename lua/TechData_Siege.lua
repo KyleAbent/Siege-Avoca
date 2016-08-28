@@ -74,6 +74,7 @@ Script.Load("lua/Additions/PrimalScream.lua")
 Script.Load("lua/Additions/FadeWall.lua")
 Script.Load("lua/Additions/OnoLow.lua")
 Script.Load("lua/Additions/OnoGrow.lua")
+--Script.Load("lua/Additions/LayStructures.lua")
 
 local kSiege_TechData =
 {        
@@ -172,7 +173,15 @@ local kSiege_TechData =
  --   [kTechDataDamageType] = kStabDamageType,  
      [kTechDataDisplayName] = "OnoGrow",
  [kTechDataTooltipInfo] = "wip"},
-  
+           /*
+                    { [kTechDataId] = kTechId.LayStructures,  
+         [kTechDataMaxHealth] = kMarineWeaponHealth, 
+       [kTechDataMapName] = LayStructures.kMapName,         
+            [kTechDataDisplayName] = "LayStructure",    
+      [kTechDataModel] = Welder.kModelName, 
+     [kTechDataDamageType] = kWelderDamageType, 
+          [kTechDataCostKey] = kWelderCost   },
+        */
 
  
 

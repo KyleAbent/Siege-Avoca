@@ -635,8 +635,84 @@ end
 return mapnameof, delay, reqpathing, CreditCost, limit
 
 end
-
+local function DeductBuy(self, Client, cost, delayafter)
+   self.CreditUsers[ Client ] = self:GetPlayerCreditsInfo(Client) - cost
+   Shine.ScreenText.SetText("Credits", string.format( "%s Credits", self:GetPlayerCreditsInfo(Client) ), Client) 
+self.BuyUsersTimer[Client] = Shared.GetTime() + delayafter
+Shared.ConsoleCommand(string.format("sh_addpool %s", cost)) 
+ self.PlayerSpentAmount[Client] = self.PlayerSpentAmount[Client]  + cost
+end
 function Plugin:CreateCommands()
+
+local function BuyWP(Client, String)
+local Player = Client:GetControllingPlayer()
+local mapname = nil
+local delayafter = 8 
+local cost = 1
+if not Player then return end
+ if FirstCheckRulesHere(self, Client, Player, String ) == true then return end
+ 
+
+   
+
+ 
+    if String  == "Mines" then cost = 1.5 mapname = LayMines.kMapName
+   elseif String == "Welder" then cost = 1 mapname = Welder.kMapName
+   elseif String == "HeavyMachineGun" then cost = 5 mapname = HeavyMachineGun.kMapName
+    elseif String  == "Shotgun" then cost = 2 mapname = Shotgun.kMapName 
+   elseif String == "FlameThrower" then mapname = Flamethrower.kMapName cost = 3
+   elseif String == "GrenadeLauncher" then mapname =  GrenadeLauncher.kMapName cost = 3 
+   end
+   
+   
+      self.CreditUsers[ Client ] = self:GetPlayerCreditsInfo(Client) - cost
+   Shine.ScreenText.SetText("Credits", string.format( "%s Credits", self:GetPlayerCreditsInfo(Client) ), Client) 
+self.BuyUsersTimer[Client] = Shared.GetTime() + delayafter
+Shared.ConsoleCommand(string.format("sh_addpool %s", cost)) 
+ self.PlayerSpentAmount[Client] = self.PlayerSpentAmount[Client]  + cost
+ 
+  Player:GiveItem(mapname)
+   
+end
+
+
+
+local BuyWPCommand = self:BindCommand("sh_buywp", "buywp", BuyWP, true)
+BuyWPCommand:Help("sh_buywp <weapon name>")
+BuyWPCommand:AddParam{ Type = "string" }
+
+
+local function BuyClass(Client, String)
+
+local Player = Client:GetControllingPlayer()
+local delayafter = 8 
+local cost = 1
+if not Player then return end
+ if FirstCheckRulesHere(self, Client, Player, String ) == true then return end
+ 
+         if Player:GetTeamNumber() == 1 then
+             if String == "JetPack" then cost = 10 DeductBuy(self, Client, cost, delayafter)   Player:GiveJetpack()
+             elseif String == "MiniGun" then cost = 30 DeductBuy(self, Client, cost, delayafter)  Player:GiveDualExo(Player:GetOrigin()) 
+             elseif String == "RailGun" then  cost = 30 DeductBuy(self, Client, cost, delayafter) Player:GiveDualRailgunExo(Player:GetOrigin())
+             end
+         elseif Player:GetTeamNumber() == 2 then
+              if String == "Gorge" then Player:CreditBuy(Gorge) cost = 10 DeductBuy(self, Client, cost)
+              elseif String == "Lerk" then  cost = 15 DeductBuy(self, Client, cost, delayafter) Player:CreditBuy(Lerk)
+              elseif String == "Fade" then  cost = 25 DeductBuy(self, Client, cost, delayafter) Player:CreditBuy(Fade)
+              elseif String == "Onos" then cost = 30 DeductBuy(self, Client, cost, delayafter)  Player:CreditBuy(Onos)
+              end
+         end
+   
+
+ 
+   
+end
+
+
+local BuyClassCommand = self:BindCommand("sh_buyclass", "buyclass", BuyClass, true)
+BuyClassCommand:Help("sh_buyclass <class name>")
+BuyClassCommand:AddParam{ Type = "string" }
+
 
 local function Buy(Client, String)
 

@@ -62,6 +62,10 @@ function Researcher:OnRoundStart()
               self:AddTimedCallback(Researcher.Calculate, 16)
             end
             
+                 local team1Commander = GetGamerules().team1:GetCommander()
+  local team2Commander = GetGamerules().team2:GetCommander()
+     self.marineenabled = not team1Commander
+   self.alienenabled = not team2Commander
 end
 function Researcher:Calculate()
 local gamestarted = false

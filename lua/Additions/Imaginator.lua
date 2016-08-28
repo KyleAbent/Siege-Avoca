@@ -18,7 +18,7 @@ local function BuildPowerNodes()
 end
 local function BuildKill()
             for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-                       if not powerpoint:GetIsSocketed() then 
+                       if not powerpoint:GetIsSocketed() and not GetIsInSiege(powerpoint) then 
                         powerpoint:SetConstructionComplete()
                        local resnodes = GetEntitiesWithinRange( "ResourcePoint", powerpoint:GetOrigin(), 18 )
                        if #resnodes >= 4 then 
@@ -38,8 +38,8 @@ function Imaginator:OnCreate()
      Print("Imaginator created")
    end
    */
-   self.marineenabled = false
-   self.alienenabled = false
+   self.marineenabled = true
+   self.alienenabled = true
 end
 function Imaginator:OnInitialized()
 
@@ -65,25 +65,31 @@ function Imaginator:OnRoundStart()
    for i = 1, 4 do
      Print("Imaginator OnRoundStart")
    end
-   
-      self.marineenabled = false
-   self.alienenabled = false
-   
-        local team2Commander = GetGamerules().team2:GetCommander()
-    if not team2Commander then 
-   BuildKill()
-   end
-
+     local team1Commander = GetGamerules().team1:GetCommander()
+  local team2Commander = GetGamerules().team2:GetCommander()
+  
+      self.marineenabled = not team1Commander
+   self.alienenabled = not team2Commander
+  
+   if self.alienenabled then BuildKill() end
             
 end
 function Imaginator:SetImagination(boolean, team)
 
-if boolean == true and team == 2 and not GetSandCastle():GetIsFrontOpen() then BuildKill() end
+
 
   if team == 1 then
   self.marineenabled = boolean
-  elseif Team == 2 then
+          --  if boolean == true then
+         --       local  BigMac = #GetEntitiesForTeam( "BigMac", 1 )
+         --        if not BigMac then  
+         --    else
+             
+         --    end
+   
+  elseif team == 2 then
   self.alienenabled = boolean
+  if self.alienenabled == true then BuildKill() end --and not GetSandCastle():GetIsFrontOpen() then BuildKill() end
   end
 
 
@@ -130,16 +136,16 @@ local function Touch(who, where, what, number)
             return tower
          end
 end
-local function Envision(who, which)
-   if which == 1 then
+local function Envision(self,who, which)
+   if which == 1 and self.marineenabled then
      Touch(who, who:GetOrigin(), kTechId.Extractor, 1)
-   elseif which == 2 then
+   elseif which == 2 and self.alienenabled then
      Touch(who, who:GetOrigin(), kTechId.Harvester, 2)
     end
 end
 local function AutoDrop(self,who)
   local which = WhoIsQualified(who)
-  if which ~= 0 then Envision(who, which) end
+  if which ~= 0 then Envision(self,who, which) end
 end
 function Imaginator:Automations() 
   local gamestarted = not GetGameInfoEntity():GetWarmUpActive() 
@@ -375,28 +381,26 @@ local function GetScanMinRangeReq(where)
 end
 local function BuildNotificationMessage(where, self, mapname)
 end
-local function FuckShitUp()
-
-      local  AvocaArcCount = #GetEntitiesForTeam( "AvocaArc", 1 )
+local function FuckShitUp(self)
+   --   local  AvocaArcCount = #GetEntitiesForTeam( "AvocaArc", 1 )
       local  SiegeArcCount = #GetEntitiesForTeam( "SiegeArc", 1 )
       local  CommandStation = GetEntitiesForTeam( "CommandStation", 1 )
       CommandStation = table.random(CommandStation)
       
       
-            if AvocaArcCount < 1 then
-              CreateEntity(AvocaArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
-              CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
-      end
+      --      if AvocaArcCount < 1 then
+      --        CreateEntity(AvocaArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
+      --        CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
+     -- end
       
-            if SiegeArcCount < 4 then
+            if SiegeArcCount < 5 then
               CreateEntity(SiegeArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
-      end
-      
+      end 
 
 end
 function Imaginator:ActualFormulaMarine()
 
-    if GetSandCastle():GetIsSiegeOpen() then FuckShitUp() end
+    if GetSandCastle():GetIsSiegeOpen() then FuckShitUp(self) end
    -- SpawnBigMac()
       
 --Print("AutoBuildConstructs")
@@ -409,7 +413,7 @@ local success = false
              if powerpoint then
                  randomspawn = FindFreeSpace(FindMarine(airlock, powerpoint))
             if randomspawn then
-                local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetTechId() == tospawn end)
+                local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetTechId() == tospawn or ent:isa("AdvancedArmory") and tospawn == kTechId.Armory end)
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
                       --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
@@ -417,9 +421,9 @@ local success = false
                           if tospawn == kTechId.Armory then minrange = 16  end
                           if tospawn == kTechId.PhaseGate then minrange = 55  end
                           if tospawn == kTechId.Observatory then minrange = kScanRadius end
-                          if tospawn == kTechId.RoboticsFactory then minrange = 35 end
+                          if tospawn == kTechId.RoboticsFactory then minrange = 72 end
                           if tospawn == kTechId.Sentry then minrange = 16  end --GetSentryMinRangeReq(randomspawn) end
-                          if tospawn == kTechId.PrototypeLab then minrange = 35  end
+                          if tospawn == kTechId.PrototypeLab then minrange = 42  end
                           if tospawn == kTechId.Scan then minrange = kScanRadius end--GetScanMinRangeReq(randomspawn) end
                           if tospawn == kTechId.CommandStation then minrange = math.random(16,420) end
                           if tospawn == kTechId.ArmsLab then minrange = 4 end

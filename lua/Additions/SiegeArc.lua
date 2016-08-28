@@ -29,7 +29,7 @@ function SiegeArc:GetMaxArmor()
     return 1200
 end
 local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
-   local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), 24)
+   local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange + 12)
    if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
 end
 local function CheckHivesForScan()
@@ -46,6 +46,23 @@ local hives = {}
 end
 function ARC:GetShowDamageIndicator()
     return true
+end
+function SiegeArc:GetCanFireAtTargetActual(target, targetPoint)    
+
+    if not target.GetReceivesStructuralDamage or not target:GetReceivesStructuralDamage() then        
+        return false
+    end
+    
+    // don't target eggs (they take only splash damage)
+    if target:isa("Egg") or target:isa("Cyst") then
+        return false
+    end
+    if not target:GetIsSighted() and not GetIsTargetDetected(target) then
+        return false
+    end
+
+    return true
+    
 end
 function SiegeArc:LameFixATM()
 self:AddTimedCallback(SiegeArc.Check, 8)
@@ -268,7 +285,7 @@ local function PerformAttack(self)
         -- don't pass triggering entity so the sound / cinematic will always be relevant for everyone
         GetEffectManager():TriggerEffects("arc_hit_primary", {effecthostcoords = Coords.GetTranslation(self.targetPosition)})
         
-        local hitEntities = GetEntitiesWithMixinWithinRange("Live", self.targetPosition, ARC.kSplashRadius)
+        local hitEntities = GetEntitiesInHiveRoom(self) -- GetEntitiesWithMixinWithinRange("Live", self.targetPosition, ARC.kSplashRadius)
 
         -- Do damage to every target in range
         RadiusDamage(hitEntities, self.targetPosition, ARC.kSplashRadius, 1200, self, true)
