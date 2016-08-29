@@ -43,9 +43,7 @@ function SandCastle:OpenFrontDoors()
                 frontdoor:Open()
                 frontdoor.isvisible = false
               end 
-              if Server then
-           Script.Load("lua/Modifications/FrontDoorOpenConvars.lua")
-          end
+
 
 end
 function SandCastle:GetIsSiegeOpen()
@@ -72,6 +70,9 @@ function SandCastle:CountSTimer()
        end
        return self.SiegeTimer ~= 0
        
+end
+function SandCastle:AddSiegeTime(seconds)
+  if not self:GetIsSiegeOpen() then self.SiegeTimer = self.SiegeTimer + seconds end
 end
 function SandCastle:FrontDoorTimer()
    local boolean = false
@@ -135,15 +136,10 @@ if Server then   self:AddTimedCallback(SandCastle.PickMainRoom, 16) end
      Print("SandCastle OnPreGame")
    end
    
-   if Server then
-  Script.Load("lua/Modifications/PreGameConvars.lua")
-  end
    
 end
 function SandCastle:OnRoundStart() 
-if Server then
-  Script.Load("lua/Modifications/RoundStartConvars.lua")
-end
+
 
 
    self.SiegeTimer = kSiegeTimer

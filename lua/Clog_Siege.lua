@@ -12,12 +12,17 @@ function Clog:OnInitialized()
   originit(self)
     if Server and not self:isa("ClogMod") then
     self:AddTimedCallback( function ()
-       CreateEntity(ClogMod.kMapName, self:GetOrigin(), 2) DestroyEntity(self) end , .5)
+       local mod = CreateEntity(ClogMod.kMapName, self:GetOrigin(), 2) 
+        mod:SetOwner(self:GetOwner())
+       DestroyEntity(self) end , .5)
     end
 end
 function ClogMod:OnInitialized()
    Clog.OnInitialized(self)
   InitMixin(self, InfestationMixin)
+end
+function ClogMod:GetTechId()
+return kTechId.Clog
 end
 function ClogMod:GetInfestationRadius()
   local frontdoor = GetEntitiesWithinRange("FrontDoor", self:GetOrigin(), 7)

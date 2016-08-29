@@ -432,11 +432,16 @@ local function GetIsAlienInSiege(Player)
     end
     return false
  end
-local function PerformBuy(self, who, whoagain, cost, reqlimit, reqground,reqpathing, setowner, delayafter, mapname,limitof)
+local function PerformBuy(self, who, whoagain, cost, reqlimit, reqground,reqpathing, setowner, delayafter, mapname,limitof, techid)
    local autobuild = false 
    local success = false
    if self:GetPlayerCreditsInfo(who) < cost then 
 self:NotifyCredits( who, "%s costs %s credits, you have %s credit(s). Purchase invalid.", true, String, cost, self:GetPlayerCreditsInfo(who))
+return
+end
+
+if whoagain:isa("Marine") and whoagain:GetHasLayStructure() then 
+self:NotifyCredits(who, "Empty hudslot 5 before buying structure, newb. You're such a newb.", true)
 return
 end
 
@@ -465,26 +470,23 @@ end
  
 
 self.CreditUsers[ who ] = self:GetPlayerCreditsInfo(who) - cost
-local entity = CreateEntity(mapname, whoagain:GetOrigin(), whoagain:GetTeamNumber()) 
 
-if not entity then self:NotifyCredits( who, "Invalid Purchase Request of %s.", true, String) return end
-
-
-
+local entity = nil 
 
 if whoagain:GetTeamNumber() == 1 then
 self.MarineTotalSpent = self.MarineTotalSpent + cost
-        if entity.SetConstructionComplete then 
-        
-             if not whoagain:GetGameEffectMask(kGameEffect.OnInfestation) then
-             entity:SetConstructionComplete()
-               else
-                self:NotifyCredits( who, "%s placed ON infestation, therefore it is not autobuilt.", true, String)
-                entity.isGhostStructure = false
-            end --
-         end  --
+         if not whoagain:isa("Exo") then 
+          whoagain:GiveLayStructure(techid, mapname)
+        else
+      entity = CreateEntity(mapname, whoagain:GetOrigin(), whoagain:GetTeamNumber()) 
+        if entity.SetOwner then entity:SetOwner(whoagain) end
+              if entity.SetConstructionComplete then  entity:SetConstructionComplete() end
+        end
 elseif whoagain:GetTeamNumber() == 2 then
     self.AlienTotalSpent = self.AlienTotalSpent + cost
+    entity = CreateEntity(mapname, whoagain:GetOrigin(), whoagain:GetTeamNumber()) 
+    if not entity then self:NotifyCredits( who, "Invalid Purchase Request of %s.", true, String) return end
+    if entity.SetOwner then entity:SetOwner(whoagain) end
       if not GetIsAlienInSiege(whoagain) then
       if entity.SetConstructionComplete then  entity:SetConstructionComplete() end
        else
@@ -492,20 +494,12 @@ elseif whoagain:GetTeamNumber() == 2 then
         end --
 end --
 
-if entity.SetOwner then entity:SetOwner(whoagain) end
 
 
-
-if entity:isa("MAC") then
-entity:ProcessFollowAndWeldOrder(Shared.GetTime(), whoagain, whoagain:GetOrigin()) 
-elseif entity:isa("ARC") then
-entity:GiveOrder(kTechId.ARCDeploy, whoagain:GetId(), whoagain:GetOrigin(), nil, true, true)
-end
-
-
-
+if entity then 
 local supply = LookupTechData(entity:GetTechId(), kTechDataSupply, nil) or 0
 whoagain:GetTeam():RemoveSupplyUsed(supply)
+end
    Shine.ScreenText.SetText("Credits", string.format( "%s Credits", self:GetPlayerCreditsInfo(who) ), who) 
 self.BuyUsersTimer[who] = Shared.GetTime() + delayafter
 Shared.ConsoleCommand(string.format("sh_addpool %s", cost)) 
@@ -554,36 +548,45 @@ local reqpathing = true
 local CreditCost = 1
 local reqground = true
 local limit = 3
+local techid = nil
 
 if String == "Observatory"  then
 mapnameof = Observatory.kMapName
+techid = kTechId.Observatory
 CreditCost = 10
 elseif String == "Armory"  then
 CreditCost = 12
 mapnameof = Armory.kMapName
+techid = kTechId.Armory
 elseif String == "SentryAvoca"  then
 mapnameof = SentryAvoca.kMapName
+techid = kTechId.Sentry
 limit = 1
 CreditCost = 8
 elseif String == "PhaseGate" then
 CreditCost = 15
 mapnameof = PhaseGate.kMapName
+techid = kTechId.PhaseGate
 elseif String == "InfantryPortal" then
 mapnameof = InfantryPortal.kMapName
+techid = kTechId.InfantryPortal
 elseif  String == "RoboticsFactory" then
+techid = kTechId.RoboticsFactory
 CreditCost = 10
 mapnameof = RoboticsFactory.kMapName
 elseif String == "Mac" then
+techid = kTechId.MAC
 CreditCost = 4
 mapnameof = MAC.kMapName
 limit = 2
 elseif string == "Arc" then 
+techid = kTechId.ARC
 CreditCost = 20
 mapnameof = ARC.kMapName
 limit = 1
 end
 
-return mapnameof, delay, reqground, reqpathing, CreditCost, limit
+return mapnameof, delay, reqground, reqpathing, CreditCost, limit, techid
 
 end
 
@@ -725,15 +728,16 @@ local reqground = true
 if not Player then return end
  if FirstCheckRulesHere(self, Client, Player, String ) == true then return end
 local CreditCost = 1
+local techid = nil
 
 if Player:GetTeamNumber() == 1 then 
-  mapnameof, delay, reqground, reqpathing, CreditCost, limit = TeamOneBuyRules(self, Client, Player, String)
+  mapnameof, delay, reqground, reqpathing, CreditCost, limit, techid = TeamOneBuyRules(self, Client, Player, String)
 elseif Player:GetTeamNumber() == 2 then
   mapnameof, delay, reqground, reqpathing, CreditCost, limit = TeamTwoBuyRules(self, Client, Player, String)
 end // end of team numbers
 
 if mapnameof then
- PerformBuy(self, Client, Player, CreditCost, true, reqground,reqpathing, true, delay, mapnameof, limit) 
+ PerformBuy(self, Client, Player, CreditCost, true, reqground,reqpathing, true, delay, mapnameof, limit, techid) 
 end
 
 end

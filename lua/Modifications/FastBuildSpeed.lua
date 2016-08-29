@@ -52,7 +52,7 @@ function ConstructMixin:Construct(elapsedTime, builder)
             local techNode = techTree:GetTechNode(self:GetTechId())
             local modifier = (self:GetTeamType() == kMarineTeamType and GetIsPointOnInfestation(self:GetOrigin())) and kInfestationBuildModifier or 1
             local gameRules = GetGamerules()
-          if Server then  modifier = modifier * kBuildSpeed end
+            modifier = modifier * ConditionalValue(not GetFrontDoorOpen() or not GetGameStarted(), kSetupBuildSpeed, modifier)
            -- Print("modifier is %s", modifier)
             local startBuildFraction = self.buildFraction
             local newBuildTime = self.buildTime + elapsedTime * modifier

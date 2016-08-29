@@ -10,6 +10,7 @@ Script.Load("lua/Additions/AvocaArc.lua")
 Script.Load("lua/Additions/PhaseAvoca.lua")
 Script.Load("lua/Additions/BigMac.lua")
 Script.Load("lua/Additions/SiegeArc.lua")
+Script.Load("lua/Additions/LayStructures.lua")
 
 
 

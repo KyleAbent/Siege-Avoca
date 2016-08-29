@@ -146,12 +146,6 @@ end
 function LayStructures:GetIsDroppable()
     return true
 end
-function LayStructures:GetIsCreditStructure()
-   return self.tellstructuretocredit
-end
-function LayStructures:SetIsCreditStructure(boolean)
-    self.tellstructuretocredit = boolean
-end
 function LayStructures:OnPrimaryAttack(player)
 
     // Ensure the current location is valid for placement.
@@ -198,15 +192,15 @@ local function DropStructure(self, player)
             if structure then
             
                 structure:SetOwner(player)
-                if not structure:isa("ARC") then structure:SetConstructionComplete()
-                else
+                if structure.SetConstructionComplete then structure:SetConstructionComplete() end
+                if structure:isa("ARC") then
                 structure.isGhostStructure = false
                 structure:GiveOrder(kTechId.ARCDeploy, structure:GetId(), structure:GetOrigin(), nil, false, false)
+                elseif structure:isa("MAC") then
+                structure:ProcessFollowAndWeldOrder(Shared.GetTime(), player, player:GetOrigin()) 
                 end
                 structure:SetOwner(player)
-                if self:GetIsCreditStructure() == true then 
-                   if structure.ignorelimit then structure.ignorelimit = true end
-                end
+
                  if HasMixin(structure, "Supply") then
                  local supplyamount = LookupTechData(structure:GetTechId(), kTechDataSupply, 0)
                  player:GetTeam():RemoveSupplyUsed(supplyamount)
@@ -351,9 +345,9 @@ function LayStructures:GetPositionForStructure(player)
     
         if trace.entity == nil then
             isPositionValid = true
-        elseif HasMixin(trace.entity, "Construct") and trace.entity:GetTeamNumber() == 1  then
-            isPositionValid = true
-            isonstructure = true
+      --  elseif HasMixin(trace.entity, "Construct") and trace.entity:GetTeamNumber() == 1  then
+      --      isPositionValid = true
+      --      isonstructure = true
         end
         
         displayOrigin = trace.endPoint

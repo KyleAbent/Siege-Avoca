@@ -140,7 +140,7 @@ function MarineOutlineMixin:OnUpdate(deltaTime)
 
 
 end
-/*
+
 local function CorrodeOnInfestation(self)
 
     if self:GetMaxArmor() == 0 then
@@ -162,12 +162,14 @@ local function CorrodeOnInfestation(self)
             self:DoDamageLighting()
         end
         
-        if not self:isa("PowerPoint") or self:GetArmor() > 0 then
+        if not self:isa("PowerPoint") or self:GetArmor() > 0 then 
             -- stop damaging power nodes when armor reaches 0... gets annoying otherwise.
-            local armoronly = not GetIsRoomPowerDown(self)
-            local damage = kInfestationCorrodeDamagePerSecond
-             damage = (GetIsMarineImaginatorActive() and armoronly == false and damage * 4) or damage
-            self:DeductHealth(damage, nil, nil, false, armoronly, true)
+            self:DeductHealth(kInfestationCorrodeDamagePerSecond, nil, nil, false, true, true)
+        end
+        
+        if not self:isa("PowerPoint") and self:GetArmor() == 0 and not self:isa("ARC")  and GetIsRoomPowerDown(self) then
+           local damage = kInfestationCorrodeDamagePerSecond * 4
+                    self:DeductHealth(damage, nil, nil, true, false, true)
         end
         
     end
@@ -192,5 +194,63 @@ function CorrodeMixin:__initmixin()
         
     end
     
+end
+
+/*
+function JetpackMarine:ModifyVelocity(input, velocity, deltaTime)
+
+    if self:GetIsJetpacking() then
+        
+        local verticalAccel = 44
+        
+        if self:GetIsWebbed() then
+            verticalAccel = 5
+        elseif input.move:GetLength() == 0 then
+            verticalAccel = 56
+        end
+    
+        self.onGround = false
+        local thrust = math.max(0, -velocity.y) / 12
+        velocity.y = math.min(5, velocity.y + verticalAccel * deltaTime * (1 + thrust * 5))
+ 
+    end
+    
+    if not self.onGround then
+    
+        -- do XZ acceleration
+        local prevXZSpeed = velocity:GetLengthXZ()
+        local maxSpeedTable = { maxSpeed = math.max(kFlySpeed, prevXZSpeed) }
+        self:ModifyMaxSpeed(maxSpeedTable)
+        local maxSpeed = maxSpeedTable.maxSpeed        
+        
+        if not self:GetIsJetpacking() then
+            maxSpeed = prevXZSpeed
+        end
+        
+        local wishDir = self:GetViewCoords():TransformVector(input.move)
+        local acceleration = 0
+        wishDir.y = 0
+        wishDir:Normalize()
+        
+        acceleration = kFlyAcceleration
+        
+        velocity:Add(wishDir * acceleration * self:GetInventorySpeedScalar() * deltaTime)
+
+        if velocity:GetLengthXZ() > maxSpeed then
+        
+            local yVel = velocity.y
+            velocity.y = 0
+            velocity:Normalize()
+            velocity:Scale(maxSpeed)
+            velocity.y = yVel
+            
+        end 
+        
+        if self:GetIsJetpacking() then
+            velocity:Add(wishDir * kJetpackingAccel * deltaTime)
+        end
+    
+    end
+
 end
 */

@@ -11,7 +11,7 @@ Shine.VoteMenu:AddPage ("SpendStructures", function( self )
        local player = Client.GetLocalPlayer()
     if player:GetTeamNumber() == 1 then 
     self:AddSideButton( "Mac(5)", function() Shared.ConsoleCommand ("sh_buy Mac")  end)
-    --self:AddSideButton( "Arc(20)", function() Shared.ConsoleCommand ("sh_buy Arc")  end)
+    self:AddSideButton( "Arc(20)", function() Shared.ConsoleCommand ("sh_buy Arc")  end)
     self:AddSideButton( "Observatory(10)", function() Shared.ConsoleCommand ("sh_buy Observatory")  end)
     self:AddSideButton( "Sentry(8)", function() Shared.ConsoleCommand ("sh_buy SentryAvoca")  end)
     self:AddSideButton( "Armory(12)", function() Shared.ConsoleCommand ("sh_buy Armory")  end)

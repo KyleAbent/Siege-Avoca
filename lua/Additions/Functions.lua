@@ -117,9 +117,8 @@ end
 function AddSiegeTime(seconds)
     local entityList = Shared.GetEntitiesWithClassname("SandCastle")
     if entityList:GetSize() > 0 then
-                 local conductor = entityList:GetEntityAtIndex(0) 
-                sandcastle:SendNotification(seconds)
-                sandcastle:AddTime(seconds) 
+                 local sandcastle = entityList:GetEntityAtIndex(0) 
+                sandcastle:AddSiegeTime(seconds) 
     end    
 end
 function GetRandomChair()
