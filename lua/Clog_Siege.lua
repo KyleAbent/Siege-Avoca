@@ -13,12 +13,13 @@ function Clog:OnInitialized()
     if Server and not self:isa("ClogMod") then
     self:AddTimedCallback( function ()
        local mod = CreateEntity(ClogMod.kMapName, self:GetOrigin(), 2) 
-        mod:SetOwner(self:GetOwner())
+       local owner = self:GetOwner()
+       if owner ~= nil then mod:SetOwner(owner) owner:GetTeam():UpdateClientOwnedStructures(self:GetId()) owner:GetTeam():AddGorgeStructure(owner, mod)   end 
        DestroyEntity(self) end , .5)
     end
 end
 function ClogMod:OnInitialized()
-   Clog.OnInitialized(self)
+     originit(self)
   InitMixin(self, InfestationMixin)
 end
 function ClogMod:GetTechId()

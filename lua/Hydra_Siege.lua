@@ -21,11 +21,15 @@ function Hydra:OnInitialized()
       --          true,
       --          { kAlienStaticTargets, kAlienMobileTargets }, { self.FilterTarget(self) } )   
                 
-                
+               --messy 
     if Server and not self:isa("HydraAvoca") then
     self:AddTimedCallback( function ()
        local hydra = CreateEntity(HydraAvoca.kMapName, self:GetOrigin(), 2) 
-      hydra:SetParent(self:GetParent())
+       local owner = self:GetOwner()
+       if owner ~= nil then 
+         hydra:SetAngles(self:GetAngles())
+       hydra:SetOwner(owner) owner:GetTeam():UpdateClientOwnedStructures(self:GetId()) owner:GetTeam():AddGorgeStructure(owner, hydra)  
+         end 
       if self:GetIsBuilt() then hydra:SetConstructionComplete() end
         DestroyEntity(self) end , .5)
     end

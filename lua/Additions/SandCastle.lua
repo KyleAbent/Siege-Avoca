@@ -2,7 +2,7 @@
 --http://twitch.tv/kyleabent
 --https://github.com/KyleAbent/
 
-class 'SandCastle' (Entity)
+class 'SandCastle' (ScriptActor)
 SandCastle.kMapName = "sandcastle"
 
 
@@ -22,6 +22,22 @@ function SandCastle:OnReset()
 end
 function SandCastle:GetIsMapEntity()
 return true
+end
+function SandCastle:OnCreate()
+  self:SetUpdates(true)
+     self.SiegeTimer = kSiegeTimer
+   self.FrontTimer = kFrontTimer
+   self.mainroom = true
+end
+
+function SandCastle:OnUpdate(deltaTime)
+      if Server and not GetGameInfoEntity():GetWarmUpActive()then
+         if not  self.timeLastSandCastle or self.timeLastSandCastle + 1 <= Shared.GetTime() then
+         self.timeLastSandCastle = Shared.GetTime()
+         self:FrontDoorTimer()
+         self:CountSTimer() 
+          end
+      end
 end
 function SandCastle:GetSiegeLength()
  return self.SiegeTimer
@@ -106,7 +122,7 @@ local function SendMarineOrders(self,where)
 
    if not self:GetIsSiegeOpen( )  then
           for _, player in ipairs(GetEntitiesWithinRange("Marine", where, 999)) do
-                 if player:GetIsAlive() and not player:isa("Commander") then
+                 if not player:isa("Commander")  and player:GetClient():GetIsVirtual() and player:GetIsAlive() then
                   local nearestenemy = GetNearestMixin(where, "Combat", 2, function(ent) return ent:GetIsInCombat() and not ent:isa("Commander") and ent:GetIsAlive()  end)
                     if not nearestenemy then return end 
                      local where = nearestenemy:GetOrigin()
@@ -146,12 +162,6 @@ function SandCastle:OnRoundStart()
    self.FrontTimer = kFrontTimer
    CloseDoors()
   -- self:AutoBioMass()
-
-           if Server then
-              kBuildSpeed = kSetupBuildSpeed
-              self:AddTimedCallback(SandCastle.CountSTimer, 1)
-              self:AddTimedCallback(SandCastle.FrontDoorTimer, 1)
-            end
 end
 function SandCastle:GetLocationWithMostMixedPlayers()
 -- works good 2.15

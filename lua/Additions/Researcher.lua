@@ -9,8 +9,13 @@ local networkVars =
  alienenabled = "boolean",
  marineenabled = "boolean",
 }
-local function TresCheck(cost)
+local function TresCheck(team, cost)
+if team == 1 then
 if GetGamerules().team1:GetTeamResources() >= cost then return true end
+elseif team == 2 then
+if GetGamerules().team2:GetTeamResources() >= cost then return true end
+end
+
 return false
 end
 function Researcher:GetIsMapEntity()
@@ -43,7 +48,7 @@ local techIds = who:GetTechButtons() or {}
                           
                             if tree:GetTechAvailable(techId) then
                              local cost = 0--LookupTechData(techId, kTechDataCostKey) * 
-                                if  NotBeingResearched(techId, who) and TresCheck(cost) then 
+                                if  NotBeingResearched(techId, who) and TresCheck(1,cost) then 
                                   who:SetResearching(techNode, who)
                                   who:GetTeam():SetTeamResources(who:GetTeam():GetTeamResources() - cost)
                                  end
@@ -91,56 +96,24 @@ local function GetBioMassLevel()
            local bioMass = (teamInfo and teamInfo.GetBioMassLevel) and teamInfo:GetBioMassLevel() or 0
            return math.round(bioMass / 4, 1, 3)
 end
-local function TresCheck(cost)
-    return GetGamerules().team2:GetTeamResources() >= cost
-
-end
 local function WorkHere(self, hive)
-       if GetHasTech(hive, kTechId.Xenocide) or not GetGamerules():GetGameStarted() or not hive:GetIsBuilt() or hive:GetIsResearching() then return true end
+       if  hive:GetIsResearching() then return true end
            
            local teamInfo = GetTeamInfoEntity(2)
            local teambioMass = (teamInfo and teamInfo.GetBioMassLevel) and teamInfo:GetBioMassLevel() or 0
            
     local techid = nil
     
-
-      if teambioMass >= 2 and not GetHasTech(hive, kTechId.Charge) then
-    techid = kTechId.Charge
-      elseif teambioMass >= 3 and not GetHasTech(hive, kTechId.BileBomb) then
-    techid = kTechId.BileBomb
-      elseif teambioMass >= 3 and not GetHasTech(hive, kTechId.MetabolizeEnergy) then
-    techid = kTechId.MetabolizeEnergy
-      elseif teambioMass >= 4 and not GetHasTech(hive, kTechId.Leap) then
-    techid = kTechId.Leap
-      elseif teambioMass >= 4 and not GetHasTech(hive, kTechId.Spores) then
-    techid = kTechId.Spores
-      elseif teambioMass >= 5 and not GetHasTech(hive, kTechId.Umbra) then
-    techid = kTechId.Umbra
-      elseif teambioMass >= 5 and not GetHasTech(hive, kTechId.MetabolizeHealth) then
-    techid = kTechId.MetabolizeHealth
-      elseif teambioMass >= 6 and not GetHasTech(hive, kTechId.BoneShield) then 
-    techid = kTechId.BoneShield
-      elseif teambioMass >= 7 and not GetHasTech(hive, kTechId.Stab) then 
-    techid = kTechId.Stab
-      elseif teambioMass >= 8 and not GetHasTech(hive, kTechId.Stomp) then 
-    techid = kTechId.Stomp
-      elseif teambioMass >= 9 and not GetHasTech(hive, kTechId.Xenocide) then 
-    techid = kTechId.Xenocide
-    end
     
-        if techid == nil and hive.bioMassLevel <= 1 then
+        if  hive.bioMassLevel <= 1 then
     techid = kTechId.ResearchBioMassOne
-    elseif techid == nil and hive.bioMassLevel == 2 then
+    elseif  hive.bioMassLevel == 2 then
     techid = kTechId.ResearchBioMassTwo
-    elseif techid == nil and hive.bioMassLevel == 3 then
-    techid = kTechId.ResearchBioMassThree
-    elseif techid == nil and hive.bioMassLevel == 4 then
-    techid = kTechId.ResearchBioMassFour   
     end
     
     if techid == nil then return true end
     local cost = LookupTechData(techid, kTechDataCostKey, 0)
-    if TresCheck(cost) then
+    if TresCheck(2,cost) then
     hive:GetTeam():SetTeamResources(hive:GetTeam():GetTeamResources() - cost) 
    local techNode = hive:GetTeam():GetTechTree():GetTechNode( techid ) 
    hive:SetResearching(techNode, self)
@@ -193,16 +166,75 @@ function Researcher:SetResearchification(boolean, team)
 
 
 end
+local function GetHiveTechButtons(who)
+  local techIds = {} 
+   table.insert(techIds,who:GetTechButtons())
+   return techIds
+end
+local function NotBeingResearchedHive(techId)   
+    if techId == kTechId.ResearchBioMassOne or techId == kTechId.ResearchBioMassTwo then return true end
+for _, structure in ientitylist(Shared.GetEntitiesWithClassname("Hive" )) do
+         if structure:GetIsResearching() and structure:GetResearchingId() == techId then return false end
+     end
+    return true
+end
+local function NotBeingResearchedChamber(techId)   
+for _, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive" )) do
+     if hive:GetIsBuilt() then
+     local chamber = hive:GetEvolutionChamber()
+         if chamber:GetIsResearching() and chamber:GetResearchingId() == techId then return false end
+     end
+     end
+    return true
+end
+local function HiveResearch(who)
+if who:GetIsResearching() then return false end
+local tree = who:GetTeam():GetTechTree()
+local technodes = {}
+--Print("HiveResearch 1")
+    for _, node in pairs(tree.nodeList) do
+   --  Print("HiveResearch 2")
+           local canRes = tree:GetHasTech(node:GetPrereq1()) and tree:GetHasTech(node:GetPrereq2())
+          local techId = node:GetTechId()
+         if canRes and NotBeingResearchedChamber(techId) and node:GetIsResearch() and node:GetCanResearch() then --and  not NotBeingResearchedHive(techId) then
+       --     Print("HiveResearch 3")
+          table.insert(technodes, node)
+         end
+    
+    end
+
+
+                       for _, technode in ipairs(technodes) do
+                      --   Print("HiveResearch 4")
+                        local techId = technode:GetTechId()
+                              --  Print("HiveResearch 5")
+                        --  Print("HiveResearch 4")
+                             --    Print("HiveResearch 6")
+                             local cost = 0--LookupTechData(techId, kTechDataCostKey) * 
+                                if  TresCheck(2,cost) then 
+                                --     Print("HiveResearch 7")
+                                  who:SetResearching(technode, who)
+                                  who:GetTeam():SetTeamResources(who:GetTeam():GetTeamResources() - cost)
+                                  break
+                                 end --
+                  end --
+                  
+                  return false
+
+end
+
 function Researcher:UpdateHivesManually()
 local randomhive = nil
+local  hivecount = #GetEntitiesForTeam( "Hive", 2 )
           for _, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
              if hive:GetIsBuilt() then 
                   if hive:GetTechId() == kTechId.Hive then UpdateTypeOfHive(hive) end
                    WorkHere(self,hive)
+                    self:AddTimedCallback(function() HiveResearch(hive) end, math.random(4,16)) 
               end
           end
       
-      if  TresCheck(40) then
+      if  hivecount < 3 and TresCheck(2,40) then
           for _, techpoint in ientitylist(Shared.GetEntitiesWithClassname("TechPoint")) do
              if techpoint:GetAttached() == nil then 
                local hive =  techpoint:SpawnCommandStructure(2) 
@@ -210,6 +242,8 @@ local randomhive = nil
              end
           end
      end
+
+     
 end
 
 Shared.LinkClassToMap("Researcher", Researcher.kMapName, networkVars)

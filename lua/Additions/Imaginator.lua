@@ -1,6 +1,6 @@
 --Kyle 'Avoca' Abent
 
-class 'Imaginator' (Entity) --Because I dont want to spawn it other than when conductor is active and that file is already full. 
+class 'Imaginator' (ScriptActor) --Because I dont want to spawn it other than when conductor is active and that file is already full. 
 Imaginator.kMapName = "imaginator"
 
 
@@ -40,6 +40,7 @@ function Imaginator:OnCreate()
    */
    self.marineenabled = true
    self.alienenabled = true
+   self:SetUpdates(true)
 end
 function Imaginator:OnInitialized()
 
@@ -47,18 +48,24 @@ end
 function Imaginator:GetIsMapEntity()
 return true
 end
-function Imaginator:OnPreGame()
-/*
-   for i = 1, 4 do
-     Print("Imaginator OnPreGame")
-   end
-     */
+function Imaginator:OnUpdate(deltatime)
    
-              if Server then
-              self:AddTimedCallback(Imaginator.Automations, 8)
-              self:AddTimedCallback(Imaginator.Imaginations, 4)
-              self:AddTimedCallback(Imaginator.CystTimer, 1)
-            end
+   if Server then
+                 if not  self.timeLastAutomations or self.timeLastAutomations + 8 <= Shared.GetTime() then
+                 self.timeLastAutomations = Shared.GetTime()
+        self:Automations()
+         end
+            if not  self.timeLastImaginations or self.timeLastImaginations + math.random(4,8) <= Shared.GetTime() then
+            self.timeLastImaginations = Shared.GetTime()
+        self:Imaginations()
+         end
+            if not  self.timeLastCystTimer or self.timeLastCystTimer + 1 <= Shared.GetTime() then
+            self.timeLastCystTimer = Shared.GetTime()
+         self:CystTimer()
+         end
+         
+         
+         end
    
 end
 function Imaginator:OnRoundStart() 
@@ -96,9 +103,13 @@ function Imaginator:SetImagination(boolean, team)
 end
 local function GetDisabledPowerPoints()
  local nodes = {}
- 
+ --add in contam
+           --  for _, contamination in ientitylist(Shared.GetEntitiesWithClassname("Contamination")) do
+         --      if contamination.GetOrigin then   table.insert(nodes, contamination) end
+        --     end
+
             for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-                    if powerpoint and  powerpoint:GetIsDisabled() then
+                    if powerpoint and  powerpoint:GetIsDisabled() and not ( not GetSiegeDoorOpen() and GetIsInSiege(powerpoint) ) then
                     table.insert(nodes, powerpoint)
                     end
                     
@@ -289,7 +300,14 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
      -- table.insert(tospawn, kTechId.Scan)
       table.insert(tospawn, kTechId.RoboticsFactory)
       table.insert(tospawn, kTechId.Observatory)
-      table.insert(tospawn, kTechId.PrototypeLab)
+      
+     local  AdvancedArmory = #GetEntitiesForTeam( "AdvancedArmory", 1 )
+     
+           if AdvancedArmory > 1 then
+            table.insert(tospawn, kTechId.PrototypeLab)
+      end
+      
+
       table.insert(tospawn, kTechId.Sentry)
       
       local  ArmsLabs = #GetEntitiesForTeam( "ArmsLab", 1 )
@@ -382,22 +400,23 @@ end
 local function BuildNotificationMessage(where, self, mapname)
 end
 local function FuckShitUp(self)
-   --   local  AvocaArcCount = #GetEntitiesForTeam( "AvocaArc", 1 )
+      local  AvocaArcCount = #GetEntitiesForTeam( "AvocaArc", 1 )
       local  SiegeArcCount = #GetEntitiesForTeam( "SiegeArc", 1 )
       local  CommandStation = GetEntitiesForTeam( "CommandStation", 1 )
       CommandStation = table.random(CommandStation)
       
       
-      --      if AvocaArcCount < 1 then
-      --        CreateEntity(AvocaArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
-      --        CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
-     -- end
+            if AvocaArcCount < 1 then
+              CreateEntity(AvocaArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
+              CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
+      end
       
             if SiegeArcCount < 5 then
               CreateEntity(SiegeArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
       end 
 
 end
+
 function Imaginator:ActualFormulaMarine()
 
     if GetSandCastle():GetIsSiegeOpen() then FuckShitUp(self) end
@@ -524,12 +543,49 @@ local hasshift = false
       return finalchoice, finalcost, gamestarted
       
 end
+local function GetBioMassLevel()
+           local teamInfo = GetTeamInfoEntity(2)
+           local bioMass = (teamInfo and teamInfo.GetBioMassLevel) and teamInfo:GetBioMassLevel() or 0
+           return bioMass
+end
+local function ChanceRandomContamination(who) --messy
+    --  Print("ChanceRandomContamination")
+     gamestarted =  not GetGameInfoEntity():GetWarmUpActive() 
+     local chance = GetSiegeDoorOpen() and 50 or 70
+     local randomchance = math.random(1, 100)
+     if (not gamestarted or TresCheck( 2, 5 ) ) and randomchance <= chance then
+       local relevantlocation =  GetSandCastle():GetLocationWithMostMixedPlayers()
+     --  Print("relevantlocation is %s", relevantlocation)
+       if relevantlocation then --rather than use the getpowerpoint for location.. it might not be built...
+       local nearestbuiltnode = GetNearest(relevantlocation:GetOrigin(), "PowerPoint", 1, function(ent) return not ent:GetIsDisabled() end)
+           --   Print("nearestbuiltnode is %s", nearestbuiltnode)
+           if nearestbuiltnode then --if not marine base?
+               local contamination = CreateEntityForTeam(kTechId.Contamination, FindFreeSpace(nearestbuiltnode:GetOrigin(), 4, 8), 2)
+            if gamestarted then contamination:GetTeam():SetTeamResources(contamination:GetTeam():GetTeamResources() - 5) end
+                        --     Print("nearestbuiltnode is %s", contamination)
+           end--
+         end--
+     end--
+end--
 function Imaginator:AlienConstructs(cystonly)
 
+
+       if not cystonly then
+       
+       if GetBioMassLevel() >= 9 then
+         ChanceRandomContamination(self)
+       
+       end
+       
+       end
+       
+       
        for i = 1, 2 do
          local success = self:ActualAlienFormula(cystonly)
                   if success == true then return true end
        end
+       
+
 
 return true
 
@@ -545,6 +601,8 @@ local name = location.name
 end
 function Imaginator:ActualAlienFormula(cystonly)
 --Print("AutoBuildConstructs")
+local  hivecount = #GetEntitiesForTeam( "Hive", 2 )
+if hivecount < 3 then return end -- build hives first ya newb
 local randomspawn = nil
 local powerPoints = GetDisabledPowerPoints()
 local tospawn, cost, gamestarted = GetAlienSpawnList(cystonly)

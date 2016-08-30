@@ -484,6 +484,7 @@ self.MarineTotalSpent = self.MarineTotalSpent + cost
         end
 elseif whoagain:GetTeamNumber() == 2 then
     self.AlienTotalSpent = self.AlienTotalSpent + cost
+    if reqpathing then CreateEntity(ClogMod.kMapName, whoagain:GetOrigin(), 2) end
     entity = CreateEntity(mapname, whoagain:GetOrigin(), whoagain:GetTeamNumber()) 
     if not entity then self:NotifyCredits( who, "Invalid Purchase Request of %s.", true, String) return end
     if entity.SetOwner then entity:SetOwner(whoagain) end
@@ -633,6 +634,7 @@ mapnameof = Shift.kMapName
 elseif String == "Hydra" then
 CreditCost = 1
 mapnameof = Hydra.kMapName
+reqpathing = false
 end
 
 return mapnameof, delay, reqpathing, CreditCost, limit
@@ -699,10 +701,10 @@ if not Player then return end
              elseif String == "RailGun" then  cost = 30 DeductBuy(self, Client, cost, delayafter) Player:GiveDualRailgunExo(Player:GetOrigin())
              end
          elseif Player:GetTeamNumber() == 2 then
-              if String == "Gorge" then Player:CreditBuy(Gorge) cost = 10 DeductBuy(self, Client, cost)
-              elseif String == "Lerk" then  cost = 15 DeductBuy(self, Client, cost, delayafter) Player:CreditBuy(Lerk)
-              elseif String == "Fade" then  cost = 25 DeductBuy(self, Client, cost, delayafter) Player:CreditBuy(Fade)
-              elseif String == "Onos" then cost = 30 DeductBuy(self, Client, cost, delayafter)  Player:CreditBuy(Onos)
+              if String == "Gorge" then Player:CreditBuy(Gorge) cost = 10  Player:SetResources(Player:GetResources() + kGorgeCost ) DeductBuy(self, Client, cost)
+              elseif String == "Lerk" then  cost = 15 DeductBuy(self, Client, cost, delayafter)  Player:SetResources(Player:GetResources() + kLerkCost ) Player:CreditBuy(Lerk)
+              elseif String == "Fade" then  cost = 25 DeductBuy(self, Client, cost, delayafter)  Player:SetResources(Player:GetResources() + kFadeCost ) Player:CreditBuy(Fade)
+              elseif String == "Onos" then cost = 30 DeductBuy(self, Client, cost, delayafter)  Player:SetResources(Player:GetResources() + kOnosCost ) Player:CreditBuy(Onos)
               end
          end
    

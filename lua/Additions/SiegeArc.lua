@@ -218,7 +218,7 @@ end
 if Server then
 function SiegeArc:Waypoint()
     for _, marine in ipairs(GetEntitiesWithinRange("Marine", self:GetOrigin(), 9999)) do
-                     if marine:GetIsAlive() and not marine:isa("Commander") then
+                     if marine:GetClient():GetIsVirtual() and marine:GetIsAlive() and not marine:isa("Commander") then
                      marine:GiveOrder(kTechId.Defend, self:GetId(), self:GetOrigin(), nil, true, true)
                      end
     end
