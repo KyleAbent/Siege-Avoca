@@ -188,7 +188,7 @@ for _, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive" )) do
     return true
 end
 local function HiveResearch(who)
-if who:GetIsResearching() then return false end
+if not who or who:GetIsResearching() then return false end
 local tree = who:GetTeam():GetTechTree()
 local technodes = {}
 --Print("HiveResearch 1")

@@ -78,8 +78,26 @@ function SiegeArc:Check()
 end
 
 local function GetSiegeLocation()
+--So 8.30 i turned siegearc from payload to auto. This moves arc into siege, close radius to hive, as a comm would.
+--it was tricky. But basically, it was stuck for a while.. but this formula here gets the correct siege location to base
+--the finding of a location within hive radius, within siege room. The avg origin stuff i guess is to make sure the
+--findarchivespawn works. Although with GetArcHiveSpawn modified to require GetWhereIsInSiege .. that helps too :)
 --local locations = {}
+
+local hive = nil
+
+ for _, hivey in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
+    hive = hivey
+ end
+ 
+ local siegeloc = GetNearest(hive:GetOrigin(), "Location", nil, function(ent) return string.find(ent.name, "siege") or string.find(ent.name, "Siege") end)
+ 
+if siegeloc then return siegeloc end
+
+
 local siege = nil
+
+
  for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
                if string.find(location.name, "siege") or string.find(location.name, "Siege") then
          -- table.insert(locations, location)
@@ -87,18 +105,28 @@ local siege = nil
              break
          end
     end
+    
     return siege --locations
 end
-local function MoveToHives(who) --Closest hive from origin
+local function MoveToHives(self) --Closest hive from origin
 local siegelocation = GetSiegeLocation()
 local siegepower = GetPowerPointForLocation(siegelocation.name)
-local inradiusofhive = FindArcHiveSpawn(siegepower:GetOrigin())
-local where = inradiusofhive
+local hiveclosest = GetNearest(siegepower:GetOrigin(), "Hive", 2)
+local origin = 0
+
+if hiveclosest then
+origin = siegepower:GetOrigin()
+origin = origin + hiveclosest:GetOrigin()
+origin = origin + siegelocation:GetOrigin()
+origin = origin / 3
+end
+if origin == 0 then origin = FindArcHiveSpawn(siegepower:GetOrigin())  end
+local where = origin
                if where then
-        who:GiveOrder(kTechId.Move, nil, where, nil, true, true)
+        self:GiveOrder(kTechId.Move, nil, where, nil, true, true)
                     return
                 end  
-    -- Print("No closest hive????")    
+   return not self.mode == ARC.kMode.Moving  and not GetIsInSiege(self)  
 end
 
 
@@ -124,7 +152,7 @@ end
 local function PlayersNearby(who)
 
 local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 5.5)
-local alive = false
+local alive = true--false
     if not who:GetInAttackMode() and #players >= 1 then
          for i = 1, #players do
             local player = players[i]
@@ -152,7 +180,7 @@ local moving = self.mode == ARC.kMode.Moving
         
 local attacking = self.deployMode == ARC.kDeployMode.Deployed
 --Print("attacking is %s", moving) 
-local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) 
+local inradius = GetIsInSiege(self) and GetIsPointWithinHiveRadius(self:GetOrigin()) 
 --Print("inradius is %s", inradius) 
 
 local shouldstop = not PlayersNearby(self)

@@ -118,24 +118,22 @@ local function GetDisabledPowerPoints()
 return nodes
 
 end
-local function PowerPointStuff(who)
-local team = 0
+local function PowerPointStuff(who, self)
 local location = GetLocationForPoint(who:GetOrigin())
 local powerpoint =  location and GetPowerPointForLocation(location.name)
+  local team1Commander = GetGamerules().team1:GetCommander()
+  local team2Commander = GetGamerules().team2:GetCommander()
       if powerpoint ~= nil then 
-              if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then 
-                team = 1
-             elseif powerpoint:GetIsDisabled() or  powerpoint:GetIsSocketed()  then
-             -- local infestation = GetEntitiesWithMixinWithinRange("Infestation", who:GetOrigin(), 7) 
-               -- if #infestation >= 1 then
-                 team = 2
-                -- end
+              if not ( team1Commander and self.marineenabled )  and ( powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() ) then 
+                return 1
+              end
+             if ( not team2Commander and self.alienenabled ) and ( not powerpoint:GetCanTakeDamageOverride() )  then
+                  return 2
                end
      end
-     return team
 end
-local function WhoIsQualified(who)
-   return PowerPointStuff(who)
+local function WhoIsQualified(who, self)
+   return PowerPointStuff(who, self)
 end
 local function Touch(who, where, what, number)
  local tower = CreateEntityForTeam(what, where, number, nil)
@@ -155,7 +153,7 @@ local function Envision(self,who, which)
     end
 end
 local function AutoDrop(self,who)
-  local which = WhoIsQualified(who)
+  local which = WhoIsQualified(who, self)
   if which ~= 0 then Envision(self,who, which) end
 end
 function Imaginator:Automations() 
@@ -301,11 +299,11 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
       table.insert(tospawn, kTechId.RoboticsFactory)
       table.insert(tospawn, kTechId.Observatory)
       
-     local  AdvancedArmory = #GetEntitiesForTeam( "AdvancedArmory", 1 )
+    -- local  AdvancedArmory = #GetEntitiesForTeam( "AdvancedArmory", 1 )
      
-           if AdvancedArmory > 1 then
+       --    if AdvancedArmory > 1 then
             table.insert(tospawn, kTechId.PrototypeLab)
-      end
+   --   end
       
 
       table.insert(tospawn, kTechId.Sentry)
@@ -427,6 +425,7 @@ local randomspawn = nil
 local tospawn, cost, gamestarted = GetMarineSpawnList()
 local airlock = GetActiveAirLock()
 local success = false
+local entity = nil
             if airlock and tospawn then
                 local powerpoint = GetPowerPointForLocation(airlock.name)
              if powerpoint then
@@ -448,15 +447,19 @@ local success = false
                           if tospawn == kTechId.ArmsLab then minrange = 4 end
                           if tospawn == kTechId.InfantryPortal then minrange = 8 end
                           if range >=  minrange  then
-                           local entity = CreateEntityForTeam(tospawn, randomspawn, 1)
+                            entity = CreateEntityForTeam(tospawn, randomspawn, 1)
                         if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                                --BuildNotificationMessage(randomspawn, self, tospawn)
                                success = true
                           end --
                      else -- it tonly takes 1!
-                      local entity = CreateEntityForTeam(tospawn, randomspawn, 1)
+                       entity = CreateEntityForTeam(tospawn, randomspawn, 1)
                         if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                         success = true
+                     end
+                     if entity ~= nil then 
+                       local supply = LookupTechData(entity:GetTechId(), kTechDataSupply, nil) or 0
+                       entity:GetTeam():RemoveSupplyUsed(supply)
                      end
                end   
             end
@@ -607,7 +610,7 @@ local randomspawn = nil
 local powerPoints = GetDisabledPowerPoints()
 local tospawn, cost, gamestarted = GetAlienSpawnList(cystonly)
 local success = false
-
+local entity = nil
 
      if powerPoints and tospawn then
                 local powerpoint = table.random(powerPoints)
@@ -629,15 +632,19 @@ local success = false
                           if tospawn == kTechId.StructureBeacon then minrange = 9999 end
                           if tospawn == kTechId.NutrientMist then minrange = NutrientMist.kSearchRange end
                           if range >=  minrange then
-                           local entity = CreateEntityForTeam(tospawn, randomspawn, 2)
+                            entity = CreateEntityForTeam(tospawn, randomspawn, 2)
                           if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                           end
                           success = true
                      else -- it tonly takes 1!
-                        local entity = CreateEntityForTeam(tospawn, randomspawn, 2)
+                         entity = CreateEntityForTeam(tospawn, randomspawn, 2)
                         if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                         success = true
                      end
+                       if entity ~= nil then 
+                       local supply = LookupTechData(entity:GetTechId(), kTechDataSupply, nil) or 0
+                       entity:GetTeam():RemoveSupplyUsed(supply)
+                          end
                end   
             end
   end

@@ -74,7 +74,7 @@ local entities = {}
 
             if #entities > 0 then
             local entity = table.random(entities)
-             if entity:GetMapName() == SentryAvoca.kMapName or entity:GetMapName() == Observatory.kMapName or entity:GetMapName() == ARC.kMapName  then return true end
+             if entity:GetMapName() == SentryAvoca.kMapName or entity:GetMapName() == Observatory.kMapName or entity:GetMapName() == ARCCredit.kMapName  then return true end
                 DestroyEntity(entity)
                  self:NotifyCredits( Client, "Deleted your old %s so you can spawn a new one, newb.", true, mapname)
             end
@@ -545,9 +545,9 @@ local function TeamOneBuyRules(self, Client, Player, String)
 
 local mapnameof = nil
 local delay = 12
-local reqpathing = true
+local reqpathing = false
 local CreditCost = 1
-local reqground = true
+local reqground = false
 local limit = 3
 local techid = nil
 
@@ -578,13 +578,14 @@ mapnameof = RoboticsFactory.kMapName
 elseif String == "Mac" then
 techid = kTechId.MAC
 CreditCost = 4
-mapnameof = MAC.kMapName
+mapnameof = MACCredit.kMapName
 limit = 2
-elseif string == "Arc" then 
+elseif String == "Arc" then 
 techid = kTechId.ARC
 CreditCost = 20
-mapnameof = ARC.kMapName
+mapnameof = ARCCredit.kMapName
 limit = 1
+elseif string == nil then
 end
 
 return mapnameof, delay, reqground, reqpathing, CreditCost, limit, techid

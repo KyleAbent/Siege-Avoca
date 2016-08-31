@@ -4,6 +4,10 @@ function Onos:GetTierFourTechId()
 end
 end
 
+function Onos:GetHasMovementSpecial()
+    return GetHasTech(self, kTechId.Charge)
+end
+
 
 --local orig_Onos_OnAdjustModelCoords = Onos.OnAdjustModelCoords
 function Onos:OnAdjustModelCoords(modelCoords) 

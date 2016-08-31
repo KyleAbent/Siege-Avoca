@@ -17,7 +17,11 @@ function Contamination:OnInitialized()
     coords.origin = self:GetOrigin()
     
     if Server then
-    
+             if not Shared.GetCheatsEnabled() then
+               if not GetFrontDoorOpen() then 
+               DestroyEntity(self)
+               end
+           end
         InitMixin( self, StaticTargetMixin )
         self:SetCoords( coords )
         

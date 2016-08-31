@@ -49,7 +49,7 @@ end
     return kHydraHealth
 end
 function HydraAvoca:GetMaxArmor()
-    return kHydraArmor
+    return kMatureHydraArmor
 end
     function HydraAvoca:GetMaxLevel()
     return 30

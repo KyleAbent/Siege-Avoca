@@ -1,3 +1,4 @@
+--just override these
 function MAC:GetCanBeUsed(player, useSuccessTable)
   useSuccessTable.useSuccess = true 
 end

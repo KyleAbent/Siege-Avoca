@@ -192,12 +192,17 @@ local function DropStructure(self, player)
             if structure then
             
                 structure:SetOwner(player)
-                if structure.SetConstructionComplete then structure:SetConstructionComplete() end
-                if structure:isa("ARC") then
-                structure.isGhostStructure = false
-                structure:GiveOrder(kTechId.ARCDeploy, structure:GetId(), structure:GetOrigin(), nil, false, false)
-                elseif structure:isa("MAC") then
-                structure:ProcessFollowAndWeldOrder(Shared.GetTime(), player, player:GetOrigin()) 
+                if structure.SetConstructionComplete  then
+                 if not GetIsPointOnInfestation(structure:GetOrigin()) then
+                  structure:SetConstructionComplete()
+                   else
+                   structure.isGhostStructure = false
+                   end
+               -- if structure:isa("ARC") then
+               -- 
+               -- structure:GiveOrder(kTechId.ARCDeploy, structure:GetId(), structure:GetOrigin(), nil, false, false)
+                --elseif structure:isa("MAC") then
+              --  structure:ProcessFollowAndWeldOrder(Shared.GetTime(), player, player:GetOrigin()) 
                 end
                 structure:SetOwner(player)
 
@@ -353,9 +358,9 @@ function LayStructures:GetPositionForStructure(player)
         displayOrigin = trace.endPoint
         
         // Can not be built on infestation
-        if GetIsPointOnInfestation(displayOrigin) then
-            isPositionValid = false
-        end
+     --   if GetIsPointOnInfestation(displayOrigin) then
+        --    isPositionValid = false
+      --  end
     
           if not IsPathable(displayOrigin) then
                     isPositionValid = false or isonstructure

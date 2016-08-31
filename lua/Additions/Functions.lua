@@ -45,6 +45,15 @@ function GetIsInSiege(who)
 if string.find(GetLocationName(who), "siege") or string.find(GetLocationName(who), "Siege") then return true end
 return false
 end
+local function GetLocationNameWhere(where)
+        local location = GetLocationForPoint(where)
+        local locationName = location and location:GetName() or ""
+        return locationName
+end
+function GetWhereIsInSiege(where)
+if string.find(GetLocationNameWhere(where), "siege") or string.find(GetLocationNameWhere(where), "Siege") then return true end
+return false
+end
        function FindArcHiveSpawn(where)    
         for index = 1, 8 do
            local extents = LookupTechData(kTechId.Skulk, kTechDataMaxExtents, nil)
@@ -55,22 +64,18 @@ end
              spawnPoint = GetGroundAtPosition(spawnPoint, nil, PhysicsMask.AllButPCs, extents)
            end
         
-           local location = spawnPoint and GetLocationForPoint(spawnPoint)
-           local locationName = location and location:GetName() or ""
-           local wherelocation = GetLocationForPoint(where)
-           wherelocation = wherelocation and wherelocation.name or nil
-           local sameLocation = spawnPoint ~= nil and locationName == wherelocation
+           local sameLocation = spawnPoint ~= nil and GetWhereIsInSiege(spawnPoint)
         
            if spawnPoint ~= nil and sameLocation and GetIsPointWithinHiveRadius(spawnPoint) then
            return spawnPoint
            end
        end
            Print("No valid spot found for FindArcHiveSpawn")
-           return nil
+           return nil --FindFreeSpace(where, .5, 48)
     end
     function GetIsPointWithinHiveRadius(point)
-      local techpoints = GetEntitiesWithinRange("Hive", point, ARC.kFireRange)
-   if #techpoints == 2 then return true end
+      local hive = GetEntitiesWithinRange("Hive", point, 18)
+   if #hive >= 1 then return true end
    return false
 end
 function GetGameStarted()
