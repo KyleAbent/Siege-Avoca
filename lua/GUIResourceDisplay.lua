@@ -23,7 +23,7 @@ GUIResourceDisplay.kTeamResourceIcon = { Width = 0, Height = 0, X = 0, Y = 0, Co
 
 GUIResourceDisplay.kResourceTowerIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 240, Y1 = 363, X2 = 280, Y2 = 411} }
 
-GUIResourceDisplay.kWorkerIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 280, Y1 = 363, X2 = 320, Y2 = 411} }
+--GUIResourceDisplay.kWorkerIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 280, Y1 = 363, X2 = 320, Y2 = 411} }
 
 GUIResourceDisplay.kEggsIcon = { Width = 0, Height = 0, X = 0, Y = 0, Coords = { X1 = 80 * 6, Y1 = 80 * 3, X2 = 80 * 7, Y2 = 80 * 4 } }
 
@@ -51,8 +51,8 @@ local function UpdateItemsGUIScale(self)
     GUIResourceDisplay.kResourceTowerIcon.Width = GUIScale(48)
     GUIResourceDisplay.kResourceTowerIcon.Height = GUIScale(48)
 
-    GUIResourceDisplay.kWorkerIcon.Width = GUIScale(48)
-    GUIResourceDisplay.kWorkerIcon.Height = GUIScale(48)
+    --GUIResourceDisplay.kWorkerIcon.Width = GUIScale(48)
+    --GUIResourceDisplay.kWorkerIcon.Height = GUIScale(48)
 
     GUIResourceDisplay.kIconTextXOffset = GUIScale(5)
     GUIResourceDisplay.kIconXOffset = GUIScale(30)
@@ -131,26 +131,26 @@ function GUIResourceDisplay:Initialize(settingsTable)
     self.towerIcon:AddChild(self.towerText)
     
     -- worker display.
-    self.workerIcon = GUIManager:CreateGraphicItem()
-    self.workerIcon:SetSize(Vector(GUIResourceDisplay.kResourceTowerIcon.Width, GUIResourceDisplay.kResourceTowerIcon.Height, 0))
-    self.workerIcon:SetAnchor(GUIItem.Right, GUIItem.Center)
-    local workerIconX = GUIResourceDisplay.kWorkerIcon.X + -GUIResourceDisplay.kWorkerIcon.Width + GUIResourceDisplay.kIconXOffset
-    local workerIconY = GUIResourceDisplay.kWorkerIcon.Y + -GUIResourceDisplay.kWorkerIcon.Height / 2
-    self.workerIcon:SetPosition(Vector(workerIconX, workerIconY, 0))
-    self.workerIcon:SetTexture(self.textureName)
-    GUISetTextureCoordinatesTable(self.workerIcon, GUIResourceDisplay.kWorkerIcon.Coords)
-    self.background:AddChild(self.workerIcon)
+  --  self.workerIcon = GUIManager:CreateGraphicItem()
+  --  self.workerIcon:SetSize(Vector(GUIResourceDisplay.kResourceTowerIcon.Width, GUIResourceDisplay.kResourceTowerIcon.Height, 0))
+  --  self.workerIcon:SetAnchor(GUIItem.Right, GUIItem.Center)
+  --  local workerIconX = GUIResourceDisplay.kWorkerIcon.X + -GUIResourceDisplay.kWorkerIcon.Width + GUIResourceDisplay.kIconXOffset
+  --  local workerIconY = GUIResourceDisplay.kWorkerIcon.Y + -GUIResourceDisplay.kWorkerIcon.Height / 2
+  --  self.workerIcon:SetPosition(Vector(workerIconX, workerIconY, 0))
+  --  self.workerIcon:SetTexture(self.textureName)
+   -- GUISetTextureCoordinatesTable(self.workerIcon, GUIResourceDisplay.kWorkerIcon.Coords)
+   -- self.background:AddChild(self.workerIcon)
 
-    self.workerText = GUIManager:CreateTextItem()
-    self.workerText:SetAnchor(GUIItem.Right, GUIItem.Center)
-    self.workerText:SetTextAlignmentX(GUIItem.Align_Min)
-    self.workerText:SetTextAlignmentY(GUIItem.Align_Center)
-    self.workerText:SetPosition(Vector(GUIResourceDisplay.kIconTextXOffset, 0, 0))
-    self.workerText:SetColor(Color(1, 1, 1, 1))
-    self.workerText:SetFontName(kFontName)
-    self.workerText:SetScale(kFontScale)
-    GUIMakeFontScale(self.workerText)
-    self.workerIcon:AddChild(self.workerText)
+    --self.workerText = GUIManager:CreateTextItem()
+   -- self.workerText:SetAnchor(GUIItem.Right, GUIItem.Center)
+   -- self.workerText:SetTextAlignmentX(GUIItem.Align_Min)
+   -- self.workerText:SetTextAlignmentY(GUIItem.Align_Center)
+   -- self.workerText:SetPosition(Vector(GUIResourceDisplay.kIconTextXOffset, 0, 0))
+   -- self.workerText:SetColor(Color(1, 1, 1, 1))
+   -- self.workerText:SetFontName(kFontName)
+   -- self.workerText:SetScale(kFontScale)
+   -- GUIMakeFontScale(self.workerText)
+   -- self.workerIcon:AddChild(self.workerText)
  
     self.eggsIcon = GUIManager:CreateGraphicItem()
     self.eggsIcon:SetSize(Vector(GUIResourceDisplay.kEggsIcon.Width, GUIResourceDisplay.kEggsIcon.Height, 0))
@@ -225,14 +225,14 @@ function GUIResourceDisplay:Update(deltaTime)
     local numHarvesters = CommanderUI_GetTeamHarvesterCount()
     self.towerText:SetText(ToString(numHarvesters))
     
-    local supplyUsed = GetSupplyUsedByTeam(Client.GetLocalPlayer():GetTeamNumber())
-    local maxSupply = GetMaxSupplyForTeam(Client.GetLocalPlayer():GetTeamNumber())
+   -- local supplyUsed = GetSupplyUsedByTeam(Client.GetLocalPlayer():GetTeamNumber())
+   -- local maxSupply = GetMaxSupplyForTeam(Client.GetLocalPlayer():GetTeamNumber())
     
-    local useColor = ConditionalValue( supplyUsed < maxSupply, kWhite, kRed)
+--    local useColor = ConditionalValue( supplyUsed < maxSupply, kWhite, kRed)
     
-    self.workerText:SetText(string.format("%d / %d", supplyUsed, maxSupply))
-    self.workerText:SetColor(useColor)
-    self.workerIcon:SetColor(useColor)
+    --self.workerText:SetText(string.format("%d / %d", supplyUsed, maxSupply))
+    --self.workerText:SetColor(useColor)
+    --self.workerIcon:SetColor(useColor)
     
     local eggCount = AlienUI_GetEggCount()   
     self.eggsText:SetText(ToString(eggCount))

@@ -2,6 +2,7 @@
 
 
 Script.Load("lua/Additions/LevelsMixin.lua")
+Script.Load("lua/Additions/AvocaMixin.lua")
 
 class 'SentryAvoca' (Sentry)
 SentryAvoca.kMapName = "sentryavoca"
@@ -9,33 +10,17 @@ SentryAvoca.kMapName = "sentryavoca"
 local networkVars = {}
 
 AddMixinNetworkVars(LevelsMixin, networkVars)
-
+AddMixinNetworkVars(AvocaMixin, networkVars)
     
-local origsentry  = Sentry.OnInitialized
-function Sentry:OnInitialized()
-  origsentry(self)
-    if Server and not self:isa("SentryAvoca") then
-    self:AddTimedCallback( function ()
-       local sentry = CreateEntity(SentryAvoca.kMapName, self:GetOrigin(), 1) 
-      sentry:SetParent(self:GetParent())
-      if self:GetIsBuilt() then sentry:SetConstructionComplete() end
-        DestroyEntity(self) end , .5)
-    end
-
-end
 
     function SentryAvoca:OnInitialized()
          Sentry.OnInitialized(self)
         InitMixin(self, LevelsMixin)
-          self:AdjustMaxHealth(self:GetMaxHealth())
-         self:AdjustMaxArmor(self:GetMaxArmor())
+        InitMixin(self, AvocaMixin)
     end
         function SentryAvoca:GetTechId()
          return kTechId.Sentry
     end
-    function SentryAvoca:GetMaxHealth()
-    return kSentryHealth
-end
 function SentryAvoca:GetMaxArmor()
     return kSentryArmor 
 end
@@ -92,7 +77,7 @@ function GetCheckSentryLimit(techId, origin, normal, commander)
         
         for index, sentry in ientitylist(Shared.GetEntitiesWithClassname("Sentry")) do
         
-            if sentry:GetLocationName() == locationName  then
+            if sentry:GetLocationName() == locationName  and not sentry.isacreditstructure then
                 numInRoom = numInRoom + 1
             end
             

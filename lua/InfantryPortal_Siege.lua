@@ -1,30 +1,26 @@
-function Whip:OnTeleportEnd()
-                    self:InfestationNeedsUpdate()
-                    self:AddTimedCallback(function()  self:InfestationNeedsUpdate() end, 1)
-end
 Script.Load("lua/Additions/AvocaMixin.lua")
-class 'WhipAvoca' (Whip)
-WhipAvoca.kMapName = "whipavoca"
+class 'InfantryPortalAvoca' (InfantryPortal)
+InfantryPortalAvoca.kMapName = "infantryportalavoca"
 
 local networkVars = {}
 
 AddMixinNetworkVars(AvocaMixin, networkVars)
     
 
-    function WhipAvoca:OnInitialized()
-         Whip.OnInitialized(self)
+    function InfantryPortalAvoca:OnInitialized()
+         InfantryPortal.OnInitialized(self)
         InitMixin(self, AvocaMixin)
     end
-        function WhipAvoca:GetTechId()
-         return kTechId.Whip
+        function InfantryPortalAvoca:GetTechId()
+         return kTechId.InfantryPortal
     end
 
-function WhipAvoca:OnGetMapBlipInfo()
+function InfantryPortalAvoca:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined
     local blipTeam = -1
     local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
-    blipType = kMinimapBlipType.Whip
+    blipType = kMinimapBlipType.InfantryPortal
      blipTeam = self:GetTeamNumber()
     if blipType ~= 0 then
         success = true
@@ -33,4 +29,4 @@ function WhipAvoca:OnGetMapBlipInfo()
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
 
-Shared.LinkClassToMap("WhipAvoca", WhipAvoca.kMapName, networkVars)
+Shared.LinkClassToMap("InfantryPortalAvoca", InfantryPortalAvoca.kMapName, networkVars)

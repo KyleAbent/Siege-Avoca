@@ -556,3 +556,36 @@ function RoboticsAddon:OnCreate()
 end
 
 Shared.LinkClassToMap("RoboticsAddon", RoboticsAddon.kMapName, addonNetworkVars)
+
+Script.Load("lua/Additions/AvocaMixin.lua")
+class 'RoboticsFactoryAvoca' (RoboticsFactory)
+RoboticsFactoryAvoca.kMapName = "roboticsfactoryavoca"
+
+local networkVars = {}
+
+AddMixinNetworkVars(AvocaMixin, networkVars)
+    
+
+    function RoboticsFactoryAvoca:OnInitialized()
+         RoboticsFactory.OnInitialized(self)
+        InitMixin(self, AvocaMixin)
+    end
+        function RoboticsFactoryAvoca:GetTechId()
+         return kTechId.RoboticsFactory
+    end
+
+function RoboticsFactoryAvoca:OnGetMapBlipInfo()
+    local success = false
+    local blipType = kMinimapBlipType.Undefined
+    local blipTeam = -1
+    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
+    blipType = kMinimapBlipType.RoboticsFactory
+     blipTeam = self:GetTeamNumber()
+    if blipType ~= 0 then
+        success = true
+    end
+    
+    return success, blipType, blipTeam, isAttacked, false --isParasited
+end
+
+Shared.LinkClassToMap("RoboticsFactoryAvoca", RoboticsFactoryAvoca.kMapName, networkVars)

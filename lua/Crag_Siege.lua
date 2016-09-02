@@ -35,3 +35,41 @@ function Crag:TryHeal(target)
     end
    
 end
+
+--SentryBattery.kRange = 9999
+
+
+Script.Load("lua/Additions/LevelsMixin.lua")
+Script.Load("lua/Additions/AvocaMixin.lua")
+
+class 'CragAvoca' (Crag)
+CragAvoca.kMapName = "cragavoca"
+
+local networkVars = {}
+
+AddMixinNetworkVars(AvocaMixin, networkVars)
+    
+
+    function CragAvoca:OnInitialized()
+         Crag.OnInitialized(self)
+        InitMixin(self, AvocaMixin)
+    end
+        function CragAvoca:GetTechId()
+         return kTechId.Crag
+    end
+
+function CragAvoca:OnGetMapBlipInfo()
+    local success = false
+    local blipType = kMinimapBlipType.Undefined
+    local blipTeam = -1
+    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
+    blipType = kMinimapBlipType.Crag
+     blipTeam = self:GetTeamNumber()
+    if blipType ~= 0 then
+        success = true
+    end
+    
+    return success, blipType, blipTeam, isAttacked, false --isParasited
+end
+
+Shared.LinkClassToMap("CragAvoca", CragAvoca.kMapName, networkVars)

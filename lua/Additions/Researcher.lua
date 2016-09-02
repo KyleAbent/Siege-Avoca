@@ -178,14 +178,13 @@ for _, structure in ientitylist(Shared.GetEntitiesWithClassname("Hive" )) do
      end
     return true
 end
-local function NotBeingResearchedChamber(techId)   
+local function NotBeingResearched(techId)   
 for _, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive" )) do
      if hive:GetIsBuilt() then
-     local chamber = hive:GetEvolutionChamber()
-         if chamber:GetIsResearching() and chamber:GetResearchingId() == techId then return false end
-     end
+         if hive:GetIsResearching() and hive:GetResearchingId() == techId then return false end
      end
     return true
+end
 end
 local function HiveResearch(who)
 if not who or who:GetIsResearching() then return false end
@@ -196,7 +195,7 @@ local technodes = {}
    --  Print("HiveResearch 2")
            local canRes = tree:GetHasTech(node:GetPrereq1()) and tree:GetHasTech(node:GetPrereq2())
           local techId = node:GetTechId()
-         if canRes and NotBeingResearchedChamber(techId) and node:GetIsResearch() and node:GetCanResearch() then --and  not NotBeingResearchedHive(techId) then
+         if canRes and NotBeingResearched(techId) and node:GetIsResearch() and node:GetCanResearch() then --and  not NotBeingResearchedHive(techId) then
        --     Print("HiveResearch 3")
           table.insert(technodes, node)
          end
@@ -230,7 +229,8 @@ local  hivecount = #GetEntitiesForTeam( "Hive", 2 )
              if hive:GetIsBuilt() then 
                   if hive:GetTechId() == kTechId.Hive then UpdateTypeOfHive(hive) end
                    WorkHere(self,hive)
-                    self:AddTimedCallback(function() HiveResearch(hive) end, math.random(4,16)) 
+                    HiveResearch(hive) --shame because the local function works to prevent triple research
+                                       --of same item. but this function calls all three hives to call it at once, voiding the call.
               end
           end
       

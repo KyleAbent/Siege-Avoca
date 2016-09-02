@@ -263,3 +263,35 @@ if Server then
     end
     
 end
+Script.Load("lua/Additions/AvocaMixin.lua")
+class 'ObservatoryAvoca' (Observatory)--may not nee dto do ongetmapblipinfo because the way i redone the setcachedtechdata to simply change the mapname to this :)
+ObservatoryAvoca.kMapName = "observatoryavoca"
+
+local networkVars = {}
+
+AddMixinNetworkVars(AvocaMixin, networkVars)
+    
+
+    function ObservatoryAvoca:OnInitialized()
+         Observatory.OnInitialized(self)
+        InitMixin(self, AvocaMixin)
+    end
+        function ObservatoryAvoca:GetTechId()
+         return kTechId.Observatory
+    end
+
+function ObservatoryAvoca:OnGetMapBlipInfo()
+    local success = false
+    local blipType = kMinimapBlipType.Undefined
+    local blipTeam = -1
+    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
+    blipType = kMinimapBlipType.Observatory
+     blipTeam = self:GetTeamNumber()
+    if blipType ~= 0 then
+        success = true
+    end
+    
+    return success, blipType, blipTeam, isAttacked, false --isParasited
+end
+
+Shared.LinkClassToMap("ObservatoryAvoca", ObservatoryAvoca.kMapName, networkVars)

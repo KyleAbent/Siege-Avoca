@@ -68,6 +68,14 @@ function Imaginator:OnUpdate(deltatime)
          end
    
 end
+function Imaginator:OnPreGame()
+
+   for i = 1, 4 do
+     Print("Imaginator OnPreGame")
+   end
+   
+   
+end
 function Imaginator:OnRoundStart() 
    for i = 1, 4 do
      Print("Imaginator OnRoundStart")
@@ -103,11 +111,6 @@ function Imaginator:SetImagination(boolean, team)
 end
 local function GetDisabledPowerPoints()
  local nodes = {}
- --add in contam
-           --  for _, contamination in ientitylist(Shared.GetEntitiesWithClassname("Contamination")) do
-         --      if contamination.GetOrigin then   table.insert(nodes, contamination) end
-        --     end
-
             for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
                     if powerpoint and  powerpoint:GetIsDisabled() and not ( not GetSiegeDoorOpen() and GetIsInSiege(powerpoint) ) then
                     table.insert(nodes, powerpoint)
@@ -349,11 +352,16 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
       --Print("GetMarineSpawnList() return finalchoice %s, finalcost %s", finalchoice, finalcost)
       return finalchoice, finalcost, gamestarted
 end
+--local function BuildArcsMacs()
+
+--end
 function Imaginator:MarineConstructs()
        for i = 1, 2 do
          local success = self:ActualFormulaMarine()
          if success == true then return true end
        end
+       
+    --   BuildArcsMacs()
 
 return true
 end
@@ -457,10 +465,6 @@ local entity = nil
                         if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                         success = true
                      end
-                     if entity ~= nil then 
-                       local supply = LookupTechData(entity:GetTechId(), kTechDataSupply, nil) or 0
-                       entity:GetTeam():RemoveSupplyUsed(supply)
-                     end
                end   
             end
   end
@@ -557,18 +561,14 @@ local function ChanceRandomContamination(who) --messy
      local chance = GetSiegeDoorOpen() and 50 or 70
      local randomchance = math.random(1, 100)
      if (not gamestarted or TresCheck( 2, 5 ) ) and randomchance <= chance then
-       local relevantlocation =  GetSandCastle():GetLocationWithMostMixedPlayers()
-     --  Print("relevantlocation is %s", relevantlocation)
-       if relevantlocation then --rather than use the getpowerpoint for location.. it might not be built...
-       local nearestbuiltnode = GetNearest(relevantlocation:GetOrigin(), "PowerPoint", 1, function(ent) return not ent:GetIsDisabled() end)
-           --   Print("nearestbuiltnode is %s", nearestbuiltnode)
-           if nearestbuiltnode then --if not marine base?
-               local contamination = CreateEntityForTeam(kTechId.Contamination, FindFreeSpace(nearestbuiltnode:GetOrigin(), 4, 8), 2)
+       local where =  GetAverageBuiltNode()
+           if where then 
+               local contamination = CreateEntityForTeam(kTechId.Contamination, FindFreeSpace(where, 4, 8), 2)
+                    -- CreatePheromone(kTechId.ExpandingMarker,contamination:GetOrigin(), 2) 
             if gamestarted then contamination:GetTeam():SetTeamResources(contamination:GetTeam():GetTeamResources() - 5) end
                         --     Print("nearestbuiltnode is %s", contamination)
            end--
          end--
-     end--
 end--
 function Imaginator:AlienConstructs(cystonly)
 
@@ -641,10 +641,6 @@ local entity = nil
                         if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
                         success = true
                      end
-                       if entity ~= nil then 
-                       local supply = LookupTechData(entity:GetTechId(), kTechDataSupply, nil) or 0
-                       entity:GetTeam():RemoveSupplyUsed(supply)
-                          end
                end   
             end
   end

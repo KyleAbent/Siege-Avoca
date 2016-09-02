@@ -50,9 +50,187 @@ function GetCheckSpurLimit(techId, origin, normal, commander)
 end
 
 
+local function GetIsACreditStructure(who)
+local boolean = HasMixin(who, "Avoca") and who:GetIsACreditStructure()  or false
+--Print("isacredit structure is %s", boolean)
+return boolean
+
+end
+
+local function GetCheckArmsLabLimit()
+    local num = 0
+
+        
+        for index, armslab in ientitylist(Shared.GetEntitiesWithClassname("ArmsLab")) do
+        
+                num = num + 1
+            
+    end
+    
+    return num < kArmsLabEntityLimit
+end
+local function GetCheckInfantryPortalLimit()
+    local num = 0
+
+        
+        for index, infantryportal in ientitylist(Shared.GetEntitiesWithClassname("InfantryPortal")) do
+               if not GetIsACreditStructure(infantryportal) then
+                num = num + 1
+                end
+            
+    end
+    
+    return num < kIPEntityLimit
+end
+local function GetCheckArmoryLimit()
+    local num = 0
+
+        
+        for index, armory in ientitylist(Shared.GetEntitiesWithClassname("Armory")) do
+        
+               if not GetIsACreditStructure(armory) then
+                num = num + 1
+                end
+            
+            
+    end
+    
+    return num < kArmoryEntityLimit
+end
+local function GetCheckPhaseGateLimit()
+    local num = 0
+
+        
+        for index, phsaegate in ientitylist(Shared.GetEntitiesWithClassname("PhaseGate")) do
+        
+               if not GetIsACreditStructure(phsaegate) then
+                num = num + 1
+                end
+            
+    end
+    
+    return num < kPGEntityLimit
+end
+local function GetCheckObservatoryLimit()
+    local num = 0
+
+        
+        for index, obs in ientitylist(Shared.GetEntitiesWithClassname("Observatory")) do
+        
+                num = num + 1
+                
+                if not GetIsACreditStructure(obs) then
+                num = num + 1
+                end
+    end
+    
+    return num < kOBSEntityLimit
+end
+local function GetCheckRoboticsFactoryLimit()
+    local num = 0
+
+        
+        for index, robo in ientitylist(Shared.GetEntitiesWithClassname("RoboticsFactory")) do
+        
+                num = num + 1
+                
+                if not GetIsACreditStructure(robo) then
+                num = num + 1
+                end
+    end
+    
+    return num < kRoboEntityLimit
+end
+local function GetCheckPrototypeLabLimit()
+    local num = 0
+
+        
+        for index, proto in ientitylist(Shared.GetEntitiesWithClassname("PrototypeLab")) do
+        
+                num = num + 1
+                
+                if not GetIsACreditStructure(proto) then
+                num = num + 1
+                end
+    end
+    
+    
+    return num < kProtoEntityLimit
+end
+ 
+ local function GetCheckWhipGateLimit()
+     local num = 0
+
+        for index, whip in ientitylist(Shared.GetEntitiesWithClassname("Whip")) do
+        
+                num = num + 1
+                
+                if not GetIsACreditStructure(whip) then
+                num = num + 1
+                end
+    end
+    
+    
+    return num < kWhipEntityLimit
+end
+local function GetCheckShiftLimit()
+    local num = 0
+
+        
+        for index, shift in ientitylist(Shared.GetEntitiesWithClassname("Shift")) do
+        
+              if not GetIsACreditStructure(shift) then
+                num = num + 1
+                end
+            
+    end
+    
+    return num < kShiftEntityLimit
+end
+local function GetCheckShadeFactoryLimit()
+    local num = 0
+
+        
+        for index, shade in ientitylist(Shared.GetEntitiesWithClassname("Shade")) do
+        
+                if not GetIsACreditStructure(shade) then
+                num = num + 1
+                end
+            
+    end
+    
+    return num < kShadeEntityLimit
+end
+local function GetCheckCragLabLimit()
+    local num = 0
+
+        
+        for index, crag in ientitylist(Shared.GetEntitiesWithClassname("Crag")) do
+        
+                 if not GetIsACreditStructure(crag) then
+                num = num + 1
+                end
+            
+    end
+    
+    return num < kCragEntityLimit
+end
+local function GetCheckCommandStationLimit()
+    local num = 0
+
+        
+        for index, commandstation in ientitylist(Shared.GetEntitiesWithClassname("CommandStation")) do
+        
+                num = num + 1
+            
+    end
+    
+    return num < 3
+end
 SetCachedTechData(kTechId.Sentry, kStructureBuildNearClass, false)
 SetCachedTechData(kTechId.Sentry, kStructureAttachRange, 999)
 SetCachedTechData(kTechId.Sentry, kTechDataSpecifyOrientation, false)
+
 SetCachedTechData(kTechId.SentryBattery, kTechDataHint, "Powers structures without power!")
 SetCachedTechData(kTechId.SentryBattery,kTechDataDisplayName, "Backup Battery")
 
@@ -60,6 +238,41 @@ SetCachedTechData(kTechId.SentryBattery,kTechDataDisplayName, "Backup Battery")
 SetCachedTechData(kTechId.Spur, kTechDataBuildMethodFailedMessage, "Trying to crash the server?")
 SetCachedTechData(kTechId.Veil, kTechDataBuildMethodFailedMessage, "Trying to crash the server?")
 SetCachedTechData(kTechId.Shell, kTechDataBuildMethodFailedMessage, "Trying to crash the server?")
+
+
+SetCachedTechData(kTechId.Whip, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.Crag, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.Shade, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.Shift, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+
+SetCachedTechData(kTechId.CommandStation, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.InfantryPortal, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.Sentry, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.Armory, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+
+SetCachedTechData(kTechId.ArmsLab, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.InfantryPortal, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.PhaseGate, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.Observatory, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.RoboticsFactory, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+SetCachedTechData(kTechId.PrototypeLab, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+
+
+
+SetCachedTechData(kTechId.ArmsLab, kTechDataBuildRequiresMethod, GetCheckArmsLabLimit)
+SetCachedTechData(kTechId.InfantryPortal, kTechDataBuildRequiresMethod, GetCheckInfantryPortalLimit)
+SetCachedTechData(kTechId.Armory, kTechDataBuildRequiresMethod, GetCheckArmoryLimit)
+SetCachedTechData(kTechId.PhaseGate, kTechDataBuildRequiresMethod, GetCheckPhaseGateLimit)
+SetCachedTechData(kTechId.Observatory, kTechDataBuildRequiresMethod, GetCheckObservatoryLimit)
+SetCachedTechData(kTechId.RoboticsFactory, kTechDataBuildRequiresMethod, GetCheckRoboticsFactoryLimit)
+SetCachedTechData(kTechId.PrototypeLab, kTechDataBuildRequiresMethod, GetCheckPrototypeLabLimit)
+
+SetCachedTechData(kTechId.CommandStation, kTechDataBuildRequiresMethod, GetCheckCommandStationLimit)
+
+SetCachedTechData(kTechId.Whip, kTechDataBuildRequiresMethod, GetCheckWhipGateLimit)
+SetCachedTechData(kTechId.Shift, kTechDataBuildRequiresMethod, GetCheckShiftLimit)
+SetCachedTechData(kTechId.Shade, kTechDataBuildRequiresMethod, GetCheckShadeFactoryLimit)
+SetCachedTechData(kTechId.Crag, kTechDataBuildRequiresMethod, GetCheckCragLabLimit)
 
 SetCachedTechData(kTechId.CommandStation, kStructureAttachClass, false)
 SetCachedTechData(kTechId.Spur, kTechDataBuildRequiresMethod, GetCheckSpurLimit)

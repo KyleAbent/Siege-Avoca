@@ -16,3 +16,5 @@ kXenocideResearchTime = 39
 kBatteryPowerRange = 4
 kSentrySupply = 5
 kSentryDamage = 4
+
+kMaxTeamResources = 999

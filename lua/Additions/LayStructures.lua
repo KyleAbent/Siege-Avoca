@@ -205,11 +205,8 @@ local function DropStructure(self, player)
               --  structure:ProcessFollowAndWeldOrder(Shared.GetTime(), player, player:GetOrigin()) 
                 end
                 structure:SetOwner(player)
+                structure:SetIsACreditStructure(true)
 
-                 if HasMixin(structure, "Supply") then
-                 local supplyamount = LookupTechData(structure:GetTechId(), kTechDataSupply, 0)
-                 player:GetTeam():RemoveSupplyUsed(supplyamount)
-                 end
                 
                 // Check for space
                 if structure:SpaceClearForEntity(coords.origin) then

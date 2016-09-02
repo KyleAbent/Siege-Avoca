@@ -1,3 +1,22 @@
+----
+--comm entity limits, rather than supply
+kArmsLabEntityLimit = 4
+kIPEntityLimit = 6
+kArmoryEntityLimit = 16
+kPGEntityLimit = 8
+kOBSEntityLimit = 12
+kRoboEntityLimit = 12
+kProtoEntityLimit = 20
+kWhipEntityLimit = 24
+kShiftEntityLimit = 12
+kShadeEntityLimit = 12
+kCragEntityLimit = 12
+
+----
+
+kMaxEntitiesInRadius = 30 
+kMaxEntityRadius = 10 
+
 kSiegeTimer = 960
 kFrontTimer = 330
 kDoorMoveUpVect = 6 --although global

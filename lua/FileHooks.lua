@@ -9,14 +9,26 @@
 -- is /pre/post limited with networkvar modification? hm
 
 ModLoader.SetupFileHook( "lua/TechTreeConstants.lua", "lua/TechTreeConstants_Siege.lua", "post" )
-ModLoader.SetupFileHook( "lua/TechData.lua", "lua/TechData_Siege.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Globals.lua", "lua/Globals_Siege.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/ArmsLab.lua", "lua/ArmsLab_Siege.lua", "post" )
+ModLoader.SetupFileHook( "lua/InfantryPortal.lua", "lua/InfantryPortal_Siege.lua", "post" )
+ModLoader.SetupFileHook( "lua/PhaseGate.lua", "lua/PhaseGate_Siege.lua", "post" )
+ModLoader.SetupFileHook( "lua/Observatory.lua", "lua/Observatory_Siege.lua", "post" )
+ModLoader.SetupFileHook( "lua/PrototypeLab.lua", "lua/PrototypeLab_Siege.lua", "post" )
+
+
 ModLoader.SetupFileHook( "lua/MarineTeam.lua", "lua/MarineTeam_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/AlienTeam.lua", "lua/AlienTeam_Siege.lua", "post" )
+--ModLoader.SetupFileHook( "lua/PlayingTeam.lua", "lua/PlayingTeam_Siege.lua", "post" )
 --ModLoader.SetupFileHook( "lua/ConstructMixin.lua", "lua/ConstructMixin_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/Lerk.lua", "lua/Additions/PrimalScream.lua", "pre" ) 
 ModLoader.SetupFileHook( "lua/Crag.lua", "lua/Crag_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Clog.lua", "lua/Clog_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Whip.lua", "lua/Whip_Siege.lua", "post" ) 
+ModLoader.SetupFileHook( "lua/Shift.lua", "lua/Shift_Siege.lua", "post" ) 
+ModLoader.SetupFileHook( "lua/Shade.lua", "lua/Shade_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/CommandStation.lua", "lua/CommandStation_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Location.lua", "lua/Location_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Observatory.lua", "lua/Observatory_Siege.lua", "post" ) 
@@ -49,3 +61,8 @@ ModLoader.SetupFileHook( "lua/NS2Gamerules.lua", "lua/NS2Gamerules_Siege.lua", "
 ModLoader.SetupFileHook( "lua/CommAbilities/Alien/Contamination.lua", "lua/CommAbilities/Alien/Contamination_Siege.lua", "post" )
 --ModLoader.SetupFileHook( "lua/ARC.lua", "lua/AvocaArc.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Alien_Client.lua", "lua/Alien_Client_Siege.lua", "post" ) 
+
+
+
+
+ModLoader.SetupFileHook( "lua/TechData.lua", "lua/TechData_Siege.lua", "post" )

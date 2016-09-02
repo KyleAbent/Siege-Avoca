@@ -28,9 +28,9 @@ function SandCastle:OnCreate()
    self.FrontTimer = kFrontTimer
    self.mainroom = true
 end
-local function CloseDoors()
-               for index, siegedoor in ientitylist(Shared.GetEntitiesWithClassname("SiegeDoor")) do
-                 siegedoor:TrickedYou()
+local function DoubleCheckLocks(who)
+               for index, door in ientitylist(Shared.GetEntitiesWithClassname("SiegeDoor")) do
+                 door:CloseLock()
               end 
 end
 function SandCastle:OnRoundStart() 
@@ -39,8 +39,8 @@ function SandCastle:OnRoundStart()
 
    self.SiegeTimer = kSiegeTimer
    self.FrontTimer = kFrontTimer
-   CloseDoors()
   -- self:AutoBioMass()
+  DoubleCheckLocks(self)
 
            if Server then
               self:AddTimedCallback(SandCastle.CountSTimer, 1)
@@ -53,16 +53,16 @@ end
 function SandCastle:GetFrontLength()
  return self.FrontTimer 
 end
-function SandCastle:OpenSiegeDoors()
-      self.SiegeTimer = 0
+function SandCastle:OpenSiegeDoors(cleartimer)
+     if cleartimer == true then self.SiegeTimer = 0 end
      -- Print("OpenSiegeDoors SandCastle")
                for index, siegedoor in ientitylist(Shared.GetEntitiesWithClassname("SiegeDoor")) do
                  if not siegedoor:isa("FrontDoor") then siegedoor:Open() end
               end 
 end
-function SandCastle:OpenFrontDoors()
+function SandCastle:OpenFrontDoors(cleartimer)
 
-      self.FrontTimer = 0
+      if cleartimer == true then self.FrontTimer = 0 end
                for index, frontdoor in ientitylist(Shared.GetEntitiesWithClassname("FrontDoor")) do
                 frontdoor:Open()
                 frontdoor.isvisible = false
@@ -86,7 +86,7 @@ function SandCastle:CountSTimer()
        if  self:GetIsSiegeOpen() then
                 --  boolean = true
            --  if not SuddenDeathConditionsCheck(self) then
-               self:OpenSiegeDoors()
+               self:OpenSiegeDoors(true)
                
             -- else
            --    AddTime(8)
@@ -102,7 +102,7 @@ function SandCastle:FrontDoorTimer()
    local boolean = false
     if self:GetIsFrontOpen() then
          boolean = true
-         self:OpenFrontDoors() -- Ddos!
+         self:OpenFrontDoors(true) -- Ddos!
        end
        
        return self.FrontTimer ~= 0
@@ -114,7 +114,7 @@ local function CloseDoors()
 end
 function SandCastle:PickMainRoom()
    if self.mainroom then
-       local location = self:GetLocationWithMostMixedPlayers()
+       local location = GetLocationWithMostMixedPlayers()
        if not location then return true end
        self:SetMainRoom(location:GetOrigin(), location, opcyst) 
    end
@@ -160,41 +160,12 @@ if Server then   self:AddTimedCallback(SandCastle.PickMainRoom, 16) end
      Print("SandCastle OnPreGame")
    end
    
+   self:OpenSiegeDoors(false)
+   self:OpenFrontDoors(false)
+   
    
 end
-function SandCastle:GetLocationWithMostMixedPlayers()
--- works good 2.15
---so far v1.23 shows this works okay except for picking empty res rooms for some reason -.-
-//Print("GetLocationWithMostMixedPlayers")
 
-            for _, mainent in ientitylist(Shared.GetEntitiesWithClassname("CommandStructure")) do
-                    if mainent:GetIsInCombat() then return mainent end
-             end
-             
-local team1avgorigin = Vector(0, 0, 0)
-local marines = 1
-local team2avgorigin = Vector(0, 0, 0)
-local aliens = 1
-local neutralavgorigin = Vector(0, 0, 0)
-
-            for _, marine in ientitylist(Shared.GetEntitiesWithClassname("Marine")) do
-            if marine:GetIsAlive() and not marine:isa("Commander") then marines = marines + 1 team1avgorigin = team1avgorigin + marine:GetOrigin() end
-             end
-             
-           for _, alien in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do
-            if alien:GetIsAlive() and not alien:isa("Commander") then aliens = aliens + 1 team2avgorigin = team2avgorigin + alien:GetOrigin() end 
-             end
-             --v1.23 added check to make sure room isnt empty
-         neutralavgorigin =  team1avgorigin + team2avgorigin
-         neutralavgorigin =  neutralavgorigin / (marines+aliens) --better as a table i know
-     //    Print("neutralavgorigin is %s", neutralavgorigin)
-     local nearest = GetNearest(neutralavgorigin, "Location", nil, function(ent) local powerpoint = GetPowerPointForLocation(ent.name) return powerpoint ~= nil end)
-    if nearest then
-   // Print("nearest is %s", nearest.name)
-        return nearest
-    end
-
-end
 function SandCastle:GetCombatEntitiesCount()
             local combatentities = 1
             for _, entity in ipairs(GetEntitiesWithMixin("Combat")) do

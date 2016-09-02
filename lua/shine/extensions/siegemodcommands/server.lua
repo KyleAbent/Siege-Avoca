@@ -139,13 +139,13 @@ Gamerules:DrawGame()
 end 
 local function OpenSiegeDoors()
    for index, sandcastle in ientitylist(Shared.GetEntitiesWithClassname("SandCastle")) do
-              sandcastle:OpenSiegeDoors()
+              sandcastle:OpenSiegeDoors(true)
       end 
 end
 
 local function OpenFrontDoors()
            for index, sandcastle in ientitylist(Shared.GetEntitiesWithClassname("SandCastle")) do
-                sandcastle:OpenFrontDoors() 
+                sandcastle:OpenFrontDoors(true) 
                 end
 
 end

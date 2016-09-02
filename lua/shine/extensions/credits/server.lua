@@ -490,6 +490,7 @@ elseif whoagain:GetTeamNumber() == 2 then
     if entity.SetOwner then entity:SetOwner(whoagain) end
       if not GetIsAlienInSiege(whoagain) then
       if entity.SetConstructionComplete then  entity:SetConstructionComplete() end
+      if entity.SetIsACreditStructure then entity:SetIsACreditStructure(true)  end
        else
        self:NotifyCredits( who, "%s placed IN siege, therefore it is not autobuilt.", true, String)
         end --
@@ -552,12 +553,12 @@ local limit = 3
 local techid = nil
 
 if String == "Observatory"  then
-mapnameof = Observatory.kMapName
+mapnameof = ObservatoryAvoca.kMapName
 techid = kTechId.Observatory
 CreditCost = 10
 elseif String == "Armory"  then
 CreditCost = 12
-mapnameof = Armory.kMapName
+mapnameof = ArmoryAvoca.kMapName
 techid = kTechId.Armory
 elseif String == "SentryAvoca"  then
 mapnameof = SentryAvoca.kMapName
@@ -566,15 +567,16 @@ limit = 1
 CreditCost = 8
 elseif String == "PhaseGate" then
 CreditCost = 15
-mapnameof = PhaseGate.kMapName
+limit = 2
+mapnameof = PhaseGateAvoca.kMapName
 techid = kTechId.PhaseGate
 elseif String == "InfantryPortal" then
-mapnameof = InfantryPortal.kMapName
+mapnameof = InfantryPortalAvoca.kMapName
 techid = kTechId.InfantryPortal
 elseif  String == "RoboticsFactory" then
 techid = kTechId.RoboticsFactory
 CreditCost = 10
-mapnameof = RoboticsFactory.kMapName
+mapnameof = RoboticsFactoryAvoca.kMapName
 elseif String == "Mac" then
 techid = kTechId.MAC
 CreditCost = 4
@@ -622,19 +624,19 @@ reqpathing = false
  mapnameof = HallucinationCloud.kMapName
 elseif String == "Shade" then
 CreditCost = 10
-mapnameof = Shade.kMapName
+mapnameof = ShadeAvoca.kMapName
 elseif String == "Crag" then
 CreditCost = 10
-mapnameof = Crag.kMapName
+mapnameof = CragAvoca.kMapName
 elseif String == "Whip" then
 CreditCost = 10
-mapnameof = Whip.kMapName
+mapnameof = WhipAvoca.kMapName
 elseif String == "Shift" then
 CreditCost = 10
 mapnameof = Shift.kMapName
 elseif String == "Hydra" then
 CreditCost = 1
-mapnameof = Hydra.kMapName
+mapnameof = HydraAvoca.kMapName
 reqpathing = false
 end
 

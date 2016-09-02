@@ -1,4 +1,5 @@
-
+kMaxTeamResources = 999
+kMaxResources = 999
 
 
 Script.Load("lua/Modifications/FrontDoorOpenConvars.lua")

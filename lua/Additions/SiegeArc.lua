@@ -17,7 +17,7 @@ function SiegeArc:OnInitialized()
  ARC.OnInitialized(self)
    if Server then
  self:AddTimedCallback(SiegeArc.Instruct, 2.5)
- self:AddTimedCallback(SiegeArc.Waypoint, 16)
+ --self:AddTimedCallback(SiegeArc.Waypoint, 16)
  end
 
 end
@@ -78,10 +78,6 @@ function SiegeArc:Check()
 end
 
 local function GetSiegeLocation()
---So 8.30 i turned siegearc from payload to auto. This moves arc into siege, close radius to hive, as a comm would.
---it was tricky. But basically, it was stuck for a while.. but this formula here gets the correct siege location to base
---the finding of a location within hive radius, within siege room. The avg origin stuff i guess is to make sure the
---findarchivespawn works. Although with GetArcHiveSpawn modified to require GetWhereIsInSiege .. that helps too :)
 --local locations = {}
 
 local hive = nil
@@ -90,7 +86,9 @@ local hive = nil
     hive = hivey
  end
  
+ if hive ~= nil then
  local siegeloc = GetNearest(hive:GetOrigin(), "Location", nil, function(ent) return string.find(ent.name, "siege") or string.find(ent.name, "Siege") end)
+ end
  
 if siegeloc then return siegeloc end
 

@@ -24,7 +24,7 @@ local function GetAutomaticOrder(self)
             primaryTarget = Shared.GetEntity(currentOrder:GetParam())
         end
 
-        if primaryTarget and (HasMixin(primaryTarget, "Weldable") and primaryTarget:GetWeldPercentage() < 1) and not primaryTarget:isa("MAC") then
+        if primaryTarget and (HasMixin(primaryTarget, "Weldable") and primaryTarget:GetWeldPercentage() < 1) and not primaryTarget:isa("MAC") and self:CheckTarget(ent:GetOrigin()) and not (GetIsInSiege(ent) and not GetSiegeDoorOpen() ) then
             
             target = primaryTarget
             orderType = kTechId.AutoWeld
@@ -33,7 +33,7 @@ local function GetAutomaticOrder(self)
 
             -- If there's a friendly entity nearby that needs constructing, constuct it.
             
-            local constructable =  GetNearestMixin(self:GetOrigin(), "Construct", 1, function(ent) return not ent:GetIsBuilt() and ent:GetCanConstruct(self) and self:CheckTarget(ent:GetOrigin())  end)
+            local constructable =  GetNearestMixin(self:GetOrigin(), "Construct", 1, function(ent) return not ent:GetIsBuilt() and ent:GetCanConstruct(self) and self:CheckTarget(ent:GetOrigin()) and not (GetIsInSiege(ent) and not GetSiegeDoorOpen() )  end)
                if constructable then
                     target = constructable
                     orderType = kTechId.Construct
@@ -41,7 +41,7 @@ local function GetAutomaticOrder(self)
 
             if not target then
             
-            local weldable =  GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return not ent:isa("Player") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  and self:CheckTarget(ent:GetOrigin())   end)
+            local weldable =  GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return not ent:isa("Player") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  and self:CheckTarget(ent:GetOrigin())   and not (GetIsInSiege(ent) and not GetSiegeDoorOpen() ) end)
                if weldable then
                     target = constructable
                     orderType = kTechId.AutoWeld

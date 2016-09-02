@@ -116,3 +116,39 @@ function Armory:ResupplyPlayer(player)
         //self:PlayArmoryScan(player:GetId())
     end
 end
+Script.Load("lua/Additions/AvocaMixin.lua")
+class 'ArmoryAvoca' (Armory)
+ArmoryAvoca.kMapName = "armoryavoca"
+
+local networkVars = {}
+
+AddMixinNetworkVars(AvocaMixin, networkVars)
+    
+
+    function ArmoryAvoca:OnCreate()
+         Armory.OnCreate(self)
+        InitMixin(self, AvocaMixin)
+    end
+        function ArmoryAvoca:GetTechId()
+         return kTechId.Armory
+    end
+
+function ArmoryAvoca:OnGetMapBlipInfo()
+    local success = false
+    local blipType = kMinimapBlipType.Undefined
+    local blipTeam = -1
+    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
+    blipType = kMinimapBlipType.Armory
+     blipTeam = self:GetTeamNumber()
+    if blipType ~= 0 then
+        success = true
+    end
+    
+    return success, blipType, blipTeam, isAttacked, false --isParasited
+end
+function ArmoryAvoca:SetIsACreditStructure(boolean)
+    
+self.isacreditstructure = boolean
+      Print("%s isacreditstructure is %s", self:GetClassName(), self.isacreditstructure)
+end
+Shared.LinkClassToMap("ArmoryAvoca", ArmoryAvoca.kMapName, networkVars)

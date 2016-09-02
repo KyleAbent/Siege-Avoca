@@ -3,16 +3,13 @@ if Server then
 
 
 
-function Hive:UpdateAliensWeaponsManually() ///Seriously this makes more sense than spamming some complicated formula every 0.5 seconds no?
- for _, alien in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do 
-        alien:HiveCompleteSoRefreshTechsManually() 
-end
 
 
 
 
 
-end
+
+
 function Hive:CheckForDoubleUpG()  --CONSTANT issue of Double hives. Meaning no upgs. Ruining games after time spent seeding server.
  
 --Print("Hive:CheckForDoubleUpG()")
@@ -33,7 +30,7 @@ end
 local orig_Hive_OnResearchComplete = Hive.OnResearchComplete
 function Hive:OnResearchComplete(researchId)
 --Print("HiveOnResearchComplete")
-self:UpdateAliensWeaponsManually()
+UpdateAliensWeaponsManually()
 
     if researchId == kTechId.UpgradeToCragHive or researchId == kTechId.UpgradeToShadeHive or researchId ==  kTechId.UpgradeToShiftHive then
         self:AddTimedCallback(Hive.CheckForDoubleUpG, 4) 
