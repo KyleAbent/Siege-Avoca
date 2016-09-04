@@ -10,6 +10,7 @@ AddMixinNetworkVars(AvocaMixin, networkVars)
     function InfantryPortalAvoca:OnInitialized()
          InfantryPortal.OnInitialized(self)
         InitMixin(self, AvocaMixin)
+        self:SetTechId(kTechId.InfantryPortal)
     end
         function InfantryPortalAvoca:GetTechId()
          return kTechId.InfantryPortal
@@ -28,5 +29,4 @@ function InfantryPortalAvoca:OnGetMapBlipInfo()
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
-
 Shared.LinkClassToMap("InfantryPortalAvoca", InfantryPortalAvoca.kMapName, networkVars)

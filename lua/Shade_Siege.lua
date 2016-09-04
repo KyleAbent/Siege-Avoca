@@ -30,3 +30,8 @@ function ShadeAvoca:OnGetMapBlipInfo()
 end
 
 Shared.LinkClassToMap("ShadeAvoca", ShadeAvoca.kMapName, networkVars)
+
+
+
+
+

@@ -19,7 +19,10 @@ self.techTree:AddResearchNode(kTechId.OnoGrow,              kTechId.Stomp, kTech
     
     
     
-    
+    self.techTree:AddBuildNode(kTechId.GorgeCrag,                      kTechId.CragHive,          kTechId.None)
+    self.techTree:AddBuildNode(kTechId.GorgeShift,                     kTechId.ShiftHive,          kTechId.None)
+    self.techTree:AddBuildNode(kTechId.GorgeShade,                     kTechId.ShadeHive,          kTechId.None)
+    self.techTree:AddBuildNode(kTechId.GorgeWhip,                     kTechId.None,          kTechId.None)
     
     
     

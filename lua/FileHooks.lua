@@ -8,15 +8,22 @@
 
 -- is /pre/post limited with networkvar modification? hm
 
-ModLoader.SetupFileHook( "lua/TechTreeConstants.lua", "lua/TechTreeConstants_Siege.lua", "post" )
+
 
 ModLoader.SetupFileHook( "lua/Globals.lua", "lua/Globals_Siege.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/ArmsLab.lua", "lua/ArmsLab_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/InfantryPortal.lua", "lua/InfantryPortal_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/PhaseGate.lua", "lua/PhaseGate_Siege.lua", "post" )
-ModLoader.SetupFileHook( "lua/Observatory.lua", "lua/Observatory_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/PrototypeLab.lua", "lua/PrototypeLab_Siege.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/NetworkMessages.lua", "lua/NetworkMessages_Siege.lua", "post" )
+ModLoader.SetupFileHook( "lua/NetworkMessages_Server.lua", "lua/NetworkMessages_Server_Siege.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/GUIGorgeBuildMenu.lua", "lua/GUIGorgeStructBuildMenu.lua", "post" )
+
+
+ModLoader.SetupFileHook( "lua/JetpackMarine.lua", "lua/JetpackMarine_Siege.lua", "post" ) 
 
 
 ModLoader.SetupFileHook( "lua/MarineTeam.lua", "lua/MarineTeam_Siege.lua", "post" )
@@ -35,6 +42,7 @@ ModLoader.SetupFileHook( "lua/Observatory.lua", "lua/Observatory_Siege.lua", "po
 ModLoader.SetupFileHook( "lua/Armory.lua", "lua/Armory_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Lerk.lua", "lua/Lerk_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Fade.lua", "lua/Fade_Siege.lua", "post" ) --includes server
+ModLoader.SetupFileHook( "lua/Gorge.lua", "lua/Gorge_Pre.lua", "pre" )
 ModLoader.SetupFileHook( "lua/Gorge.lua", "lua/Gorge_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Onos.lua", "lua/Onos_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/Sentry.lua", "lua/Sentry_Siege.lua", "post" ) 
@@ -55,6 +63,7 @@ ModLoader.SetupFileHook( "lua/RoboticsFactory.lua", "lua/RoboticsFactory_Siege.l
 --ModLoader.SetupFileHook( "lua/PowerPointLightHandler.lua", "lua/PowerPointLightHandler_Siege.lua", "post" ) -- for now anyway
 --ModLoader.SetupFileHook( "lua/AchievementReceiverMixin.lua", "lua/AchievementReceiverMixin_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/Balance.lua", "lua/Balance_Siege.lua", "post" )
+ModLoader.SetupFileHook( "lua/BalanceHealth.lua", "lua/BalanceHealth_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/PowerPoint.lua", "lua/PowerPoint_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/NS2Utility.lua", "lua/NS2Utility_Siege.lua", "post" ) --includes server
 ModLoader.SetupFileHook( "lua/NS2Gamerules.lua", "lua/NS2Gamerules_Siege.lua", "post" )
@@ -64,5 +73,5 @@ ModLoader.SetupFileHook( "lua/Alien_Client.lua", "lua/Alien_Client_Siege.lua", "
 
 
 
-
+ModLoader.SetupFileHook( "lua/TechTreeConstants.lua", "lua/TechTreeConstants_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/TechData.lua", "lua/TechData_Siege.lua", "post" )

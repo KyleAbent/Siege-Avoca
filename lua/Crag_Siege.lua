@@ -73,3 +73,6 @@ function CragAvoca:OnGetMapBlipInfo()
 end
 
 Shared.LinkClassToMap("CragAvoca", CragAvoca.kMapName, networkVars)
+
+
+

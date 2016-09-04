@@ -85,39 +85,28 @@ local hive = nil
  for _, hivey in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
     hive = hivey
  end
- 
+ local siegeloc = nil
  if hive ~= nil then
- local siegeloc = GetNearest(hive:GetOrigin(), "Location", nil, function(ent) return string.find(ent.name, "siege") or string.find(ent.name, "Siege") end)
+  siegeloc = GetNearest(hive:GetOrigin(), "Location", nil, function(ent) return string.find(ent.name, "siege") or string.find(ent.name, "Siege") end)
  end
  
 if siegeloc then return siegeloc end
-
-
-local siege = nil
-
-
- for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
-               if string.find(location.name, "siege") or string.find(location.name, "Siege") then
-         -- table.insert(locations, location)
-             siege = location
-             break
-         end
-    end
-    
-    return siege --locations
+ return nil
 end
 local function MoveToHives(self) --Closest hive from origin
+--Print("Siegearc MoveToHives")
 local siegelocation = GetSiegeLocation()
+if not siegelocation then return true end
 local siegepower = GetPowerPointForLocation(siegelocation.name)
 local hiveclosest = GetNearest(siegepower:GetOrigin(), "Hive", 2)
 local origin = 0
 
-if hiveclosest then
-origin = siegepower:GetOrigin()
-origin = origin + hiveclosest:GetOrigin()
-origin = origin + siegelocation:GetOrigin()
-origin = origin / 3
-end
+--if hiveclosest then
+--origin = siegepower:GetOrigin()
+--origin = origin + hiveclosest:GetOrigin()
+--origin = origin + siegelocation:GetOrigin()
+--origin = origin / 3
+--end
 if origin == 0 then origin = FindArcHiveSpawn(siegepower:GetOrigin())  end
 local where = origin
                if where then
@@ -173,6 +162,7 @@ if #players >=1 then return false end
 return true
 end
 function SiegeArc:SpecificRules()
+--Print("Siegearc SpecificRules")
 local moving = self.mode == ARC.kMode.Moving     
 --Print("moving is %s", moving) 
         
@@ -183,9 +173,9 @@ local inradius = GetIsInSiege(self) and GetIsPointWithinHiveRadius(self:GetOrigi
 
 local shouldstop = not PlayersNearby(self)
 --Print("shouldstop is %s", shouldstop) 
-local shouldmove = not shouldstop and not moving and not inradius
+local shouldmove = not moving and not inradius
 --Print("shouldmove is %s", shouldmove) 
-local shouldstop = moving and not PlayersNearby(self)
+local shouldstop = moving and inradius
 --Print("shouldstop is %s", shouldstop) 
 local shouldattack = inradius and not attacking 
 --Print("shouldattack is %s", shouldattack) 

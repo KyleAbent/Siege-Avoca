@@ -34,3 +34,6 @@ function WhipAvoca:OnGetMapBlipInfo()
 end
 
 Shared.LinkClassToMap("WhipAvoca", WhipAvoca.kMapName, networkVars)
+
+
+

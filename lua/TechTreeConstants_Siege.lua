@@ -36,6 +36,10 @@ local kSiege_TechIds =
     'FadeWall',
     'OnoLow',
     'OnoGrow',
+    'GorgeShift',
+    'GorgeShade',
+    'GorgeCrag',
+    'GorgeWhip',
     --'LayStructure',
 
 }

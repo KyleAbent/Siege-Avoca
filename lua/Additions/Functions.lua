@@ -64,30 +64,23 @@ end
            local extents = LookupTechData(kTechId.Skulk, kTechDataMaxExtents, nil)
            local capsuleHeight, capsuleRadius = GetTraceCapsuleFromExtents(extents)  
            local spawnPoint = GetRandomSpawnForCapsule(capsuleHeight, capsuleRadius, where, .5, 48, EntityFilterAll())
-        
+           local inradius = false
+
            if spawnPoint ~= nil then
              spawnPoint = GetGroundAtPosition(spawnPoint, nil, PhysicsMask.AllButPCs, extents)
+             inradius = #GetEntitiesWithinRange("Hive", spawnPoint, ARC.kFireRange) >= 1
            end
-        
+                 Print("FindArcHiveSpawn inradius is %s", inradius)
            local sameLocation = spawnPoint ~= nil and GetWhereIsInSiege(spawnPoint)
-        
-           if spawnPoint ~= nil and sameLocation and GetIsPointWithinHiveRadius(spawnPoint) then
+           Print("FindArcHiveSpawn sameLocation is %s", sameLocation)
+
+           if spawnPoint ~= nil and sameLocation and inradius then
            return spawnPoint
            end
        end
            Print("No valid spot found for FindArcHiveSpawn")
            return nil --FindFreeSpace(where, .5, 48)
     end
-    function GetIsPointWithinHiveRadius(point)
-      local hive = GetEntitiesWithinRange("Hive", point, 18)
-   if #hive >= 1 then return true end
-   return false
-end
-function GetGameStarted()
-     local gamestarted = false
-   if GetGamerules():GetGameState() == kGameState.Started or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end
-   return gamestarted
-end
 function GetIsPointWithinHiveRadius(point)     
     /*
     local hivesnearby = GetEntitiesWithinRange("Hive", point, ARC.kFireRange)
@@ -102,6 +95,11 @@ function GetIsPointWithinHiveRadius(point)
    if #hive >= 1 then return true end
 
    return false
+end
+function GetGameStarted()
+     local gamestarted = false
+   if GetGamerules():GetGameState() == kGameState.Started or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end
+   return gamestarted
 end
 function ExploitCheck(who)
 local gamestarted = false

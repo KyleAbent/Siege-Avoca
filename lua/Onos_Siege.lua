@@ -1,3 +1,4 @@
+Onos.kMaxSpeed = 9 
 if Server then
 function Onos:GetTierFourTechId()
     return kTechId.OnoGrow

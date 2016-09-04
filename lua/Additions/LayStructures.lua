@@ -205,7 +205,7 @@ local function DropStructure(self, player)
               --  structure:ProcessFollowAndWeldOrder(Shared.GetTime(), player, player:GetOrigin()) 
                 end
                 structure:SetOwner(player)
-                structure:SetIsACreditStructure(true)
+                if structure.SetIsACreditStructure then structure:SetIsACreditStructure(true) end
 
                 
                 // Check for space

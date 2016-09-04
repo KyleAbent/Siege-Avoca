@@ -1,0 +1,1 @@
+Script.Load("lua/Weapons/Alien/DropGorgeStructureAbility.lua") 

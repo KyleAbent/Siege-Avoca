@@ -30,3 +30,5 @@ function ShiftAvoca:OnGetMapBlipInfo()
 end
 
 Shared.LinkClassToMap("ShiftAvoca", ShiftAvoca.kMapName, networkVars)
+
+

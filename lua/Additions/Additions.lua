@@ -1,4 +1,5 @@
 Script.Load("lua/Additions/AvocaMixin.lua")
+Script.Load("lua/Additions/AcidRocket.lua")
 Script.Load("lua/Additions/Functions.lua")
 Script.Load("lua/Additions/Convars.lua")
 Script.Load("lua/Additions/SandCastle.lua")

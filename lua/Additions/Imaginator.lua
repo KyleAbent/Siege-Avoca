@@ -302,11 +302,11 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
       table.insert(tospawn, kTechId.RoboticsFactory)
       table.insert(tospawn, kTechId.Observatory)
       
-    -- local  AdvancedArmory = #GetEntitiesForTeam( "AdvancedArmory", 1 )
+   -- local  AdvancedArmory = #GetEntitiesForTeam( "AdvancedArmory", 1 )
      
-       --    if AdvancedArmory > 1 then
+        --  if AdvancedArmory => 1 then
             table.insert(tospawn, kTechId.PrototypeLab)
-   --   end
+    --  end
       
 
       table.insert(tospawn, kTechId.Sentry)
@@ -322,9 +322,6 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
       table.insert(tospawn, kTechId.ArmsLab)
       end
       
-      if ArmsLabs < 2 then
-      table.insert(tospawn, kTechId.ArmsLab)
-      end
       
       if InfantryPortal < 4 then
       table.insert(tospawn, kTechId.InfantryPortal)
@@ -417,7 +414,7 @@ local function FuckShitUp(self)
               CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
       end
       
-            if SiegeArcCount < 5 then
+            if SiegeArcCount < 12 then
               CreateEntity(SiegeArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
       end 
 

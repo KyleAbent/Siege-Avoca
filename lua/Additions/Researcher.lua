@@ -6,7 +6,6 @@ Researcher.kMapName = "researcher"
 
 local networkVars = 
 {
- alienenabled = "boolean",
  marineenabled = "boolean",
 }
 local function TresCheck(team, cost)
@@ -28,7 +27,6 @@ function Researcher:OnCreate()
    end
    
    self.marineenabled = false
-   self.alienenabled = false
 end
 local function NotBeingResearched(techId, who)   
 for _, structure in ientitylist(Shared.GetEntitiesWithClassname( string.format("%s", who:GetClassName()) )) do
@@ -68,15 +66,12 @@ function Researcher:OnRoundStart()
             end
             
                  local team1Commander = GetGamerules().team1:GetCommander()
-  local team2Commander = GetGamerules().team2:GetCommander()
      self.marineenabled = not team1Commander
-   self.alienenabled = not team2Commander
 end
 function Researcher:Calculate()
 local gamestarted = false
 if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true end
 local team1Commander = GetGamerules().team1:GetCommander()
-local team2Commander = GetGamerules().team1:GetCommander()
 
             if not gamestarted  or (self.marineenabled and not team1Commander) then
             for _, researchable in ipairs(GetEntitiesWithMixinForTeam("Research", 1)) do
@@ -84,7 +79,7 @@ local team2Commander = GetGamerules().team1:GetCommander()
              end
          end
          
-                if  not gamestarted or ( self.alienenabled and not team2Commander ) then  self:UpdateHivesManually()  end
+                if gamestarted then  self:UpdateHivesManually()  end
                        
               return true
               
@@ -160,8 +155,6 @@ function Researcher:SetResearchification(boolean, team)
 
   if team == 1 then
   self.marineenabled = boolean
-  elseif Team == 2 then
-  self.alienenabled = boolean
   end
 
 
@@ -229,8 +222,6 @@ local  hivecount = #GetEntitiesForTeam( "Hive", 2 )
              if hive:GetIsBuilt() then 
                   if hive:GetTechId() == kTechId.Hive then UpdateTypeOfHive(hive) end
                    WorkHere(self,hive)
-                    HiveResearch(hive) --shame because the local function works to prevent triple research
-                                       --of same item. but this function calls all three hives to call it at once, voiding the call.
               end
           end
       

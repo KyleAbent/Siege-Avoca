@@ -1,8 +1,19 @@
-function Gorge:GetTierOneTechId()
-    return kTechId.BileBomb
+				
+if Server then 			
+local origcweapons =  Gorge.InitWeapons 			
+			
+			
+			
+function Gorge:InitWeapons() 			
+origcweapons(self) 			
+    self:GiveItem(DropGorgeStructureAbility.kMapName) 			
+end 			
+			
+	function Gorge:GetTierOneTechId()	
+	  return kTechId.BileBomb
+		end 	
 end
-
-
+	
 
 
 
@@ -182,4 +193,86 @@ function Gorge:HandleButtons(input)
     
     UpdateGorgeSliding(self, input)
     
+end
+
+if Client then
+
+    function Gorge:OverrideInput(input)
+
+        local weapon = self:GetActiveWeapon()
+        if weapon and ( weapon:isa("DropStructureAbility") or weapon:isa("DropGorgeStructureAbility") ) then
+            return weapon:OverrideInput(input)
+        end
+
+        return Player.OverrideInput(self, input)
+        
+    end
+   
+
+
+    function Gorge:GetShowGhostModel()
+    
+        local weapon = self:GetActiveWeapon()
+        if weapon and ( weapon:isa("DropStructureAbility") or weapon:isa("DropGorgeStructureAbility") ) then
+            return weapon:GetShowGhostModel()
+        end
+        
+        return false
+        
+    end
+    
+    function Gorge:GetGhostModelOverride()
+    
+        local weapon = self:GetActiveWeapon()
+        if weapon and ( weapon:isa("DropStructureAbility") or weapon:isa("DropGorgeStructureAbility") ) and weapon.GetGhostModelName then
+            return weapon:GetGhostModelName(self)
+        end
+        
+    end
+    
+    function Gorge:GetGhostModelTechId()
+    
+        local weapon = self:GetActiveWeapon()
+        if weapon and ( weapon:isa("DropStructureAbility") or weapon:isa("DropGorgeStructureAbility") ) then
+            return weapon:GetGhostModelTechId()
+        end
+        
+    end
+    
+    function Gorge:GetGhostModelCoords()
+    
+        local weapon = self:GetActiveWeapon()
+        if weapon and ( weapon:isa("DropStructureAbility") or weapon:isa("DropGorgeStructureAbility") ) then
+            return weapon:GetGhostModelCoords()
+        end
+        
+    end
+    
+    function Gorge:GetLastClickedPosition()
+    
+        local weapon = self:GetActiveWeapon()
+        if weapon and ( weapon:isa("DropStructureAbility") or weapon:isa("DropGorgeStructureAbility") ) then
+            return weapon.lastClickedPosition
+        end
+        
+    end
+
+    function Gorge:GetIsPlacementValid()
+    
+        local weapon = self:GetActiveWeapon()
+        if weapon and ( weapon:isa("DropStructureAbility") or weapon:isa("DropGorgeStructureAbility") ) then
+            return weapon:GetIsPlacementValid()
+        end
+    
+    end
+
+    function Gorge:GetIgnoreGhostHighlight()
+    
+        local weapon = self:GetActiveWeapon()
+        if weapon and ( weapon:isa("DropStructureAbility") or weapon:isa("DropGorgeStructureAbility") ) and weapon.GetIgnoreGhostHighlight then
+            return weapon:GetIgnoreGhostHighlight()
+        end
+        
+    end  
+
 end

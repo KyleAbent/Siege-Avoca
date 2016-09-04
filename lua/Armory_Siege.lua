@@ -146,6 +146,10 @@ function ArmoryAvoca:OnGetMapBlipInfo()
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
+function ArmoryAvoca:OnCreate()
+Armory.OnCreate(self)
+self:SetTechId(kTechId.Armory)
+end
 function ArmoryAvoca:SetIsACreditStructure(boolean)
     
 self.isacreditstructure = boolean

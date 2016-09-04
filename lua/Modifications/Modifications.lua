@@ -314,15 +314,42 @@ end
 */
 
 
+  local origmaturinit = MaturityMixin.__initmixin
+function MaturityMixin:__initmixin()
+
+origmaturinit(self)
+ if Server then if not self:GetIsMature() then self:SetMature() end end
+end
+
+
+function PowerConsumerMixin:GetHasSentryBatteryInRadius()
+      local backupbattery = GetEntitiesWithinRange("SentryBattery", self:GetOrigin(), kBatteryPowerRange)
+          for index, battery in ipairs(backupbattery) do
+            if GetIsUnitActive(battery) then return true end
+           end      
+ 
+   return false
+end
+
+function PowerConsumerMixin:GetIsPowered() 
+    return self.powered or self.powerSurge or self:GetHasSentryBatteryInRadius()
+end
 
 
 
 
+    Script.Load("lua/Hud/Commander/ShiftGhostModel.lua")
+    function ShiftGhostModel:Update()
 
-
-
-
-
-
-
+    local modelCoords = GhostModel.Update(self)
+    
+    if modelCoords then        
+        
+        local player = Client.GetLocalPlayer()
+        
+        if player:isa("Commander") then player:AddGhostGuide(Vector(modelCoords.origin), kEnergizeRange) end
+        
+    end
+    
+end
 

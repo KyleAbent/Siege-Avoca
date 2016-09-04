@@ -95,6 +95,9 @@ function SiegeDoor:CloseLock()
      --   end
      --   end
 end
+function SiegeDoor:GetIsMapEntity()
+return true
+end
 function SiegeDoor:GetIsOpen()    
 return self.opened
 end

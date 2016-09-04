@@ -99,15 +99,48 @@ function GetBatteryInRange(commander)
     return batteries
     
 end
-function PowerConsumerMixin:GetHasSentryBatteryInRadius()
-      local backupbattery = GetEntitiesWithinRange("SentryBattery", self:GetOrigin(), kBatteryPowerRange)
-          for index, battery in ipairs(backupbattery) do
-            if GetIsUnitActive(battery) then return true end
-           end      
- 
-   return false
-end
 
-function PowerConsumerMixin:GetIsPowered() 
-    return self.powered or self.powerSurge or self:GetHasSentryBatteryInRadius()
+
+ function SentryAvoca:FireBullets()
+
+    local startPoint = self:GetBarrelPoint()
+    local directionToTarget = self.target:GetEngagementPoint() - self:GetEyePos()
+    local targetDistanceSquared = directionToTarget:GetLengthSquared()
+    local theTimeToReachEnemy = targetDistanceSquared / (10 * 10)
+    local engagementPoint = self.target:GetEngagementPoint()
+    if self.target.GetVelocity then
+    
+        local targetVelocity = self.target:GetVelocity()
+        engagementPoint = self.target:GetEngagementPoint() - ((targetVelocity:GetLength() * 0.5 - (self.level/100) * 1 * theTimeToReachEnemy) * GetNormalizedVector(targetVelocity))
+        
+    end
+    
+    local fireDirection = GetNormalizedVector(engagementPoint - startPoint)
+    local fireCoords = Coords.GetLookIn(startPoint, fireDirection)    
+    local spreadDirection = CalculateSpread(fireCoords, Math.Radians(15), math.random)
+    
+    local endPoint = startPoint + spreadDirection * (Sentry.kRange * (self.level/100) + Sentry.kRange)
+    
+    local trace = Shared.TraceRay(startPoint, endPoint, CollisionRep.Damage, PhysicsMask.Bullets, EntityFilterOne(self))
+    
+    if trace.fraction < 1 then
+    
+        local surface = nil
+        
+        // Disable friendly fire.
+        local validtarget = GetAreEnemies(trace.entity, self)
+        trace.entity = (not trace.entity or validtarget) and trace.entity or nil
+        
+        if not trace.entity then
+            surface = trace.surface
+        end
+        
+        local direction = (trace.endPoint - startPoint):GetUnit()
+        local damage = 5 
+        //if not self:GetIsaCreditStructure() and trace.entity and trace.entity:isa("Onos") then damage = 7 end 
+        self:DoDamage(damage * (self.level/100) + damage, trace.entity, trace.endPoint, fireDirection, surface, false, true)
+        
+    end
+    
+        
 end

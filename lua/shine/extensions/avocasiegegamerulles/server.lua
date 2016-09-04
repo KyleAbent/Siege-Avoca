@@ -92,7 +92,7 @@ function Plugin:SetGameState( Gamerules, State, OldState )
        elseif State == kGameState.NotStarted then
              GetSandCastle():OnPreGame()
              GetImaginator():OnPreGame()
-             GetResearcher():OnPreGame()
+--             GetResearcher():OnPreGame()
          --elseif State == kGameState.Team1Won or state == kGameState.Team2Won then    
 
        
