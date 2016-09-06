@@ -80,13 +80,12 @@ function Imaginator:OnRoundStart()
    for i = 1, 4 do
      Print("Imaginator OnRoundStart")
    end
-     local team1Commander = GetGamerules().team1:GetCommander()
   local team2Commander = GetGamerules().team2:GetCommander()
+     if not team2Commander then BuildKill() end
+      self.marineenabled = true
+   self.alienenabled = true
   
-      self.marineenabled = not team1Commander
-   self.alienenabled = not team2Commander
-  
-   if self.alienenabled then BuildKill() end
+
             
 end
 function Imaginator:SetImagination(boolean, team)

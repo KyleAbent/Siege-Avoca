@@ -389,7 +389,7 @@ end //end of rol 2
       return 
       end // end of effects roll 13
       if EffectsRoll == 12 then
-           if not Player:isa("JetpackMarine") then 
+           if not Player:isa("JetpackMarine") and not Player:isa("Exo") then 
            //  self:RollPlayer(Player) return 
                  self:NotifyMarine( nil, "%s switched to a jetpack", true, Player:GetName())
                  self:AddDelayToPlayer(Player) 

@@ -293,8 +293,8 @@ function ObservatoryAvoca:OnGetMapBlipInfo()
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
-function ObservatoryAvoca:OnCreate()
-Observatory.OnCreate(self)
+function ObservatoryAvoca:OnInitialized()
+Observatory.OnInitialized(self)
 self:SetTechId(kTechId.Observatory)
 end
 Shared.LinkClassToMap("ObservatoryAvoca", ObservatoryAvoca.kMapName, networkVars)

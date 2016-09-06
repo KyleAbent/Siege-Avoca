@@ -224,7 +224,11 @@ local  hivecount = #GetEntitiesForTeam( "Hive", 2 )
                    WorkHere(self,hive)
               end
           end
-      
+        local team2Commander = GetGamerules().team2:GetCommander()
+        
+      if not team2Commander then 
+
+  
       if  hivecount < 3 and TresCheck(2,40) then
           for _, techpoint in ientitylist(Shared.GetEntitiesWithClassname("TechPoint")) do
              if techpoint:GetAttached() == nil then 
@@ -234,6 +238,7 @@ local  hivecount = #GetEntitiesForTeam( "Hive", 2 )
           end
      end
 
+     end
      
 end
 

@@ -699,7 +699,7 @@ if not Player then return end
  if FirstCheckRulesHere(self, Client, Player, String ) == true then return end
  
          if Player:GetTeamNumber() == 1 then
-             if String == "JetPack" then cost = 10 DeductBuy(self, Client, cost, delayafter)   Player:GiveJetpack()
+             if String == "JetPack" and not Player:isa("Exo") then cost = 10 DeductBuy(self, Client, cost, delayafter)   Player:GiveJetpack()
              elseif String == "MiniGun" then cost = 30 DeductBuy(self, Client, cost, delayafter)  Player:GiveDualExo(Player:GetOrigin()) 
              elseif String == "RailGun" then  cost = 30 DeductBuy(self, Client, cost, delayafter) Player:GiveDualRailgunExo(Player:GetOrigin())
              end

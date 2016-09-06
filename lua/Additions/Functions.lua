@@ -70,9 +70,9 @@ end
              spawnPoint = GetGroundAtPosition(spawnPoint, nil, PhysicsMask.AllButPCs, extents)
              inradius = #GetEntitiesWithinRange("Hive", spawnPoint, ARC.kFireRange) >= 1
            end
-                 Print("FindArcHiveSpawn inradius is %s", inradius)
+                -- Print("FindArcHiveSpawn inradius is %s", inradius)
            local sameLocation = spawnPoint ~= nil and GetWhereIsInSiege(spawnPoint)
-           Print("FindArcHiveSpawn sameLocation is %s", sameLocation)
+         --  Print("FindArcHiveSpawn sameLocation is %s", sameLocation)
 
            if spawnPoint ~= nil and sameLocation and inradius then
            return spawnPoint
@@ -223,7 +223,7 @@ end
 function FindFreeSpace(where, mindistance, maxdistance)    
      if not mindistance then mindistance = .5 end
      if not maxdistance then maxdistance = 24 end
-        for index = 1, 8 do
+        for index = 1, 1 do
            local extents = LookupTechData(kTechId.Skulk, kTechDataMaxExtents, nil)
            local capsuleHeight, capsuleRadius = GetTraceCapsuleFromExtents(extents)  
            local spawnPoint = GetRandomSpawnForCapsule(capsuleHeight, capsuleRadius, where, mindistance, maxdistance, EntityFilterAll())

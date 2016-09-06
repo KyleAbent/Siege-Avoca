@@ -28,22 +28,7 @@ end
 function SiegeArc:GetMaxArmor()
     return 1200
 end
-local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
-   local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange + 12)
-   if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
-end
-local function CheckHivesForScan()
-local hives = {}
-           for _, hiveent in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
-             table.insert(hives, hiveent)
-          end
-          if #hives == 0 then return end
-          --Scan hive if arc in range, only 1 check per hive.. not per arc.. or whatever. 
-          for i = 1, #hives do
-             local ent = hives[i]
-             SoTheGameCanEnd(self, ent)
-          end
-end
+
 function ARC:GetShowDamageIndicator()
     return true
 end
@@ -241,7 +226,6 @@ function SiegeArc:Waypoint()
     return true
 end
 function SiegeArc:Instruct()
-   CheckHivesForScan()
    self:SpecificRules()
    return true
 end

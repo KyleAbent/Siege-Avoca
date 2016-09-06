@@ -27,8 +27,8 @@ function PrototypeLabAvoca:OnGetMapBlipInfo()
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
-function PrototypeLabAvoca:OnCreate()
-PrototypeLab.OnCreate(self)
+function PrototypeLabAvoca:OnInitialized()
+PrototypeLab.OnInitialized(self)
 self:SetTechId(kTechId.PrototypeLab)
 end
 Shared.LinkClassToMap("PrototypeLabAvoca", PrototypeLabAvoca.kMapName, networkVars)
