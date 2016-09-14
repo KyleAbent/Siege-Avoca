@@ -3,9 +3,12 @@ function Alien:OnCreate()
     orig_Alien_OnCreate(self)
     if Server then
         self:AddTimedCallback(function() UpdateAvocaAvailability(self, self:GetTierOneTechId(), self:GetTierTwoTechId(), self:GetTierThreeTechId(), self:GetTierFourTechId()) end, .8) 
-    elseif Client then
+    end
+    
+     if Client then
        GetGUIManager():CreateGUIScriptSingle("GUIInsight_TopBar")  
     end
+    
 end
 
 local orig_Alien_OnUpdateAnimationInput = Alien.OnUpdateAnimationInput 

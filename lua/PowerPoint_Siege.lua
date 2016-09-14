@@ -23,11 +23,12 @@ end
      end--
      return not self:GetIsDisabled() and canspawn
 end
-local orig_PowerPoint_StopDamagedSound = PowerPoint.StopDamagedSound
-    function PowerPoint:StopDamagedSound()
-    orig_PowerPoint_StopDamagedSound(self)
-        if self:GetHealthScalar() ~= 1 then return end
+local orig_PowerPoint_SetInternalPowerState = PowerPoint.SetInternalPowerState
+    function PowerPoint:SetInternalPowerState(powerState)
+    orig_PowerPoint_SetInternalPowerState(self, powerState)
+       if self.powerState == PowerPoint.kPowerState.destroyed and powerState == PowerPoint.kPowerState.socketed then
            self:SpawnSurgeForEach()
-           AddSiegeTime(4)
+        --   AddSiegeTime(4)
+       end
    end
    

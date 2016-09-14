@@ -65,21 +65,15 @@ function SiegeDoor:OnInitialized()
     self.opened = false
 end
   
-function SiegeDoor:Open()    
-        self:SetOrigin(self:GetOrigin() + Vector(0,.25,0) )   
-        self:AddTimedCallback(SiegeDoor.UpdatePosition, 0.1)
-        
-        
-       -- if Client and not self.effect then
-       -- self.effect = Client.CreateCinematic(RenderScene.Zone_Default)  
-       -- self.effect:SetRepeatStyle(Cinematic.Repeat_Endless)  
-       -- self.effect:SetCinematic(kOpeningEffect)   
-       -- self.effect:SetCoords(self:GetCoords())
-       -- end
-        
-        
-        
-        self.opened = true
+function SiegeDoor:Open(pregame)    
+ if not self.opened then
+        self:SetOrigin(self:GetOrigin() + Vector(0,.5,0) )   
+        if pregame == true then self:SetOrigin(self:GetOrigin() + Vector(0,kDoorMoveUpVect,0) )  end 
+        local waypointreached = (self:GetOrigin() - self.savedOrigin):GetLength() >= kDoorMoveUpVect
+        self:UpdatePosition(waypointreached)
+        self.opened = waypointreached
+        self:MakeSurePlayersCanGoThroughWhenMoving()
+ end
 end
 function SiegeDoor:CloseLock()    
  self:SetOrigin(self.savedOrigin)
@@ -115,16 +109,12 @@ function SiegeDoor:MakeSurePlayersCanGoThroughWhenMoving()
                end  
                self:MarkPhysicsDirty()    
 end
-function SiegeDoor:UpdatePosition() 
+function SiegeDoor:UpdatePosition(waypointreached) 
      local waypoint = self.savedOrigin + Vector(0, kDoorMoveUpVect, 0)
-     local waypointreached = (self:GetOrigin() - self.savedOrigin):GetLength() >= kDoorMoveUpVect
-     local startingposition = self:GetOrigin() == self.savedOrigin
       -- Print("Waypoint difference is %s", waypoint - self:GetOrigin())
-       
-       
    if waypoint then
        if not waypointreached then               
-               self:SetOrigin(self:GetOrigin() + Vector(0,0.005,0) )        
+               self:SetOrigin(self:GetOrigin() + Vector(0,.1,0) )        
                 self:MakeSurePlayersCanGoThroughWhenMoving()                      
        else
          --if Client then 

@@ -52,11 +52,11 @@ function UpdateAvocaAvailability(forAlien, tierOneTechId, tierTwoTechId, tierThr
    local t2 = false
    local t3 = false
    local t4 = false
-     
-             t1 = GetGamerules():GetAllTech() or (tierOneTechId ~= nil and tierOneTechId ~= kTechId.None and GetHasTech(forAlien, tierOneTechId))
-            t2 = GetGamerules():GetAllTech() or (tierTwoTechId ~= nil and tierTwoTechId ~= kTechId.None and GetHasTech(forAlien, tierTwoTechId))
-            t3 = GetGamerules():GetAllTech() or (tierThreeTechId ~= nil and tierThreeTechId ~= kTechId.None and GetHasTech(forAlien, tierThreeTechId))
-            t4= GetGamerules():GetAllTech() or (tierFourTechId ~= nil and tierFourTechId ~= kTechId.None and GetHasTech(forAlien, tierFourTechId))
+     local  Hives = #GetEntitiesForTeam( "Hive", 2 )
+             t1 = GetGamerules():GetAllTech() or (tierOneTechId ~= nil and tierOneTechId ~= kTechId.None and Hives >= 1)
+            t2 = GetGamerules():GetAllTech() or (tierTwoTechId ~= nil and tierTwoTechId ~= kTechId.None and Hives >= 2)
+            t3 = GetGamerules():GetAllTech() or (tierThreeTechId ~= nil and tierThreeTechId ~= kTechId.None and Hives >= 3)
+            t4= GetGamerules():GetAllTech() or (tierFourTechId ~= nil and tierFourTechId ~= kTechId.None and t3)
 
 
             if t1 then

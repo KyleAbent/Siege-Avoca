@@ -17,12 +17,16 @@ AddMixinNetworkVars(AvocaMixin, networkVars)
          Sentry.OnInitialized(self)
         InitMixin(self, LevelsMixin)
         InitMixin(self, AvocaMixin)
+        self:SetTechId(kTechId.Sentry)
     end
         function SentryAvoca:GetTechId()
          return kTechId.Sentry
     end
 function SentryAvoca:GetMaxArmor()
     return kSentryArmor 
+end
+function SentryAvoca:GetMinRangeAC()
+return SentryAutoCCMR     
 end
 function SentryAvoca:OnUpdateAnimationInput(modelMixin)
 

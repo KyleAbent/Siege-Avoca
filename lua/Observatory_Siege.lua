@@ -1,4 +1,6 @@
-
+function Observatory:GetMinRangeAC()
+return ObsAutoCCMR   
+end
 --Right now pure overwrites because lazy
 local kObservatoryTechButtons = { kTechId.Scan, kTechId.DistressBeacon, kTechId.Detector, kTechId.None,
 kTechId.PhaseTech, kTechId.AdvancedBeacon, kTechId.None, kTechId.None }
@@ -275,6 +277,7 @@ AddMixinNetworkVars(AvocaMixin, networkVars)
     function ObservatoryAvoca:OnInitialized()
          Observatory.OnInitialized(self)
         InitMixin(self, AvocaMixin)
+        self:SetTechId(kTechId.Observatory)
     end
         function ObservatoryAvoca:GetTechId()
          return kTechId.Observatory
@@ -292,9 +295,5 @@ function ObservatoryAvoca:OnGetMapBlipInfo()
     end
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
-end
-function ObservatoryAvoca:OnInitialized()
-Observatory.OnInitialized(self)
-self:SetTechId(kTechId.Observatory)
 end
 Shared.LinkClassToMap("ObservatoryAvoca", ObservatoryAvoca.kMapName, networkVars)

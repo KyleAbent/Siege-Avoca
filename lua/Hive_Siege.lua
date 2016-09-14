@@ -2,11 +2,29 @@ if Server then
 
 
 
+local orig_Hive_OnKill = Hive.OnKill
+function Hive:OnKill(attacker, doer, point, direction)
+    orig_Hive_OnKill(self, attacker, doer, point, direction)
+UpdateAliensWeaponsManually()
+end
+
+function Hive:HiveResearch()
+if not self or GetGameInfoEntity():GetWarmUpActive() then return false end
+if self:GetIsResearching() then return true end
+local tree = self:GetTeam():GetTechTree()
+local technodes = {}
+    for _, node in pairs(tree.nodeList) do
+           local canRes = tree:GetHasTech(node:GetPrereq1()) and tree:GetHasTech(node:GetPrereq2())
+         if canRes and node:GetIsResearch() and node:GetCanResearch() then
+                node:SetResearched(true)
+                tree:SetTechNodeChanged(node, string.format("hasTech = %s", ToString(true)))
+         end
+    
+    end              
+                  return false
 
 
-
-
-
+end
 
 
 
@@ -41,53 +59,14 @@ UpdateAliensWeaponsManually()
 end
 
 end
-local function NotBeingResearchedHive(techId)   
-    if techId == kTechId.ResearchBioMassOne or techId == kTechId.ResearchBioMassTwo then return true end
-for _, structure in ientitylist(Shared.GetEntitiesWithClassname("Hive" )) do
-         if structure:GetIsResearching() and structure:GetResearchingId() == techId then return false end
-     end
-    return true
-end
-function Hive:HiveResearch()
-if not self or GetGameInfoEntity():GetWarmUpActive() then return false end
-if self:GetIsResearching() then return true end
-local tree = self:GetTeam():GetTechTree()
-local technodes = {}
---Print("HiveResearch 1")
-    for _, node in pairs(tree.nodeList) do
-   --  Print("HiveResearch 2")
-           local canRes = tree:GetHasTech(node:GetPrereq1()) and tree:GetHasTech(node:GetPrereq2())
-          local techId = node:GetTechId()
-         if canRes and NotBeingResearchedHive(techId) and node:GetIsResearch() and node:GetCanResearch() then --and  not NotBeingResearchedHive(techId) then
-       --     Print("HiveResearch 3")
-          table.insert(technodes, node)
-         end
-    
-    end
-
-
-                       for _, technode in ipairs(technodes) do
-                      --   Print("HiveResearch 4")
-                        local techId = technode:GetTechId()
-                              --  Print("HiveResearch 5")
-                        --  Print("HiveResearch 4")
-                             --    Print("HiveResearch 6")
-                             local cost = 0--LookupTechData(techId, kTechDataCostKey) * 
-                                --     Print("HiveResearch 7")
-                                  self:SetResearching(technode, self)
-                                  break
-                  end --
-                  
-                  return true
-
-end
-
 local orig_Hive_OnConstructionComplete = Hive.OnConstructionComplete
 function Hive:OnConstructionComplete()
-
+self.bioMassLevel = 3
+UpdateTypeOfHive(self)
+UpdateAliensWeaponsManually()
 self:AddTimedCallback(Hive.HiveResearch, 4)
-
 end
+/*
 function Hive:GetTechButtons()
 
 return {}
@@ -95,5 +74,5 @@ return {}
 end
 
 
-
+*/
 

@@ -6,7 +6,9 @@ local networkVars = {}
 
 AddMixinNetworkVars(AvocaMixin, networkVars)
     
-
+function ShiftAvoca:GetMinRangeAC()
+return ShiftAutoCCMR    
+end
     function ShiftAvoca:OnInitialized()
          Shift.OnInitialized(self)
         InitMixin(self, AvocaMixin)

@@ -9,11 +9,14 @@ AddMixinNetworkVars(AvocaMixin, networkVars)
     function PrototypeLabAvoca:OnInitialized()
          PrototypeLab.OnInitialized(self)
         InitMixin(self, AvocaMixin)
+        self:SetTechId(kTechId.PrototypeLab)
     end
         function PrototypeLabAvoca:GetTechId()
          return kTechId.PrototypeLab
     end
-
+function PrototypeLab:GetMinRangeAC()
+return ProtoAutoCCMR      
+end
 function PrototypeLabAvoca:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined
@@ -26,9 +29,5 @@ function PrototypeLabAvoca:OnGetMapBlipInfo()
     end
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
-end
-function PrototypeLabAvoca:OnInitialized()
-PrototypeLab.OnInitialized(self)
-self:SetTechId(kTechId.PrototypeLab)
 end
 Shared.LinkClassToMap("PrototypeLabAvoca", PrototypeLabAvoca.kMapName, networkVars)

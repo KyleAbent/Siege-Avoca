@@ -15,6 +15,9 @@ local function TimeUp(self)
     return false
 
 end
+function Shell:GetMinRangeAC()
+return  9999   
+end
 function EggBeacon:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined

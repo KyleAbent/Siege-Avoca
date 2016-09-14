@@ -1,9 +1,3 @@
-
-
-
-Script.Load("lua/Modifications/FrontDoorOpenConvars.lua")
-Script.Load("lua/Modifications/PreGameConvars.lua")
-Script.Load("lua/Modifications/RoundStartConvars.lua")
 Script.Load("lua/Modifications/WelderMod.lua")
 Script.Load("lua/Modifications/CustomLightRules.lua")
 Script.Load("lua/Modifications/FastBuildSpeed.lua")
@@ -20,8 +14,10 @@ SetCachedTechData(kTechId.Observatory, kTechDataMapName, ObservatoryAvoca.kMapNa
 SetCachedTechData(kTechId.Shift, kTechDataMapName, ShiftAvoca.kMapName)
 SetCachedTechData(kTechId.Shade, kTechDataMapName,ShadeAvoca.kMapName)
 SetCachedTechData(kTechId.Whip, kTechDataMapName,WhipAvoca.kMapName)
-SetCachedTechData(kTechId.RoboticsFactory, kTechDataMapName,RoboticsFactory.kMapName)
-
+--SetCachedTechData(kTechId.RoboticsFactory, kTechDataMapName,RoboticsFactory.kMapName)
+function Veil:GetMinRangeAC()
+return  9999   
+end
 function LeapMixin:GetHasSecondary(player)
     return GetHasTech(player, kTechId.Leap)
 end

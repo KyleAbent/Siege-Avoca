@@ -15,7 +15,9 @@ AddMixinNetworkVars(AvocaMixin, networkVars)
         function InfantryPortalAvoca:GetTechId()
          return kTechId.InfantryPortal
     end
-
+function InfantryPortal:GetMinRangeAC()
+return IPAutoCCMR  
+end
 function InfantryPortalAvoca:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined

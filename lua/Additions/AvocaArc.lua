@@ -17,7 +17,7 @@ function AvocaArc:OnInitialized()
  ARC.OnInitialized(self)
    if Server then
  self:AddTimedCallback(AvocaArc.Instruct, 2.5)
- self:AddTimedCallback(AvocaArc.Waypoint, 16)
+ --self:AddTimedCallback(AvocaArc.Waypoint, 16)
   self:AddTimedCallback(AvocaArc.Scan, 6)
  end
 

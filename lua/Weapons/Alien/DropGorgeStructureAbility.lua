@@ -160,7 +160,7 @@ function DropGorgeStructureAbility:GetDamageType()
 end
 
 function DropGorgeStructureAbility:GetHUDSlot()
-    return 4
+    return 5
 end
 
 function DropGorgeStructureAbility:GetHasSecondary(player)
@@ -253,6 +253,7 @@ local function DropStructure(self, player, origin, direction, structureAbility, 
             if structure then
             
                 structure:SetOwner(player)
+               if structure.SetIsACreditStructure then structure:SetIsACreditStructure(true) end
                 player:GetTeam():AddGorgeStructure(player, structure)
                 
                 if onEntity and HasMixin(onEntity, "ClogFall") and HasMixin(structure, "ClogFall") then
@@ -365,7 +366,7 @@ function DropGorgeStructureAbility:GetPositionForStructure(startPosition, direct
     PROFILE("DropGorgeStructureAbility:GetPositionForStructure")
 
     local validPosition = false
-    local range = structureAbility.GetDropRange()
+    local range = 3
     local origin = startPosition + direction * range
     local player = self:GetParent()
 

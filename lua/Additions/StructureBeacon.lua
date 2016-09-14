@@ -14,6 +14,15 @@ local function TimeUp(self)
     return false
 
 end
+function Spur:GetMinRangeAC()
+return  9999   
+end
+local function GetIsACreditStructure(who)
+local boolean = HasMixin(who, "Avoca") and who:GetIsACreditStructure()  or false
+--Print("isacredit structure is %s", boolean)
+return boolean
+
+end
 function StructureBeacon:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined
@@ -42,7 +51,7 @@ if Server then
          local structure = entity[i]
          local distance = self:GetDistance(structure)
          local locationsmatch = GetLocationForPoint(self:GetOrigin()) ==  GetLocationForPoint(structure:GetOrigin()) 
-           local restrictions = (not locationsmatch or distance >= 8) and not structure:isa("Drifter") and not structure:isa("DrifterEgg") and not  ( structure.GetIsMoving and structure:GetIsMoving() )
+           local restrictions = (not locationsmatch or distance >= 8) and not structure:isa("Drifter") and not structure:isa("DrifterEgg") and not  ( structure.GetIsMoving and structure:GetIsMoving()  and not GetIsACreditStructure(structure) )
             if restrictions then
                        if locationsmatch and self:GetDistance(structure) >= 12 or
                         not locationsmatch and self:GetDistance(structure) <= 25 then 

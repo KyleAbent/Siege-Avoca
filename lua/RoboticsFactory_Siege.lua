@@ -166,7 +166,9 @@ end
 function RoboticsFactory:GetReceivesStructuralDamage()
     return true
 end
-
+function RoboticsFactory:GetMinRangeAC()
+return RoboAutoCCMR    
+end
 function RoboticsFactory:GetRequiresPower()
     return true
 end
@@ -518,7 +520,6 @@ AddMixinNetworkVars(AvocaMixin, networkVars)
     function RoboticsFactoryAvoca:OnInitialized()
          RoboticsFactory.OnInitialized(self)
         InitMixin(self, AvocaMixin)
-         self:SetTechId(kTechId.RoboticsFactory)
     end
         function RoboticsFactoryAvoca:GetTechId()
          return kTechId.RoboticsFactory

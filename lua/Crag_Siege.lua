@@ -1,3 +1,6 @@
+function Crag:GetMinRangeAC()
+return CragAutoCCMR       
+end
 function Crag:GetCragsInRange()
       local crag = GetEntitiesWithinRange("Crag", self:GetOrigin(), Crag.kHealRadius)
            return Clamp(#crag, 0, 3)

@@ -42,23 +42,18 @@ function Plugin:MapPostLoad()
       Server.CreateEntity(Researcher.kMapName)
 end
 
-/*
+
 function Plugin:CommLoginPlayer(Building, Player)
-  if not  GetGameInfoEntity():GetWarmUpActive() then 
-if Building:GetTeamNumber() == 1 then
-GetImaginator().marineenabled = false
-GetResearcher().marineenabled = false
-self:NotifyGeneric( nil, "Marines Imaginator set to false (No Comm Required)", true)
-self:NotifyGeneric( nil, "Marines Researcher set to false (No Comm Required)", true)
-elseif  Building:GetTeamNumber() == 2 then
-GetImaginator().alienenabled = false
-GetResearcher().alienenabled = false
-self:NotifyGeneric( nil, "Aliens Imaginator set to false (No Comm Required)", true)
-self:NotifyGeneric( nil, "Aliens Researcher set to false (No Comm Required)", true)
-end
+  if GetGameInfoEntity():GetWarmUpActive() then 
+   local client = Player:GetClient()
+ if not client then return end
+   --  if client:GetUserId() == 22542592 or client:GetUserId() == 8086089 or client:GetUserId() == 121608212 then
+       Shared.ConsoleCommand("sh_forceroundstart") 
+    -- end
  end
 end
 
+/*
 function Plugin:CommLogout(Building)
   if not  GetGameInfoEntity():GetWarmUpActive()then 
 if Building:GetTeamNumber() == 1 then

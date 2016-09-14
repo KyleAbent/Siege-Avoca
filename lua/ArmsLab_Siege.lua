@@ -15,7 +15,9 @@ AddMixinNetworkVars(AvocaMixin, networkVars)
         function ArmsLabAvoca:GetTechId()
          return kTechId.ArmsLab
     end
-
+function ArmsLabAvoca:GetMinRangeAC()
+return ArmsLabAutoCCMR 
+end
 function ArmsLabAvoca:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined

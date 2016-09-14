@@ -2,9 +2,37 @@ local kGorgeStructMaterial = PrecacheAsset("cinematics/vfx_materials/mucousshiel
 
 
 Script.Load("lua/Crag.lua")
+Script.Load("lua/Additions/AvocaMixin.lua")
+Script.Load("lua/InfestationMixin.lua")
+
+
+
 class 'GorgeCrag' (Crag)
 GorgeCrag.kMapName = "gorgecrag"
 
+local networkVars = {}
+
+AddMixinNetworkVars(AvocaMixin, networkVars)
+AddMixinNetworkVars(InfestationMixin, networkVars)
+
+function GorgeCrag:PreOnKill(attacker, doer, point, direction)
+    self:SetDesiredInfestationRadius(0)
+    
+      for _, structure in ipairs( GetEntitiesWithMixinWithinRange("InfestationTracker", self:GetOrigin(), 8)) do
+      structure:AddTimedCallback(function() structure:SetGameEffectMask(kGameEffect.OnInfestation, false) end, 1)
+      end
+      
+      
+end
+    function GorgeCrag:OnInitialized()
+         Crag.OnInitialized(self)
+        InitMixin(self, AvocaMixin)
+          InitMixin(self, InfestationMixin)
+                self.isacreditstructure = true
+    end
+    function GorgeCrag:GetInfestationRadius()
+  return 1
+end
 function GorgeCrag:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined
@@ -68,6 +96,28 @@ Script.Load("lua/Whip.lua")
 class 'GorgeWhip' (Whip)
 GorgeWhip.kMapName = "gorgewhip"
 
+local networkVars = {}
+
+AddMixinNetworkVars(AvocaMixin, networkVars)
+AddMixinNetworkVars(InfestationMixin, networkVars)
+    function GorgeWhip:OnInitialized()
+         Whip.OnInitialized(self)
+        InitMixin(self, AvocaMixin)
+          InitMixin(self, InfestationMixin)
+                self.isacreditstructure = true
+    end
+    function GorgeWhip:PreOnKill(attacker, doer, point, direction)
+    self:SetDesiredInfestationRadius(0)
+    
+      for _, structure in ipairs( GetEntitiesWithMixinWithinRange("InfestationTracker", self:GetOrigin(), 8)) do
+      structure:AddTimedCallback(function() structure:SetGameEffectMask(kGameEffect.OnInfestation, false) end, 1)
+      end
+      
+      
+end
+ function GorgeWhip:GetInfestationRadius()
+  return 1
+end
 function GorgeWhip:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined
@@ -134,6 +184,28 @@ class 'GorgeShift' (Shift)
 GorgeShift.kMapName = "gorgeshift"
 
 
+local networkVars = {}
+
+AddMixinNetworkVars(AvocaMixin, networkVars)
+AddMixinNetworkVars(InfestationMixin, networkVars)
+ function GorgeShift:GetInfestationRadius()
+  return 1
+end
+    function GorgeShift:PreOnKill(attacker, doer, point, direction)
+    self:SetDesiredInfestationRadius(0)
+    
+      for _, structure in ipairs( GetEntitiesWithMixinWithinRange("InfestationTracker", self:GetOrigin(), 8)) do
+      structure:AddTimedCallback(function() structure:SetGameEffectMask(kGameEffect.OnInfestation, false) end, 1)
+      end
+      
+      
+end
+    function GorgeShift:OnInitialized()
+         Shift.OnInitialized(self)
+        InitMixin(self, AvocaMixin)
+          InitMixin(self, InfestationMixin)
+                self.isacreditstructure = true
+    end
 function GorgeShift:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined
@@ -200,8 +272,29 @@ Script.Load("lua/Shade.lua")
 class 'GorgeShade' (Shade)
 GorgeShade.kMapName = "gorgeshade"
 
+local networkVars = {}
 
-
+AddMixinNetworkVars(AvocaMixin, networkVars)
+AddMixinNetworkVars(InfestationMixin, networkVars)
+ function GorgeShade:GetInfestationRadius()
+  return 1
+end
+    function GorgeShade:PreOnKill(attacker, doer, point, direction)
+    self:SetDesiredInfestationRadius(0)
+    
+      for _, structure in ipairs( GetEntitiesWithMixinWithinRange("InfestationTracker", self:GetOrigin(), 8)) do
+      structure:AddTimedCallback(function() structure:SetGameEffectMask(kGameEffect.OnInfestation, false) end, 1)
+      end
+      
+      
+end
+    function GorgeShade:OnInitialized()
+     Shade.OnInitialized(self)
+        InitMixin(self, AvocaMixin)
+          InitMixin(self, InfestationMixin)
+        self.isacreditstructure = true
+    end
+    
 function GorgeShade:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined

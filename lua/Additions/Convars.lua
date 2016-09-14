@@ -1,3 +1,5 @@
+
+
 ----
 --comm entity limits, rather than supply
 kArmsLabEntityLimit = 4
@@ -14,6 +16,25 @@ kCragEntityLimit = 12
 
 ----
 
+--
+--minrange distance placements with autocomm
+ArmoryAutoCCMR =  16
+PGAutoCCMR = 54
+ObsAutoCCMR = kScanRadius
+RoboAutoCCMR = 72
+SentryAutoCCMR = 16
+ProtoAutoCCMR = 42
+--CommandStationAutoCCMR = math.random(16,420)
+ArmsLabAutoCCMR = 4
+IPAutoCCMR = 8
+
+ShadeAutoCCMR = 17
+ShiftAutoCCMR  = kEnergizeRange
+CragAutoCCMR  = 14 / 3
+WhipAutoCCMR  = 14 / 3
+
+----
+
 kMaxEntitiesInRadius = 30 
 kMaxEntityRadius = 10 
 
@@ -21,6 +42,7 @@ kSiegeTimer = 960
 kFrontTimer = 330
 kDoorMoveUpVect = 6 --although global
 kCreditMultiplier = 1 //2 for double credit weekend
+kCreditsPerRoundCap = 200 -- 200 for reg 420 for double credit
 kCommSentryPerRoom = 3
 kBuildSpeed = 1
 kSetupBuildSpeed = 4

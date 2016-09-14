@@ -1,4 +1,6 @@
-
+function CommandStation:GetMinRangeAC()
+return math.random(16,420)      
+end
 
 
 local orig_CommandStation_OnKill = CommandStation.OnKill

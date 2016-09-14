@@ -8,6 +8,7 @@ function BigMac:OnCreate()
  self:AdjustMaxHealth(kMACHealth * 4)
  self:AdjustMaxArmor(kMACArmor * 4)
  self:SetPhysicsGroup(PhysicsGroup.PlayerControllersGroup)
+ if Server then self:LameFixATM() end
 end
 
 
@@ -118,7 +119,7 @@ function BigMac:Check()
     local team1Commander = GetGamerules().team1:GetCommander()
    if GetGamerules():GetGameState() == kGameState.Started or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end
    if gamestarted and team1Commander then DestroyEntity(self) end
-   return false
+   return true
 end
 function BigMac:OnUpdate(deltaTime)
   ScriptActor.OnUpdate(self, deltaTime)

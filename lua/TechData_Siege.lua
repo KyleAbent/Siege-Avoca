@@ -1,7 +1,30 @@
 
 
 
+function CheckCommTunnelReq(techId, origin, normal, commander)
+local tunnelEntrances = 0 
+for index, tunnelEntrance in ientitylist(Shared.GetEntitiesWithClassname("CommTunnel")) do 
+tunnelEntrances = tunnelEntrances + 1 
+end
 
+   local cyst = GetEntitiesWithinRange("Cyst", origin, 7)
+   
+   if #cyst >= 1 then 
+   
+         for i = 1, #cyst do
+            local cysty = cyst[i]
+                if cysty:GetCurrentInfestationRadius() == kInfestationRadius then
+                return tunnelEntrances < 2
+                 end
+         end
+   
+
+   end
+   
+                return false
+
+
+end
 
 function GetCheckShellLimit(techId, origin, normal, commander)
     local num = 0
@@ -117,7 +140,6 @@ local function GetCheckObservatoryLimit()
         
         for index, obs in ientitylist(Shared.GetEntitiesWithClassname("Observatory")) do
         
-                num = num + 1
                 
                 if not GetIsACreditStructure(obs) then
                 num = num + 1
@@ -287,6 +309,7 @@ Script.Load("lua/Additions/PrimalScream.lua")
 Script.Load("lua/Additions/FadeWall.lua")
 Script.Load("lua/Additions/OnoLow.lua")
 Script.Load("lua/Additions/OnoGrow.lua")
+Script.Load("lua/Additions/CommTunnel.lua")
 
 Script.Load("lua/Modifications/GorgeStruct.lua")
 
@@ -398,15 +421,30 @@ local kSiege_TechData =
         */
         
         
-          { [kTechDataId] = kTechId.GorgeCrag, [kTechDataAllowConsumeDrop] = true, [kTechDataMaxAmount] = 3, [kTechDataBioMass] = kCragBiomass, [kTechDataSupply] = kCragSupply, [kTechDataHint] = "CRAG_HINT", [kTechDataGhostModelClass] = "AlienGhostModel",    [kTechDataMapName] = GorgeCrag.kMapName,                         [kTechDataDisplayName] = "GorgeCRAG",  [kTechDataCostKey] = kCragCost,     [kTechDataRequiresInfestation] = true, [kTechDataHotkey] = Move.C,       [kTechDataBuildTime] = kCragBuildTime, [kTechDataModel] = Crag.kModelName,           [kTechDataMaxHealth] = kCragHealth, [kTechDataMaxArmor] = kCragArmor,   [kTechDataInitialEnergy] = kCragInitialEnergy,      [kTechDataMaxEnergy] = kCragMaxEnergy, [kTechDataPointValue] = kCragPointValue, [kVisualRange] = Crag.kHealRadius, [kTechDataTooltipInfo] = "CRAG_TOOLTIP", [kTechDataGrows] = true},
+          { [kTechDataId] = kTechId.GorgeCrag, [kTechDataAllowConsumeDrop] = true, [kTechDataMaxAmount] = 3, [kTechDataBioMass] = kCragBiomass, [kTechDataSupply] = kCragSupply, [kTechDataHint] = "CRAG_HINT", [kTechDataGhostModelClass] = "AlienGhostModel",    [kTechDataMapName] = GorgeCrag.kMapName,                         [kTechDataDisplayName] = "GorgeCRAG",  [kTechDataCostKey] = kCragCost,     [kTechDataRequiresInfestation] = false, [kTechDataHotkey] = Move.C,       [kTechDataBuildTime] = kCragBuildTime, [kTechDataModel] = Crag.kModelName,           [kTechDataMaxHealth] = kCragHealth, [kTechDataMaxArmor] = kCragArmor,   [kTechDataInitialEnergy] = kCragInitialEnergy,      [kTechDataMaxEnergy] = kCragMaxEnergy, [kTechDataPointValue] = kCragPointValue, [kVisualRange] = Crag.kHealRadius, [kTechDataTooltipInfo] = "CRAG_TOOLTIP", [kTechDataGrows] = true},
 
-        { [kTechDataId] = kTechId.GorgeWhip, [kTechDataAllowConsumeDrop] = true, [kTechDataMaxAmount] = 3, [kTechDataBioMass] = kWhipBiomass, [kTechDataSupply] = kWhipSupply, [kTechDataHint] = "WHIP_HINT", [kTechDataGhostModelClass] = "AlienGhostModel",    [kTechDataMapName] = GorgeWhip.kMapName,                         [kTechDataDisplayName] = "GorgeWHIP",  [kTechDataCostKey] = kWhipCost,    [kTechDataRequiresInfestation] = true, [kTechDataHotkey] = Move.W,        [kTechDataBuildTime] = kWhipBuildTime, [kTechDataModel] = Whip.kModelName,           [kTechDataMaxHealth] = kWhipHealth, [kTechDataMaxArmor] = kWhipArmor,   [kTechDataDamageType] = kDamageType.Structural, [kTechDataInitialEnergy] = kWhipInitialEnergy,      [kTechDataMaxEnergy] = kWhipMaxEnergy, [kVisualRange] = Whip.kRange, [kTechDataPointValue] = kWhipPointValue, [kTechDataTooltipInfo] = "WHIP_TOOLTIP", [kTechDataGrows] = true},
+        { [kTechDataId] = kTechId.GorgeWhip, [kTechDataAllowConsumeDrop] = true, [kTechDataMaxAmount] = 3, [kTechDataBioMass] = kWhipBiomass, [kTechDataSupply] = kWhipSupply, [kTechDataHint] = "WHIP_HINT", [kTechDataGhostModelClass] = "AlienGhostModel",    [kTechDataMapName] = GorgeWhip.kMapName,                         [kTechDataDisplayName] = "GorgeWHIP",  [kTechDataCostKey] = kWhipCost,    [kTechDataRequiresInfestation] = false, [kTechDataHotkey] = Move.W,        [kTechDataBuildTime] = kWhipBuildTime, [kTechDataModel] = Whip.kModelName,           [kTechDataMaxHealth] = kWhipHealth, [kTechDataMaxArmor] = kWhipArmor,   [kTechDataDamageType] = kDamageType.Structural, [kTechDataInitialEnergy] = kWhipInitialEnergy,      [kTechDataMaxEnergy] = kWhipMaxEnergy, [kVisualRange] = Whip.kRange, [kTechDataPointValue] = kWhipPointValue, [kTechDataTooltipInfo] = "WHIP_TOOLTIP", [kTechDataGrows] = true},
 
-        { [kTechDataId] = kTechId.GorgeShift, [kTechDataAllowConsumeDrop] = true, [kTechDataMaxAmount] = 3, [kTechDataBioMass] = kShiftBiomass, [kTechDataSupply] = kShiftSupply, [kTechDataHint] = "SHIFT_HINT", [kTechDataGhostModelClass] = "ShiftGhostModel",    [kTechDataMapName] = GorgeShift.kMapName,                        [kTechDataDisplayName] = "GorgeSHIFT",  [kTechDataRequiresInfestation] = true, [kTechDataCostKey] = kShiftCost,    [kTechDataHotkey] = Move.S,        [kTechDataBuildTime] = kShiftBuildTime, [kTechDataModel] = Shift.kModelName,           [kTechDataMaxHealth] = kShiftHealth,  [kTechDataMaxArmor] = kShiftArmor,  [kTechDataInitialEnergy] = kShiftInitialEnergy,      [kTechDataMaxEnergy] = kShiftMaxEnergy, [kTechDataPointValue] = kShiftPointValue, [kVisualRange] = kEchoRange, [kTechDataTooltipInfo] = "SHIFT_TOOLTIP", [kTechDataGrows] = true },
+        { [kTechDataId] = kTechId.GorgeShift, [kTechDataAllowConsumeDrop] = true, [kTechDataMaxAmount] = 3, [kTechDataBioMass] = kShiftBiomass, [kTechDataSupply] = kShiftSupply, [kTechDataHint] = "SHIFT_HINT", [kTechDataGhostModelClass] = "ShiftGhostModel",    [kTechDataMapName] = GorgeShift.kMapName,                        [kTechDataDisplayName] = "GorgeSHIFT",  [kTechDataRequiresInfestation] = false, [kTechDataCostKey] = kShiftCost,    [kTechDataHotkey] = Move.S,        [kTechDataBuildTime] = kShiftBuildTime, [kTechDataModel] = Shift.kModelName,           [kTechDataMaxHealth] = kShiftHealth,  [kTechDataMaxArmor] = kShiftArmor,  [kTechDataInitialEnergy] = kShiftInitialEnergy,      [kTechDataMaxEnergy] = kShiftMaxEnergy, [kTechDataPointValue] = kShiftPointValue, [kVisualRange] = kEchoRange, [kTechDataTooltipInfo] = "SHIFT_TOOLTIP", [kTechDataGrows] = true },
         
         { [kTechDataId] = kTechId.GorgeShade, [kTechDataAllowConsumeDrop] = true, [kTechDataMaxAmount] = 3, [kTechDataBioMass] = kShadeBiomass, [kTechDataSupply] = kShadeSupply, [kTechDataHint] = "SHADE_HINT", [kTechDataGhostModelClass] = "AlienGhostModel",    [kTechDataMapName] = GorgeShade.kMapName,                        [kTechDataDisplayName] = "GorgeSHADE",  [kTechDataCostKey] = kShadeCost,      [kTechDataRequiresInfestation] = true,     [kTechDataBuildTime] = kShadeBuildTime, [kTechDataHotkey] = Move.D, [kTechDataModel] = Shade.kModelName,           [kTechDataMaxHealth] = kShadeHealth, [kTechDataMaxArmor] = kShadeArmor,   [kTechDataInitialEnergy] = kShadeInitialEnergy,      [kTechDataMaxEnergy] = kShadeMaxEnergy, [kTechDataPointValue] = kShadePointValue, [kVisualRange] = Shade.kCloakRadius, [kTechDataMaxExtents] = Vector(1, 1.3, .4), [kTechDataTooltipInfo] = "SHADE_TOOLTIP", [kTechDataGrows] = true },
  
-
+  { [kTechDataId] = kTechId.CommTunnel,  
+--[kTechDataSupply] = kCommTunnelSupply, 
+[kTechDataBuildRequiresMethod] = CheckCommTunnelReq,
+[kTechDataBuildMethodFailedMessage] = "2max/near fully infested cyst only",
+[kTechDataGhostModelClass] = "AlienGhostModel", 
+[kTechDataModel] = TunnelEntrance.kModelName, 
+[kTechDataMapName] = CommTunnel.kMapName, 
+[kTechDataMaxHealth] = kTunnelEntranceHealth, 
+[kTechDataMaxArmor] = kTunnelEntranceArmor, 
+ [kTechDataPointValue] = kTunnelEntrancePointValue, 
+[kTechDataCollideWithWorldOnly] = true,
+ [kTechDataDisplayName] = "Commander Tunnel", 
+[kTechDataCostKey] = 4, 
+[kTechDataRequiresInfestation] = false,
+[kTechDataTooltipInfo] =  "GORGE_TUNNEL_TOOLTIP"}, 
+  
 }   
 
 local kSiege_TechIdToMaterialOffset = {}

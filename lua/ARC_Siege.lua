@@ -1,3 +1,6 @@
+Script.Load("lua/ResearchMixin.lua")
+Script.Load("lua/RecycleMixin.lua")
+
 /*
 local orig_ARC_GetTechButtons = ARC.GetTechButtons
 function ARC:GetTechButtons()

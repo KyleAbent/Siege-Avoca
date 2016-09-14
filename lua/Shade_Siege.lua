@@ -6,7 +6,9 @@ local networkVars = {}
 
 AddMixinNetworkVars(AvocaMixin, networkVars)
     
-
+function ShadeAvoca:GetMinRangeAC()
+return ShadeAutoCCMR     
+end
     function ShadeAvoca:OnInitialized()
          Shade.OnInitialized(self)
         InitMixin(self, AvocaMixin)

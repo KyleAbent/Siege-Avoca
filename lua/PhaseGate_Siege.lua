@@ -6,10 +6,13 @@ local networkVars = {}
 
 AddMixinNetworkVars(AvocaMixin, networkVars)
     
-
+function PhaseGateAvoca:GetMinRangeAC()
+return PGAutoCCMR  
+end
     function PhaseGateAvoca:OnInitialized()
          PhaseGate.OnInitialized(self)
         InitMixin(self, AvocaMixin)
+        self:SetTechId(kTechId.PhaseGate)
     end
         function PhaseGateAvoca:GetTechId()
          return kTechId.PhaseGate

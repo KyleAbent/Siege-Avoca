@@ -1,4 +1,81 @@
 --Kyle 'Avoca' Abent
+function CheckSpaceAboveForJump(who)
+
+    local startPoint = who:GetOrigin() 
+    local endPoint = startPoint + Vector(1.2, 1.2, 1.2)
+    local trace = Shared.TraceRay(who:GetOrigin(), who:GetOrigin() + Vector(0,1,0),  CollisionRep.Default,  PhysicsMask.All,  EntityFilterOne(self))
+       if trace.fraction < 1 or trace.entity then
+            return false
+        end
+    return GetWallBetween(startPoint, endPoint, who)
+    
+end
+   function FindFreeSpawn(who) 
+         if not CheckSpaceAboveForJump(who) then return who:GetOrigin() + Vector(0, 0.2, 0) end
+        for index = 1, 25 do
+           local extents = LookupTechData(kTechId.Onos, kTechDataMaxExtents, nil)
+           local capsuleHeight, capsuleRadius = GetTraceCapsuleFromExtents(extents)  
+           local spawnPoint = GetRandomSpawnForCapsule(capsuleHeight, capsuleRadius, who:GetModelOrigin(), .5, 12, EntityFilterAll())
+        
+           if spawnPoint ~= nil then
+             spawnPoint = GetGroundAtPosition(spawnPoint, nil, PhysicsMask.AllButPCs, extents)
+           end
+        
+           local location = spawnPoint and GetLocationForPoint(spawnPoint)
+           local locationName = location and location:GetName() or ""
+           local sameLocation = spawnPoint ~= nil and locationName == who:GetLocationName()
+        
+           if spawnPoint ~= nil and sameLocation then//and GetIsPointOnInfestation(spawnPoint) then
+           return spawnPoint
+           end
+       end
+           Print("No valid spot found for tunnel exit!")
+           return FindFreeSpace(who:GetOrigin())
+    end 
+function GetAllLocationsWithSameName(origin)
+local location = GetLocationForPoint(origin)
+local locations = {}
+local name = location.name
+ for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
+        if location.name == name then table.insert(locations, location) end
+    end
+    return locations
+end
+function UpdateTypeOfHive(who)
+local hasshade = false
+local hasecrag = false
+local hasshift = false
+
+             for index, hive in ipairs(GetEntitiesForTeam("Hive", 2)) do
+               if hive:GetIsAlive() and hive:GetIsBuilt() then 
+                  if hive:GetTechId() ==  kTechId.CragHive then
+                  hasecrag = true
+                  elseif hive:GetTechId() ==  kTechId.ShadeHive then
+                  hasshade = true
+                  elseif hive:GetTechId() ==  kTechId.ShiftHive then
+                  hasshift = true
+                  end
+                end
+              end
+local techids = {}
+if hasecrag == false then table.insert(techids, kTechId.CragHive) end
+if hasshade == false then table.insert(techids, kTechId.ShadeHive) end
+if hasshift == false then table.insert(techids, kTechId.ShiftHive) end
+   
+   if #techids == 0 then return end 
+    for i = 1, #techids do
+      local current = techids[i]
+      if who:GetTechId() == techid then
+      table.remove(techids, current)
+      end
+    end
+    
+    local random = table.random(techids)
+    
+    who:UpgradeToTechId(random) 
+    who:GetTeam():GetTechTree():SetTechChanged()
+
+end
 function UpdateAliensWeaponsManually() ///Seriously this makes more sense than spamming some complicated formula every 0.5 seconds no?
  for _, alien in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do 
         alien:HiveCompleteSoRefreshTechsManually() 
@@ -78,7 +155,7 @@ end
            return spawnPoint
            end
        end
-           Print("No valid spot found for FindArcHiveSpawn")
+--           Print("No valid spot found for FindArcHiveSpawn")
            return nil --FindFreeSpace(where, .5, 48)
     end
 function GetIsPointWithinHiveRadius(point)     
@@ -242,7 +319,7 @@ function FindFreeSpace(where, mindistance, maxdistance)
               return spawnPoint
            end
        end
-           Print("No valid spot found for FindFreeSpace")
+--           Print("No valid spot found for FindFreeSpace")
            return where
 end
   function GetAverageBuiltNode()
@@ -257,36 +334,4 @@ end
    origin = origin / count
     return origin 
   end
-    function GetLocationWithMostMixedPlayers()
--- works good 2.15
---so far v1.23 shows this works okay except for picking empty res rooms for some reason -.-
-//Print("GetLocationWithMostMixedPlayers")
-
-            for _, mainent in ientitylist(Shared.GetEntitiesWithClassname("CommandStructure")) do
-                    if mainent:GetIsInCombat() then return mainent end
-             end
-             
-local team1avgorigin = Vector(0, 0, 0)
-local marines = 1
-local team2avgorigin = Vector(0, 0, 0)
-local aliens = 1
-local neutralavgorigin = Vector(0, 0, 0)
-
-            for _, marine in ientitylist(Shared.GetEntitiesWithClassname("Marine")) do
-            if marine:GetIsAlive() and not marine:isa("Commander") then marines = marines + 1 team1avgorigin = team1avgorigin + marine:GetOrigin() end
-             end
-             
-           for _, alien in ientitylist(Shared.GetEntitiesWithClassname("Alien")) do
-            if alien:GetIsAlive() and not alien:isa("Commander") then aliens = aliens + 1 team2avgorigin = team2avgorigin + alien:GetOrigin() end 
-             end
-             --v1.23 added check to make sure room isnt empty
-         neutralavgorigin =  team1avgorigin + team2avgorigin
-         neutralavgorigin =  neutralavgorigin / (marines+aliens) --better as a table i know
-     //    Print("neutralavgorigin is %s", neutralavgorigin)
-     local nearest = GetNearest(neutralavgorigin, "Location", nil, function(ent) local powerpoint = GetPowerPointForLocation(ent.name) return powerpoint ~= nil end)
-    if nearest then
-   // Print("nearest is %s", nearest.name)
-        return nearest
-    end
-
-end
+    

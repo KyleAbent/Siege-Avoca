@@ -76,16 +76,23 @@ function Imaginator:OnPreGame()
    
    
 end
+function Imaginator:DelayActivation()
+  local team1Commander = GetGamerules().team2:GetCommander()
+    local team2Commander = GetGamerules().team2:GetCommander()
+          self.marineenabled = not team1Commander
+   self.alienenabled = not team2Commander
+   return true
+end
 function Imaginator:OnRoundStart() 
    for i = 1, 4 do
      Print("Imaginator OnRoundStart")
    end
-  local team2Commander = GetGamerules().team2:GetCommander()
-     if not team2Commander then BuildKill() end
-      self.marineenabled = true
-   self.alienenabled = true
-  
+     BuildKill()
 
+      self.marineenabled = false
+   self.alienenabled = false
+  
+       self:AddTimedCallback(Imaginator.DelayActivation, 16)
             
 end
 function Imaginator:SetImagination(boolean, team)
@@ -410,7 +417,7 @@ local function FuckShitUp(self)
       
             if AvocaArcCount < 1 then
               CreateEntity(AvocaArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
-              CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
+--              CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
       end
       
             if SiegeArcCount < 12 then
@@ -419,14 +426,18 @@ local function FuckShitUp(self)
 
 end
 
+local function InstructSiegeArcs(self)
+             for index, siegearc in ipairs(GetEntitiesForTeam("SiegeArc", 1)) do
+                 siegearc:Instruct()
+             end
+end
 function Imaginator:ActualFormulaMarine()
 
-    if GetSandCastle():GetIsSiegeOpen() then FuckShitUp(self) end
-   -- SpawnBigMac()
       
 --Print("AutoBuildConstructs")
 local randomspawn = nil
 local tospawn, cost, gamestarted = GetMarineSpawnList()
+if not gamestarted or (gamestarted and GetSandCastle():GetIsSiegeOpen()) then FuckShitUp(self) InstructSiegeArcs(self)end
 local airlock = GetActiveAirLock()
 local success = false
 local entity = nil
@@ -439,17 +450,8 @@ local entity = nil
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
                       --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
-                          local minrange = 12
-                          if tospawn == kTechId.Armory then minrange = 16  end
-                          if tospawn == kTechId.PhaseGate then minrange = 55  end
-                          if tospawn == kTechId.Observatory then minrange = kScanRadius end
-                          if tospawn == kTechId.RoboticsFactory then minrange = 72 end
-                          if tospawn == kTechId.Sentry then minrange = 16  end --GetSentryMinRangeReq(randomspawn) end
-                          if tospawn == kTechId.PrototypeLab then minrange = 42  end
-                          if tospawn == kTechId.Scan then minrange = kScanRadius end--GetScanMinRangeReq(randomspawn) end
-                          if tospawn == kTechId.CommandStation then minrange = math.random(16,420) end
-                          if tospawn == kTechId.ArmsLab then minrange = 4 end
-                          if tospawn == kTechId.InfantryPortal then minrange = 8 end
+                          local minrange = nearestof:GetMinRangeAC()
+                          if tospawn == kTechId.Scan then minrange = kScanRadius end
                           if range >=  minrange  then
                             entity = CreateEntityForTeam(tospawn, randomspawn, 1)
                         if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
@@ -485,45 +487,21 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
       table.insert(tospawn, kTechId.Whip)
       table.insert(tospawn, kTechId.Crag)
       
-      
-      local hasshade = false
-local hasecrag = false
-local hasshift = false
-
-             for index, hive in ipairs(GetEntitiesForTeam("Hive", 2)) do
-               if hive:GetIsAlive() and hive:GetIsBuilt() then 
-                  if hive:GetTechId() ==  kTechId.CragHive then
-                  hasecrag = true
-                  elseif hive:GetTechId() ==  kTechId.ShadeHive then
-                  hasshade = true
-                  elseif hive:GetTechId() ==  kTechId.ShiftHive then
-                  hasshift = true
-                  end
-                end
-             end
-                
-                
-        if hasshift or not gamestarted then  
-              local  Spur = #GetEntitiesForTeam( "Shell", 2 )
-              if gamestarted then
-                if GetFrontDoorOpen() then table.insert(tospawn, kTechId.StructureBeacon) 
-                 end 
-               else
-              table.insert(tospawn, kTechId.StructureBeacon)  
-             end
-              if Spur < 3 then table.insert(tospawn, kTechId.Spur) end
+     
+      if GetFrontDoorOpen() then
+        local  ShadeHive = #GetEntitiesForTeam( "ShadeHive", 2 )
+         local  ShiftHive = #GetEntitiesForTeam( "ShiftHive", 2 )
+          
+          if ShadeHive >= 1 then
+               table.insert(tospawn, kTechId.EggBeacon)
+          end
+          
+          if ShiftHive >= 1 then
+          table.insert(tospawn, kTechId.StructureBeacon)
+          end
+        
+                   
        end
-
-        if hasecrag or not gamestarted  then  
-              local  Shell = #GetEntitiesForTeam( "Shell", 2 )
-              if GetFrontDoorOpen() then table.insert(tospawn, kTechId.EggBeacon) end
-              if Shell < 3 then table.insert(tospawn, kTechId.Shell) end
-       end
-        if hasshade or not gamestarted then  
-                local  Veil = #GetEntitiesForTeam( "Veil", 2 )
-              if Veil < 3 then table.insert(tospawn, kTechId.Veil) end
-       end
-       
       table.insert(tospawn, kTechId.NutrientMist)
       
       
@@ -584,19 +562,90 @@ function Imaginator:AlienConstructs(cystonly)
                   if success == true then return true end
        end
        
-
+      self:DoBetterUpgs()
 
 return true
 
 end
-local function GetAllLocationsWithSameName(origin)
-local location = GetLocationForPoint(origin)
-local locations = {}
-local name = location.name
- for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
-        if location.name == name then table.insert(locations, location) end
+local function UpgChambers()
+           local gamestarted = not GetGameInfoEntity():GetWarmUpActive()   
+if not gamestarted then return nil end     
+ local tospawn = {}
+local canafford = {}    
+
+      local hasshade = false
+local hasecrag = false
+local hasshift = false
+
+             for index, hive in ipairs(GetEntitiesForTeam("Hive", 2)) do
+               if hive:GetIsAlive() and hive:GetIsBuilt() then 
+                  if hive:GetTechId() ==  kTechId.CragHive then
+                  hasecrag = true
+                  elseif hive:GetTechId() ==  kTechId.ShadeHive then
+                  hasshade = true
+                  elseif hive:GetTechId() ==  kTechId.ShiftHive then
+                  hasshift = true
+                  end
+                end
+             end
+
+           
+        if hasshift then  
+              local  Spur = #GetEntitiesForTeam( "Spur", 2 )
+              if Spur < 3 then table.insert(tospawn, kTechId.Spur) end
+       end
+
+        if hasecrag  then  
+              local  Shell = #GetEntitiesForTeam( "Shell", 2 )
+              if Shell < 3 then table.insert(tospawn, kTechId.Shell) end
+       end
+        if hasshade then  
+                local  Veil = #GetEntitiesForTeam( "Veil", 2 )
+              if Veil < 3 then table.insert(tospawn, kTechId.Veil) end
+       end
+       
+             
+       for _, techid in pairs(tospawn) do
+          local cost = LookupTechData(techid, kTechDataCostKey)
+           if not gamestarted or TresCheck(2,cost) then
+             table.insert(canafford, techid)   
+           end
     end
-    return locations
+       
+      local finalchoice = table.random(canafford)
+      local finalcost = LookupTechData(finalchoice, kTechDataCostKey)
+      finalcost = not gamestarted and 0 or finalcost
+      --Print("GetAlienSpawnList() return finalchoice %s, finalcost %s", finalchoice, finalcost)
+      return finalchoice, finalcost, gamestarted
+       
+end
+local function GetHivePowerPoint()
+ local hivey = nil
+            for _, hive in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
+               hivey = hive
+               break   
+             end
+local node = GetNearest(hivey:GetOrigin(), "PowerPoint", 1, function(ent) return GetLocationForPoint(ent:GetOrigin()) == GetLocationForPoint(hivey:GetOrigin())  end)
+
+if node then return node end
+
+return nil
+
+end
+function Imaginator:DoBetterUpgs()
+local tospawn, cost, gamestarted = UpgChambers()
+local success = false
+local randomspawn = nil
+local hivepower = GetHivePowerPoint()
+     if hivepower and tospawn then             
+                 randomspawn = FindFreeSpace(hivepower:GetOrigin())
+            if randomspawn then
+                   local entity = CreateEntityForTeam(tospawn, randomspawn, 2)
+                    if gamestarted then entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost) end
+            end
+  end
+    
+  return success
 end
 function Imaginator:ActualAlienFormula(cystonly)
 --Print("AutoBuildConstructs")
@@ -618,12 +667,7 @@ local entity = nil
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
                       --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
-                          local minrange = 12
-                          if tospawn == kTechId.Clog then minrange = kCystRedeployRange * .7 end
-                          if tospawn == kTechId.Shade then minrange = 17 end
-                          if tospawn == kTechId.Shift then minrange = kEnergizeRange end
-                          if tospawn == kTechId.Shift then minrange = kEnergizeRange end
-                          if tospawn == kTechId.Crag then minrange = Crag.kHealRadius / 3 end
+                          local minrange =  nearestof:GetMinRangeAC() or 12
                           if tospawn == kTechId.EggBeacon then minrange = 9999 end
                           if tospawn == kTechId.StructureBeacon then minrange = 9999 end
                           if tospawn == kTechId.NutrientMist then minrange = NutrientMist.kSearchRange end

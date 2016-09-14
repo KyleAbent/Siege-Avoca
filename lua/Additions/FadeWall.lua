@@ -49,7 +49,7 @@ function FadeWall:GetAnimationGraphName()
 end
 
 function FadeWall:GetEnergyCost(player)
-    return kPrimalScreamEnergyCost * .7
+    return kPrimalScreamEnergyCost * .3
 end
 
 function FadeWall:GetHUDSlot()

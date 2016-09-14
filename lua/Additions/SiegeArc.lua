@@ -16,7 +16,6 @@ end
 function SiegeArc:OnInitialized()
  ARC.OnInitialized(self)
    if Server then
- self:AddTimedCallback(SiegeArc.Instruct, 2.5)
  --self:AddTimedCallback(SiegeArc.Waypoint, 16)
  end
 
@@ -121,26 +120,6 @@ local function GiveUnDeploy(who)
      who:TriggerEffects("arc_stop_charge")
      who:TriggerEffects("arc_undeploying")
 end
-local function PlayersNearby(who)
-
-local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 5.5)
-local alive = true--false
-    if not who:GetInAttackMode() and #players >= 1 then
-         for i = 1, #players do
-            local player = players[i]
-            if player:GetIsAlive() and alive == false then alive = true end
-            if ( player:GetIsAlive() and  player.GetIsNanoShielded and not player:GetIsNanoShielded()) then player:ActivateNanoShield() end
-           if player:isa("Marine") and( player:GetHealth() == player:GetMaxHealth() ) then
-           local addarmoramount = kArmoryAvoArcAddArmrAmt * player:GetArmorLevel()
-           addarmoramount = who:GetInAttackMode() and addarmoramount * 1.5 or addarmoramount
-           player:AddHealth(addarmoramount, false, not true, nil, nil, true)
-           else
-           player:AddHealth(Armory.kHealAmount, false, false, nil, nil, true)   
-           end
-         end
-    end
-return alive
-end
 local function ShouldStop(who)
 local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
 if #players >=1 then return false end
@@ -156,7 +135,7 @@ local attacking = self.deployMode == ARC.kDeployMode.Deployed
 local inradius = GetIsInSiege(self) and GetIsPointWithinHiveRadius(self:GetOrigin()) 
 --Print("inradius is %s", inradius) 
 
-local shouldstop = not PlayersNearby(self)
+local shouldstop = not true
 --Print("shouldstop is %s", shouldstop) 
 local shouldmove = not moving and not inradius
 --Print("shouldmove is %s", shouldmove) 
