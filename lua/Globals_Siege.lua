@@ -1,2 +1,2 @@
 
-kMaxResources = 999
+kMaxResources = 420

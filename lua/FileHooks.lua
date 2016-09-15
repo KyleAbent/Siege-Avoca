@@ -19,6 +19,9 @@ ModLoader.SetupFileHook( "lua/PrototypeLab.lua", "lua/PrototypeLab_Siege.lua", "
 
 ModLoader.SetupFileHook( "lua/Tunnel.lua", "lua/Tunnel_Siege.lua", "post" )
 
+ModLoader.SetupFileHook( "lua/TargetCache.lua", "lua/TargetCache_Siege.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Exo.lua", "lua/Exo_Siege.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/NetworkMessages.lua", "lua/NetworkMessages_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/NetworkMessages_Server.lua", "lua/NetworkMessages_Server_Siege.lua", "post" )

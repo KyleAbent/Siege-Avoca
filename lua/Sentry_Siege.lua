@@ -37,11 +37,6 @@ function SentryAvoca:OnUpdateAnimationInput(modelMixin)
 end
 if Server then
 
- function SentryAvoca:OnUpdate(deltaTime)
-        Sentry.OnUpdate(self, deltaTime)  
-        self.attachedToBattery = true
-end
-
 end
     function SentryAvoca:GetMaxLevel()
     return 25

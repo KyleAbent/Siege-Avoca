@@ -15,16 +15,13 @@ end
 function Location:GetIsPowerUp()
 return IsPowerUp(self)
 end
-function Location:InitiateDefense()
-   self:AddTimedCallback(Location.BaseDefense, 4)
-end
-local function GetRandom(self, nameofwhich)
+function Location:GetRandomMarine()
 
 local lottery = {}
-     for _, unit in ipairs(GetEntitiesWithMixinForTeamWithinRange("Live", 2, self:GetOrigin(), 24)) do
+     for _, unit in ipairs(GetEntitiesWithMixinForTeamWithinRange("Live", 1, self:GetOrigin(), 24)) do
      
          local location = GetLocationForPoint(unit:GetOrigin())
-         if location and location.name == nameofwhich then
+         if location and location.name == self.name then
               table.insert(lottery, unit)
          end
      end
@@ -42,21 +39,10 @@ local function GetCanSpawn(self)
           end
           return true
 end
-function Location:BaseDefense() 
-  if Server then  
-  --                Print("BaseDefense triggered")
-          local spawnpoint = GetRandom(self, self.name)
-            if spawnpoint ~= nil and IsPowerUp(self) then 
-                 -- Print("SpawnDefense triggered")
-              CreateEntity(FireFlameCloud.kMapName, spawnpoint, 1) --oh fuck i had this set as team 2 LOL 
-           end
-   end
-     return GetCanSpawn(self)
-end
 function Location:GetIsAirLock(ask)
   local marine = false
     for _, entity in ipairs(self:GetEntitiesInTrigger()) do
-        if entity:isa("Player") and entity:GetTeamNumber() == 1 and entity:GetIsAlive() then marine = true break end 
+        if entity and entity:isa("Player") and entity:GetTeamNumber() == 1 and entity:GetIsAlive() then marine = true break end 
     end
     local poweron = IsPowerUp(self)
     local boolean = marine and poweron

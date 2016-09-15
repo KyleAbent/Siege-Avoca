@@ -20,7 +20,7 @@ kBatteryPowerRange = 4
 kSentrySupply = 5
 kSentryDamage = 4
 
-kMaxTeamResources = 999
+kMaxTeamResources = 420
 
 
 

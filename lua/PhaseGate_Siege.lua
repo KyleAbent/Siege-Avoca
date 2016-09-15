@@ -1,9 +1,11 @@
+Script.Load("lua/Additions/LevelsMixin.lua")
 Script.Load("lua/Additions/AvocaMixin.lua")
 class 'PhaseGateAvoca' (PhaseGate)
 PhaseGateAvoca.kMapName = "phasegateavoca"
 
 local networkVars = {}
 
+AddMixinNetworkVars(LevelsMixin, networkVars)
 AddMixinNetworkVars(AvocaMixin, networkVars)
     
 function PhaseGateAvoca:GetMinRangeAC()
@@ -11,13 +13,19 @@ return PGAutoCCMR
 end
     function PhaseGateAvoca:OnInitialized()
          PhaseGate.OnInitialized(self)
+        InitMixin(self, LevelsMixin)
         InitMixin(self, AvocaMixin)
         self:SetTechId(kTechId.PhaseGate)
     end
         function PhaseGateAvoca:GetTechId()
          return kTechId.PhaseGate
     end
-
+    function PhaseGateAvoca:GetMaxLevel()
+    return 25
+    end
+    function PhaseGateAvoca:GetAddXPAmount()
+    return 0.25
+    end
 function PhaseGateAvoca:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined

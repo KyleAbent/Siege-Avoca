@@ -25,6 +25,16 @@ local function TriggerMarineBeaconEffects(self)
     end
 
 end
+function Observatory:OnVortex()
+
+    if self:GetIsBeaconing() then
+        self:CancelDistressBeacon()
+    elseif self:GetIsAdvancedBeaconing() then
+       self:CancelAdvancedBeacon()
+      
+    end
+    
+end
 function Observatory:TriggerAdvancedBeacon()
 
     local success = false
@@ -265,24 +275,32 @@ if Server then
     end
     
 end
+Script.Load("lua/Additions/LevelsMixin.lua")
 Script.Load("lua/Additions/AvocaMixin.lua")
 class 'ObservatoryAvoca' (Observatory)--may not nee dto do ongetmapblipinfo because the way i redone the setcachedtechdata to simply change the mapname to this :)
 ObservatoryAvoca.kMapName = "observatoryavoca"
 
 local networkVars = {}
 
+AddMixinNetworkVars(LevelsMixin, networkVars)
 AddMixinNetworkVars(AvocaMixin, networkVars)
     
 
     function ObservatoryAvoca:OnInitialized()
          Observatory.OnInitialized(self)
+        InitMixin(self, LevelsMixin)
         InitMixin(self, AvocaMixin)
         self:SetTechId(kTechId.Observatory)
     end
         function ObservatoryAvoca:GetTechId()
          return kTechId.Observatory
     end
-
+    function ObservatoryAvoca:GetMaxLevel()
+    return 25
+    end
+    function ObservatoryAvoca:GetAddXPAmount()
+    return 0.25
+    end
 function ObservatoryAvoca:OnGetMapBlipInfo()
     local success = false
     local blipType = kMinimapBlipType.Undefined

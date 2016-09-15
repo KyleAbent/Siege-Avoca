@@ -14,6 +14,7 @@ SetCachedTechData(kTechId.Observatory, kTechDataMapName, ObservatoryAvoca.kMapNa
 SetCachedTechData(kTechId.Shift, kTechDataMapName, ShiftAvoca.kMapName)
 SetCachedTechData(kTechId.Shade, kTechDataMapName,ShadeAvoca.kMapName)
 SetCachedTechData(kTechId.Whip, kTechDataMapName,WhipAvoca.kMapName)
+SetCachedTechData(kTechId.InfantryPortal, kTechDataMapName,InfantryPortalAvoca.kMapName)
 --SetCachedTechData(kTechId.RoboticsFactory, kTechDataMapName,RoboticsFactory.kMapName)
 function Veil:GetMinRangeAC()
 return  9999   
@@ -23,9 +24,6 @@ function LeapMixin:GetHasSecondary(player)
 end
 function StompMixin:GetHasSecondary(player)
     return  GetHasTech(player, kTechId.Stomp)
-end
-function AchievementReceiverMixin:OnUpdatePlayer(deltaTime)
- return -- I cringed when this was introduced. Thinking of the Perf onupdate tick whatever you wanna call it. No place for Siege, mate.
 end
 
 

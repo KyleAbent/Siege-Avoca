@@ -3,4 +3,8 @@
       return
         
     end
-    
+     function NS2Gamerules:CheckForNoCommander(onTeam, commanderType)
+
+        return
+        
+    end

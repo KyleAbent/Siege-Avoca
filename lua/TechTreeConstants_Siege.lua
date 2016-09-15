@@ -41,6 +41,7 @@ local kSiege_TechIds =
     'GorgeCrag',
     'GorgeWhip',
     'CommTunnel',
+    'CommVortex',
     --'LayStructure',
 
 }

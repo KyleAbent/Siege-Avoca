@@ -263,14 +263,7 @@ local function GetRange(who, where)
     return ArcFormula
 end
 
-local function TresCheck(team, cost)
-    if team == 1 then
-    return GetGamerules().team1:GetTeamResources() >= cost
-    elseif team == 2 then
-    return GetGamerules().team2:GetTeamResources() >= cost
-    end
 
-end
 local function GetSentryMinRangeReq(where)
 local count = 0
             local ents = GetEntitiesForTeamWithinRange("SentryAvoca", 1, where, 16)
@@ -295,12 +288,52 @@ local count = 0
            return count*16
                 
 end
+local function GetHasAdvancedArmory()
+    for index, armory in ipairs(GetEntitiesForTeam("Armory", 1)) do
+       if armory:GetTechId() == kTechId.AdvancedArmory then return true end
+    end
+    return false
+end
+local function GetIsACreditStructure(who)
+local boolean = HasMixin(who, "Avoca") and who:GetIsACreditStructure()  or false
+--Print("isacredit structure is %s", boolean)
+return boolean
+
+end
+local function OrganizedIPCheck(who)
+local count = 0
+local ips = GetEntitiesForTeamWithinRange("InfantryPortal", 1, who:GetOrigin(), kInfantryPortalAttachRange)
+            for index, ent in ipairs(ips) do
+              if not GetIsACreditStructure(ent) then
+                  count = count + 1
+               end   
+           end
+           
+           if count >= 2 then return end
+           
+           for i = 1, math.abs( 2 - count ) do
+           local cost = 20
+               if TresCheck(1, cost) then 
+               local origin = FindFreeSpace(who:GetOrigin(), 1, kInfantryPortalAttachRange)
+               local ip = CreateEntity(InfantryPortalAvoca.kMapName, origin,  1)
+              ip:GetTeam():SetTeamResources(ip:GetTeam():GetTeamResources() - cost)
+              end
+           end
+           
+              
+           
+end
+local function HaveCCsCheckIps()
+   local CommandStations = GetEntitiesForTeam( "CommandStation", 1 )
+       if not CommandStations then return end
+        OrganizedIPCheck(table.random(CommandStations))
+end
 local function GetMarineSpawnList()
 local tospawn = {}
 local canafford = {}
 local cost = 1 
 local gamestarted = false
-if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true end
+if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true HaveCCsCheckIps() end
       table.insert(tospawn, kTechId.PhaseGate)
       table.insert(tospawn, kTechId.Armory)
       table.insert(tospawn, kTechId.Observatory)
@@ -311,14 +344,16 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
    -- local  AdvancedArmory = #GetEntitiesForTeam( "AdvancedArmory", 1 )
      
         --  if AdvancedArmory => 1 then
+            if GetHasAdvancedArmory() then
             table.insert(tospawn, kTechId.PrototypeLab)
+            end
     --  end
       
 
       table.insert(tospawn, kTechId.Sentry)
       
       local  ArmsLabs = #GetEntitiesForTeam( "ArmsLab", 1 )
-      local  InfantryPortal = #GetEntitiesForTeam( "InfantryPortal", 1 )
+      --local  InfantryPortal = #GetEntitiesForTeam( "InfantryPortal", 1 )
       local  CommandStation = #GetEntitiesForTeam( "CommandStation", 1 )
       
 
@@ -329,9 +364,9 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
       end
       
       
-      if InfantryPortal < 4 then
-      table.insert(tospawn, kTechId.InfantryPortal)
-      end
+      --if InfantryPortal < 4 then
+      --table.insert(tospawn, kTechId.InfantryPortal)
+      --end
       
       if CommandStation < 3 then
       table.insert(tospawn, kTechId.CommandStation)
@@ -407,8 +442,9 @@ local function GetScanMinRangeReq(where)
                 
 end
 local function BuildNotificationMessage(where, self, mapname)
+
 end
-local function FuckShitUp(self)
+local function FuckShitUp(self)               --would these be better spawned through robo?
       local  AvocaArcCount = #GetEntitiesForTeam( "AvocaArc", 1 )
       local  SiegeArcCount = #GetEntitiesForTeam( "SiegeArc", 1 )
       local  CommandStation = GetEntitiesForTeam( "CommandStation", 1 )
@@ -444,9 +480,9 @@ local entity = nil
             if airlock and tospawn then
                 local powerpoint = GetPowerPointForLocation(airlock.name)
              if powerpoint then
-                 randomspawn = FindFreeSpace(FindMarine(airlock, powerpoint))
+                 randomspawn = FindFreeSpace(FindMarine(airlock, powerpoint), 2.5)
             if randomspawn then
-                local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetTechId() == tospawn or ent:isa("AdvancedArmory") and tospawn == kTechId.Armory end)
+                local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetTechId() == tospawn or ( ent:GetTechId() == kTechId.AdvancedArmory and tospawn == kTechId.Armory) end)
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
                       --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
@@ -486,22 +522,6 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
       table.insert(tospawn, kTechId.Shift)
       table.insert(tospawn, kTechId.Whip)
       table.insert(tospawn, kTechId.Crag)
-      
-     
-      if GetFrontDoorOpen() then
-        local  ShadeHive = #GetEntitiesForTeam( "ShadeHive", 2 )
-         local  ShiftHive = #GetEntitiesForTeam( "ShiftHive", 2 )
-          
-          if ShadeHive >= 1 then
-               table.insert(tospawn, kTechId.EggBeacon)
-          end
-          
-          if ShiftHive >= 1 then
-          table.insert(tospawn, kTechId.StructureBeacon)
-          end
-        
-                   
-       end
       table.insert(tospawn, kTechId.NutrientMist)
       
       
@@ -529,16 +549,22 @@ local function GetBioMassLevel()
            local bioMass = (teamInfo and teamInfo.GetBioMassLevel) and teamInfo:GetBioMassLevel() or 0
            return bioMass
 end
+local function FindPoorVictim()
+local airlock = GetActiveAirLock()
+local spawnpoint = airlock and airlock:GetRandomMarine() or nil
+       return spawnpoint
+end
 local function ChanceRandomContamination(who) --messy
     --  Print("ChanceRandomContamination")
      gamestarted =  not GetGameInfoEntity():GetWarmUpActive() 
-     local chance = GetSiegeDoorOpen() and 50 or 70
+     local chance = GetSiegeDoorOpen() and 50 or 30
      local randomchance = math.random(1, 100)
      if (not gamestarted or TresCheck( 2, 5 ) ) and randomchance <= chance then
-       local where =  GetAverageBuiltNode()
+       local where = FindPoorVictim()
            if where then 
                local contamination = CreateEntityForTeam(kTechId.Contamination, FindFreeSpace(where, 4, 8), 2)
                     -- CreatePheromone(kTechId.ExpandingMarker,contamination:GetOrigin(), 2) 
+                    contamination:StartBeaconTimer()
             if gamestarted then contamination:GetTeam():SetTeamResources(contamination:GetTeam():GetTeamResources() - 5) end
                         --     Print("nearestbuiltnode is %s", contamination)
            end--
@@ -632,6 +658,9 @@ if node then return node end
 return nil
 
 end
+function Imaginator:ClearAttached()
+return 
+end
 function Imaginator:DoBetterUpgs()
 local tospawn, cost, gamestarted = UpgChambers()
 local success = false
@@ -660,7 +689,7 @@ local entity = nil
      if powerPoints and tospawn then
                 local powerpoint = table.random(powerPoints)
              if powerpoint then                      
-                 randomspawn = FindFreeSpace(FindAlien(GetAllLocationsWithSameName(powerpoint:GetOrigin(), tospawn == kTechId.Clog), powerpoint))
+                 randomspawn = FindFreeSpace(FindAlien(GetAllLocationsWithSameName(powerpoint:GetOrigin(), tospawn == kTechId.Clog), powerpoint), 2.5)
             if randomspawn then
                 local nearestof = GetNearestMixin(randomspawn, "Construct", 2, function(ent) return ent:GetTechId() == tospawn end)
                 if tospawn == kTechId.Clog then  nearestof = GetNearest(randomspawn, "Clog", 2) end
@@ -668,8 +697,6 @@ local entity = nil
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
                       --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
                           local minrange =  nearestof:GetMinRangeAC() or 12
-                          if tospawn == kTechId.EggBeacon then minrange = 9999 end
-                          if tospawn == kTechId.StructureBeacon then minrange = 9999 end
                           if tospawn == kTechId.NutrientMist then minrange = NutrientMist.kSearchRange end
                           if range >=  minrange then
                             entity = CreateEntityForTeam(tospawn, randomspawn, 2)
@@ -689,7 +716,7 @@ local entity = nil
  end
 function Imaginator:AutoBuildResTowers()
   for _, respoint in ientitylist(Shared.GetEntitiesWithClassname("ResourcePoint")) do
-        if respoint:GetAttached() == nil then AutoDrop(self, respoint) end
+        if not respoint:GetAttached() then AutoDrop(self, respoint) end
     end
 end
 

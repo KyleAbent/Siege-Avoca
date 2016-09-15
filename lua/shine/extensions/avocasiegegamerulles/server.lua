@@ -2,6 +2,13 @@
 local Shine = Shine
 local Plugin = Plugin
 
+local OldUpdateBatteryState
+
+local function NewUpdateBatteryState( self )
+     self.attachedToBattery = true
+end
+
+OldUpdateBatteryState = Shine.Hook.ReplaceLocalFunction( Sentry.OnUpdate, "UpdateBatteryState", NewUpdateBatteryState )
 
 Plugin.Version = "1.0"
 
@@ -48,7 +55,10 @@ function Plugin:CommLoginPlayer(Building, Player)
    local client = Player:GetClient()
  if not client then return end
    --  if client:GetUserId() == 22542592 or client:GetUserId() == 8086089 or client:GetUserId() == 121608212 then
-       Shared.ConsoleCommand("sh_forceroundstart") 
+        self:SimpleTimer( 1, function() 
+           Shared.ConsoleCommand("sh_forceroundstart")
+      end)
+     
     -- end
  end
 end

@@ -24,7 +24,7 @@ self.techTree:AddResearchNode(kTechId.OnoGrow,              kTechId.Stomp, kTech
     self.techTree:AddBuildNode(kTechId.GorgeShade,                     kTechId.ShadeHive,          kTechId.None)
     self.techTree:AddBuildNode(kTechId.GorgeWhip,                     kTechId.None,          kTechId.None)
     self.techTree:AddBuildNode(kTechId.CommTunnel,                     kTechId.None,          kTechId.None)
-    
+    self.techTree:AddBuildNode(kTechId.CommVortex,                     kTechId.ShadeHive,          kTechId.None)
     
     
     

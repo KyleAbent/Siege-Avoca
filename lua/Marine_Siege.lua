@@ -17,7 +17,9 @@ function Marine:GetHasLayStructure()
     
     return builder
 end
-
+function Marine:GetCanBeVortexed()
+    return false
+end
 if Server then
 
 
@@ -57,7 +59,12 @@ orig_Marine_UpdateGhostModel(self)
         self.ghostStructureCoords = weapon:GetGhostModelCoords()
         self.ghostStructureValid = weapon:GetIsPlacementValid()
         self.showGhostModel = weapon:GetShowGhostModel()
-        end
+        elseif weapon:isa("LayMines") then
+        self.currentTechId = kTechId.Mine
+        self.ghostStructureCoords = weapon:GetGhostModelCoords()
+        self.ghostStructureValid = weapon:GetIsPlacementValid()
+        self.showGhostModel = weapon:GetShowGhostModel()
+         end
     end
 
 

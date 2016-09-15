@@ -104,38 +104,14 @@ local function GiveUnDeploy(who)
      who:TriggerEffects("arc_stop_charge")
      who:TriggerEffects("arc_undeploying")
 end
-local function BuffPlayersNearby(who)
-
-local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 5.5)
-local alive = false
-         for i = 1, #players do
-            local player = players[i]
-            if player:GetIsAlive() and alive == false then alive = true end
-            if ( player:GetIsAlive() and  player.GetIsNanoShielded and not player:GetIsNanoShielded()) then player:ActivateNanoShield() end
-           if player:isa("Marine") and( player:GetHealth() == player:GetMaxHealth() ) then
-           local addarmoramount = 8 
-           addarmoramount = who:GetInAttackMode() and addarmoramount * 1.5 or addarmoramount
-           player:AddHealth(addarmoramount, false, not true, nil, nil, true)
-           else
-           player:AddHealth(Armory.kHealAmount, false, false, nil, nil, true)   
-           end
-         end
-return alive
-
-end
-local function ShouldStop(who)
-local players =  GetEntitiesForTeamWithinRange("Player", 1, who:GetOrigin(), 8)
-if #players >=1 then return false end
-return true
-end
 function AvocaArc:SpecificRules()
 local moving = self.mode == ARC.kMode.Moving     
         
 local attacking = self.deployMode == ARC.kDeployMode.Deployed
 local inradius = GetIsPointWithinHiveRadius(self:GetOrigin()) or CheckForAndActAccordingly(self)  
-local shouldstop = ShouldStop(self)
+local shouldstop = false
 local shouldmove = not shouldstop and not moving and not inradius
-local shouldstop = moving and ShouldStop(self)
+local shouldstop = moving and shouldstop
 local shouldattack = inradius and not attacking 
 local shouldundeploy = attacking and not inradius and not moving
   
@@ -214,7 +190,6 @@ end
 function AvocaArc:Instruct()
    CheckHivesForScan()
    self:SpecificRules()
-   BuffPlayersNearby(self)
    return true
 end
 
@@ -233,13 +208,9 @@ function AvocaArc:UpdateMoveOrder(deltaTime)
     ASSERT(currentOrder)
     
     self:SetMode(ARC.kMode.Moving)  
-    local slowspeed = ARC.kCombatMoveSpeed
-    local normalspeed = ARC.kMoveSpeed * 1.25
+    local slowspeed = ARC.kCombatMoveSpeed * 1.5 
+    local normalspeed = ARC.kMoveSpeed * 2
     local moveSpeed = ( self:GetIsInCombat() or self:GetGameEffectMask(kGameEffect.OnInfestation) ) and slowspeed or normalspeed
-   -- local marines = GetEntitiesWithinRange("Marine", self:GetOrigin(), 4)
-    --        if #marines >= 2 then
-    --        moveSpeed = moveSpeed * Clamp(#marines/4, 1.1, 4)
-    --        end
     local maxSpeedTable = { maxSpeed = moveSpeed }
     self:ModifyMaxSpeed(maxSpeedTable)
     

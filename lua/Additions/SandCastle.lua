@@ -22,6 +22,9 @@ end
 function SandCastle:GetIsMapEntity()
 return true
 end
+function SandCastle:ClearAttached()
+return 
+end
 function SandCastle:OnCreate()
      self.SiegeTimer = kSiegeTimer
    self.FrontTimer = kFrontTimer

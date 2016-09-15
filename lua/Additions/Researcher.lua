@@ -30,7 +30,7 @@ function Researcher:OnCreate()
 end
 local function NotBeingResearched(techId, who)   
 for _, structure in ientitylist(Shared.GetEntitiesWithClassname( string.format("%s", who:GetClassName()) )) do
-         if structure:GetIsResearching() and structure:GetClassName() == who:GetClassName( )and structure:GetResearchingId() == techId then return false end
+         if not techId ==  kTechId.AdvancedArmoryUpgrade and structure:GetIsResearching() and structure:GetClassName() == who:GetClassName( )and structure:GetResearchingId() == techId then return false end
      end
     return true
 end

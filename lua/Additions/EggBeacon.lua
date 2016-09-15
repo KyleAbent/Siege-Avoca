@@ -57,12 +57,6 @@ function EggBeacon:GenerateRandomNumberofEggsNearbyDerpHead()
      local egg = CreateEntity(Egg.kMapName, spawnpoint, 2)
             egg:AddTimedCallback(function()  DestroyEntity(egg) end, 30)
             egg:SetHive(self)
-            if egg ~= nil then
-                local angles = self:GetAngles()
-                angles.yaw = math.random() * math.pi * 2
-                egg:SetAngles(angles)
-                egg:UpdatePhysicsModel()          
-            end
     end
    
     return true

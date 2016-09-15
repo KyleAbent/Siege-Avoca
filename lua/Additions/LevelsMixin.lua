@@ -41,7 +41,8 @@ function LevelsMixin:AddXP(amount)
     local xpReward = 0
         xpReward = math.min(amount, self:GetMaxLevel() - self.level)
         self.level = self.level + xpReward
-        --self:AdjustMaxHealth(self:GetMaxHealth() * (self.level/self:GetMaxLevel()) + self:GetMaxHealth()) 
+        local defaultarmor = LookupTechData(self:GetTechId(), kTechDataMaxArmor)
+        self:AdjustMaxArmor(defaultarmor * (self.level/self:GetMaxLevel()) +  defaultarmor) 
       
     return xpReward
     

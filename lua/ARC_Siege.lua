@@ -1,6 +1,18 @@
 Script.Load("lua/ResearchMixin.lua")
 Script.Load("lua/RecycleMixin.lua")
 
+local origcanfire = ARC.GetCanFireAtTarget
+
+function ARC:GetCanFireAtTarget(target)
+
+local boolean = origcanfire(self, target)
+
+boolean = boolean and GetFrontDoorOpen() and not self:GetIsVortexed()
+
+return boolean
+
+end
+
 /*
 local orig_ARC_GetTechButtons = ARC.GetTechButtons
 function ARC:GetTechButtons()

@@ -310,6 +310,8 @@ Script.Load("lua/Additions/FadeWall.lua")
 Script.Load("lua/Additions/OnoLow.lua")
 Script.Load("lua/Additions/OnoGrow.lua")
 Script.Load("lua/Additions/CommTunnel.lua")
+Script.Load("lua/Additions/CommVortex.lua")
+
 
 Script.Load("lua/Modifications/GorgeStruct.lua")
 
@@ -349,11 +351,11 @@ local kSiege_TechData =
           [kTechDataDisplayName] = "Disables automatic arc spawning",       
          [kTechDataCostKey] = 0, 
           [kTechDataTooltipInfo] = "For those who prefer micro-micro management"},
-
+          
        
         { [kTechDataId] = kTechId.EggBeacon, 
         [kTechDataCooldown] = kEggBeaconCoolDown, [kTechDataBioMass] = kShellBiomass, 
-         [kTechDataHint] = "Eggs Spawn approximately at the placed Egg Beacon. Be careful as infestation is required.", 
+         [kTechDataTooltipInfo] = "Eggs Spawn approximately at the placed Egg Beacon. Be careful as infestation is required.", 
         [kTechDataGhostModelClass] = "AlienGhostModel",   
             [kTechDataMapName] = EggBeacon.kMapName,        
                  [kTechDataDisplayName] = "Egg Beacon",  [kTechDataCostKey] = kEggBeaconCost,   
@@ -364,7 +366,7 @@ local kSiege_TechData =
 
         { [kTechDataId] = kTechId.StructureBeacon, 
         [kTechDataCooldown] = kStructureBeaconCoolDown, [kTechDataBioMass] = kShellBiomass, 
-         [kTechDataHint] = "Structures move approximately at the placed Egg Beacon", 
+         [kTechDataTooltipInfo] = "Structures move approximately at the placed Egg Beacon", 
         [kTechDataGhostModelClass] = "AlienGhostModel",   
             [kTechDataMapName] = StructureBeacon.kMapName,        
                  [kTechDataDisplayName] = "Structure Beacon",  [kTechDataCostKey] = kStructureBeaconCost,   
@@ -444,6 +446,20 @@ local kSiege_TechData =
 [kTechDataCostKey] = 4, 
 [kTechDataRequiresInfestation] = false,
 [kTechDataTooltipInfo] =  "GORGE_TUNNEL_TOOLTIP"}, 
+
+
+                  { [kTechDataId] = kTechId.CommVortex, 
+        [kTechDataMapName] = CommVortex.kMapName,
+       [kTechDataAllowStacking] = true,
+       [kTechDataIgnorePathingMesh] = true, 
+       [kTechDataCollideWithWorldOnly] = true,
+       [kTechDataRequiresInfestation] = true, 
+      [kTechDataDisplayName] = "CommVortex", 
+        [kTechDataCostKey] = 8, 
+     [kTechDataCooldown] = 8, 
+      [kTechDataTooltipInfo] =  "Places structures in another dimension - making them useless and nullfies damage."},
+      
+      
   
 }   
 

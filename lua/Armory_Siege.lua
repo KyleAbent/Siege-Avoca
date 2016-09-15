@@ -119,6 +119,7 @@ function Armory:ResupplyPlayer(player)
         //self:PlayArmoryScan(player:GetId())
     end
 end
+Script.Load("lua/Additions/LevelsMixin.lua")
 Script.Load("lua/Additions/AvocaMixin.lua")
 class 'ArmoryAvoca' (Armory)
 ArmoryAvoca.kMapName = "armoryavoca"
@@ -126,14 +127,11 @@ ArmoryAvoca.kMapName = "armoryavoca"
 local networkVars = {}
 
 AddMixinNetworkVars(AvocaMixin, networkVars)
-    
+AddMixinNetworkVars(LevelsMixin, networkVars)
 
     function ArmoryAvoca:OnCreate()
          Armory.OnCreate(self)
         InitMixin(self, AvocaMixin)
-    end
-        function ArmoryAvoca:GetTechId()
-         return kTechId.Armory
     end
 
 function ArmoryAvoca:OnGetMapBlipInfo()
@@ -151,11 +149,20 @@ function ArmoryAvoca:OnGetMapBlipInfo()
 end
 function ArmoryAvoca:OnInitialized()
 Armory.OnInitialized(self)
-self:SetTechId(kTechId.Armory)
+InitMixin(self, LevelsMixin)
+if self:GetTechId() ~= kTechId.AdvancedArmory  then self:SetTechId(kTechId.Armory) end
 end
-function ArmoryAvoca:SetIsACreditStructure(boolean)
+    function ArmoryAvoca:GetMaxLevel()
+    return 30
+    end
+    function ArmoryAvoca:GetAddXPAmount()
+    return 0.25
+    end
     
-self.isacreditstructure = boolean
-      Print("%s isacreditstructure is %s", self:GetClassName(), self.isacreditstructure)
-end
+    
+    
+    
+    
+    
+    
 Shared.LinkClassToMap("ArmoryAvoca", ArmoryAvoca.kMapName, networkVars)

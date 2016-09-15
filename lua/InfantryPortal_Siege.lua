@@ -1,20 +1,30 @@
+Script.Load("lua/Additions/LevelsMixin.lua")
 Script.Load("lua/Additions/AvocaMixin.lua")
 class 'InfantryPortalAvoca' (InfantryPortal)
 InfantryPortalAvoca.kMapName = "infantryportalavoca"
 
 local networkVars = {}
 
+AddMixinNetworkVars(LevelsMixin, networkVars)
 AddMixinNetworkVars(AvocaMixin, networkVars)
     
 
     function InfantryPortalAvoca:OnInitialized()
          InfantryPortal.OnInitialized(self)
+        InitMixin(self, LevelsMixin)
         InitMixin(self, AvocaMixin)
         self:SetTechId(kTechId.InfantryPortal)
     end
         function InfantryPortalAvoca:GetTechId()
          return kTechId.InfantryPortal
     end
+        function InfantryPortalAvoca:GetMaxLevel()
+    return 25
+    end
+    function InfantryPortalAvoca:GetAddXPAmount()
+    return 0.25
+    end
+    
 function InfantryPortal:GetMinRangeAC()
 return IPAutoCCMR  
 end

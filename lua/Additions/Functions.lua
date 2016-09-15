@@ -1,4 +1,31 @@
 --Kyle 'Avoca' Abent
+ function TresCheck(team, cost)
+    if team == 1 then
+    return GetGamerules().team1:GetTeamResources() >= cost
+    elseif team == 2 then
+    return GetGamerules().team2:GetTeamResources() >= cost
+    end
+
+end
+ function GetHasCragHive()
+    for index, hive in ipairs(GetEntitiesForTeam("Hive", 2)) do
+       if hive:GetTechId() == kTechId.CragHive then return true end
+    end
+    return false
+end
+ function GetHasShiftHive()
+    for index, hive in ipairs(GetEntitiesForTeam("Hive", 2)) do
+       if hive:GetTechId() == kTechId.ShiftHive then return true end
+    end
+    return false
+end
+ function GetHasShadeHive()
+    for index, hive in ipairs(GetEntitiesForTeam("Hive", 2)) do
+       if hive:GetTechId() == kTechId.ShadeHive then return true end
+    end
+    return false
+end
+
 function CheckSpaceAboveForJump(who)
 
     local startPoint = who:GetOrigin() 
