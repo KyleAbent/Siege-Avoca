@@ -14,8 +14,8 @@ SetCachedTechData(kTechId.Observatory, kTechDataMapName, ObservatoryAvoca.kMapNa
 SetCachedTechData(kTechId.Shift, kTechDataMapName, ShiftAvoca.kMapName)
 SetCachedTechData(kTechId.Shade, kTechDataMapName,ShadeAvoca.kMapName)
 SetCachedTechData(kTechId.Whip, kTechDataMapName,WhipAvoca.kMapName)
+SetCachedTechData(kTechId.CommandStation, kTechDataMapName,CommandStationAvoca.kMapName)
 SetCachedTechData(kTechId.InfantryPortal, kTechDataMapName,InfantryPortalAvoca.kMapName)
---SetCachedTechData(kTechId.RoboticsFactory, kTechDataMapName,RoboticsFactory.kMapName)
 function Veil:GetMinRangeAC()
 return  9999   
 end

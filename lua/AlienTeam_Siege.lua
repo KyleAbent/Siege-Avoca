@@ -1,4 +1,22 @@
 
+
+local function OnlyPregame(self, techPoint)
+     local gamestarted = false
+   if GetGamerules():GetGameState() == kGameState.Started  or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end
+   if not gamestarted then 
+  local bigmac  = CreateEntity(BigDrifter.kMapName, FindFreeSpace(techPoint:GetOrigin()), 2)
+  
+  return false
+  end
+end
+
+local orig_AlienTeam_SpawnInitialStructures = AlienTeam.SpawnInitialStructures
+function AlienTeam:SpawnInitialStructures(techPoint)
+orig_AlienTeam_SpawnInitialStructures(self, techPoint)
+     OnlyPregame(self, techPoint)
+end
+
+
 local orig_AlienTeam_InitTechTree = AlienTeam.InitTechTree
 function AlienTeam:InitTechTree()
     local orig_PlayingTeam_InitTechTree = PlayingTeam.InitTechTree

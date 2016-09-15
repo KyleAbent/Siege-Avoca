@@ -1,14 +1,14 @@
 --Kyle 'Avoca' Abent
 
-class 'Imaginator' (ScriptActor) --Because I dont want to spawn it other than when conductor is active and that file is already full. 
+class 'Imaginator' (ScriptActor) 
 Imaginator.kMapName = "imaginator"
 
 
 local networkVars = 
 
 {
- alienenabled = "boolean",
- marineenabled = "boolean",
+ alienenabled = "private boolean",
+ marineenabled = "private boolean",
 }
 
 local function BuildPowerNodes()

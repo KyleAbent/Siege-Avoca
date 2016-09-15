@@ -508,18 +508,27 @@ end
 
 Shared.LinkClassToMap("RoboticsAddon", RoboticsAddon.kMapName, addonNetworkVars)
 
+Script.Load("lua/Additions/LevelsMixin.lua")
 Script.Load("lua/Additions/AvocaMixin.lua")
 class 'RoboticsFactoryAvoca' (RoboticsFactory)
 RoboticsFactoryAvoca.kMapName = "roboticsfactoryavoca"
 
 local networkVars = {}
 
+AddMixinNetworkVars(LevelsMixin, networkVars)
 AddMixinNetworkVars(AvocaMixin, networkVars)
     
 
     function RoboticsFactoryAvoca:OnInitialized()
          RoboticsFactory.OnInitialized(self)
         InitMixin(self, AvocaMixin)
+        InitMixin(self, LevelsMixin)
+    end
+        function RoboticsFactoryAvoca:GetMaxLevel()
+    return 25
+    end
+    function RoboticsFactoryAvoca:GetAddXPAmount()
+    return 0.25
     end
         function RoboticsFactoryAvoca:GetTechId()
          return kTechId.RoboticsFactory

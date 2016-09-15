@@ -1,14 +1,8 @@
 
-
-
-Script.Load("lua/Additions/LevelsMixin.lua")
-
 class 'HydraAvoca' (Hydra)
 HydraAvoca.kMapName = "hydraavoca"
 
 local networkVars = {}
-
-AddMixinNetworkVars(LevelsMixin, networkVars)
 
     
 local orighydra  = Hydra.OnInitialized
@@ -27,16 +21,7 @@ end
 
     function HydraAvoca:OnInitialized()
          Hydra.OnInitialized(self)
-        InitMixin(self, LevelsMixin)
-    end
-        function HydraAvoca:GetTechId()
-         return kTechId.Hydra
-    end
-    function HydraAvoca:GetMaxLevel()
-    return 30
-    end
-    function HydraAvoca:GetAddXPAmount()
-    return 1
+         self:SetTechId(kTechId.Hydra)
     end
 
 function HydraAvoca:OnGetMapBlipInfo()
