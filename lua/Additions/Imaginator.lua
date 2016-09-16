@@ -1,5 +1,7 @@
 --Kyle 'Avoca' Abent
 
+
+
 class 'Imaginator' (ScriptActor) 
 Imaginator.kMapName = "imaginator"
 
@@ -47,6 +49,10 @@ function Imaginator:OnInitialized()
 end
 function Imaginator:GetIsMapEntity()
 return true
+end
+function Imaginator:GetIsMarineEnabled()
+if self.marineenabled then return true end
+return false
 end
 function Imaginator:OnUpdate(deltatime)
    
@@ -294,6 +300,13 @@ local function GetHasAdvancedArmory()
     end
     return false
 end
+local function GetHasTwoChairs()
+local CommandStations = #GetEntitiesForTeam( "CommandStation", 1 )
+
+if CommandStations >= 2 then return true end
+
+return false
+end
 local function GetIsACreditStructure(who)
 local boolean = HasMixin(who, "Avoca") and who:GetIsACreditStructure()  or false
 --Print("isacredit structure is %s", boolean)
@@ -444,28 +457,96 @@ end
 local function BuildNotificationMessage(where, self, mapname)
 
 end
-local function FuckShitUp(self)               --would these be better spawned through robo?
-      local  AvocaArcCount = #GetEntitiesForTeam( "AvocaArc", 1 )
-      local  SiegeArcCount = #GetEntitiesForTeam( "SiegeArc", 1 )
-      local  CommandStation = GetEntitiesForTeam( "CommandStation", 1 )
-      CommandStation = table.random(CommandStation)
-      
-      
-            if AvocaArcCount < 1 then
-              CreateEntity(AvocaArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
---              CreateEntity(PhaseAvoca.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
-      end
-      
-            if SiegeArcCount < 12 then
-              CreateEntity(SiegeArc.kMapName, FindFreeSpace(CommandStation:GetOrigin()) , 1)
-      end 
+local function ChangeArcTo(who, mapname)
+
+if not who or not mapname  then return end
+
+                      local entity = CreateEntity(mapname, who:GetOrigin(), 1)
+                      entity:SetHealth(who:GetHealth())
+                      entity:SetArmor(who:GetArmor())
+                      DestroyEntity(who)
+                     
 
 end
-
 local function InstructSiegeArcs(self)
              for index, siegearc in ipairs(GetEntitiesForTeam("SiegeArc", 1)) do
                  siegearc:Instruct()
              end
+end
+local function ManageRoboticFactories()
+      local  ARCS = {}
+      local ARCRobo = {} --ugh
+      
+          --Because researcher will spawn macs.
+        for index, robo in ipairs(GetEntitiesForTeam("RoboticsFactory", 1)) do
+       if  robo:GetTechId() ~= kTechId.ARCRoboticsFactory and robo:GetIsBuilt() and not robo:GetIsResearching() then
+           local techid = kTechId.UpgradeRoboticsFactory
+          local techNode = robo:GetTeam():GetTechTree():GetTechNode( techid ) 
+            robo:SetResearching(techNode, robo)
+       end
+       if robo:GetTechId() == kTechId.ARCRoboticsFactory then table.insert(ARCRobo, robo) end --ugh
+     end
+     
+     
+     if ( not GetHasTwoChairs() and not GetFrontDoorOpen() ) then return end
+        
+          if  table.count(ARCRobo) == 0 then return end
+          
+                    ARCRobo = table.random(ARCRobo)
+          
+     for index, arc in ipairs(GetEntitiesForTeam("ARC", 1)) do
+       if not arc:isa("ARCCredit") and not arc:isa("SiegeArc") then table.insert(ARCS,arc) end
+     end
+          
+          --Not avoca arc because we want these changed to siegearcs when siege is open
+     local ArcCount = table.count(ARCS) 
+     
+     
+      if ArcCount < 12 and TresCheck(1, kARCCost) then
+      ARCRobo:GetTeam():SetTeamResources(ARCRobo:GetTeam():GetTeamResources() - kARCCost)
+      ARCRobo:OverrideCreateManufactureEntity(kTechId.ARC)
+      end
+
+
+      if GetSandCastle():GetIsSiegeOpen() then 
+
+                  --change arcs to siege
+                  for index, ent in ipairs(ARCS) do
+                   ChangeArcTo(ent, SiegeArc.kMapName)
+                   end
+                   InstructSiegeArcs(self) 
+
+      return -- Dont want new AvocaArcs during siege
+      end
+      
+     local  AvoArc = GetEntitiesForTeam("AvocaArc", 1)
+     local AACount = table.count(AvoArc)
+     
+      if ArcCount  > 3 and AACount < 4 then
+
+                    local victim = table.random(ARCS)
+                    ChangeArcTo(victim, AvocaArc.kMapName)
+      
+      end
+   
+    if  AACount >= 1 then 
+      if  TresCheck(1,3) then --because if they scan, they stop :x and fire
+      local randomarc = table.random(AvoArc)
+      local origin = randomarc:GetOrigin()
+        local scan = CreateEntity(Scan.kMapName, origin, 1)
+        randomarc:GetTeam():SetTeamResources(randomarc:GetTeam():GetTeamResources() - 3)
+      end
+    end
+      
+      --and finally instruct normal arcs, because siegearcs and avocaarcs have autopilot already.
+
+       for index, ent in ipairs(ARCS) do
+          ent:Instruct()
+       end       
+
+--yes its funny to delete and create entities on the fly mid game such as this
+-- I dont feel like writing enums with seperate modes. Maybe this can be optimized, if fun.
+
 end
 function Imaginator:ActualFormulaMarine()
 
@@ -473,7 +554,7 @@ function Imaginator:ActualFormulaMarine()
 --Print("AutoBuildConstructs")
 local randomspawn = nil
 local tospawn, cost, gamestarted = GetMarineSpawnList()
-if not gamestarted or (gamestarted and GetSandCastle():GetIsSiegeOpen()) then FuckShitUp(self) InstructSiegeArcs(self)end
+if gamestarted then ManageRoboticFactories() end
 local airlock = GetActiveAirLock()
 local success = false
 local entity = nil
@@ -482,7 +563,7 @@ local entity = nil
              if powerpoint then
                  randomspawn = FindFreeSpace(FindMarine(airlock, powerpoint), 2.5)
             if randomspawn then
-                local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetTechId() == tospawn or ( ent:GetTechId() == kTechId.AdvancedArmory and tospawn == kTechId.Armory) end)
+                local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetTechId() == tospawn or ( ent:GetTechId() == kTechId.AdvancedArmory and tospawn == kTechId.Armory)  or ( ent:GetTechId() == kTechId.ARCRoboticsFactory and tospawn == kTechId.RoboticsFactory) end)
                       if nearestof then
                       local range = GetRange(nearestof, randomspawn) --6.28 -- improved formula?
                       --Print("tospawn is %s, location is %s, range between is %s", tospawn, GetLocationForPoint(randomspawn).name, range)
@@ -719,5 +800,100 @@ function Imaginator:AutoBuildResTowers()
         if not respoint:GetAttached() then AutoDrop(self, respoint) end
     end
 end
+
+
+
+--Contam
+
+--Better than hanging out in contamination_siege.lua
+local function TresSpawn(who, cost, randomlychosen)
+
+ if TresCheck(2, cost) then 
+
+local entity = CreateEntityForTeam(randomlychosen, FindFreeSpace(who:GetOrigin(), 1, 8), 2)
+ entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
+end
+
+end
+
+local function AdditionalSpawns(who)
+
+local contamchance = math.random(1, 100) 
+
+local mistchance = math.random(1, 100)
+
+local rupturechance = math.random(1, 100)
+
+local tospawn ={}
+
+if contamchance <= 10 then
+
+table.insert(tospawn, kTechId.Contamination) 
+
+end  
+
+if mistchance <= 15 then
+
+table.insert(tospawn, kTechId.NutrientMist) 
+
+end
+
+
+if rupturechance <= 50 then
+
+table.insert(tospawn, kTechId.Rupture)
+
+end
+
+if  table.count(tospawn) == 0 then return end
+
+
+local randomlychosen = table.random(tospawn)
+
+
+
+local cost = LookupTechData(randomlychosen, kTechDataCostKey)
+
+TresSpawn(who, cost, randomlychosen)
+
+
+end
+
+function Imaginator:HandleIntrepid(who)
+local tospawn = {}
+      local  StructureBeacon = #GetEntitiesForTeam( "StructureBeacon", 2 )
+      local  EggBeacon = #GetEntitiesForTeam( "EggBeacon", 2 )
+      local CommVortex = #GetEntitiesForTeam( "CommVortex", 2 )
+      local BoneWall = #GetEntitiesForTeam( "BoneWall", 2 )
+      --Rupture
+      --Mist
+      --DrifterAvoca
+      --10% xhance of contam
+      
+if StructureBeacon < 1 and GetHasShiftHive() then table.insert(tospawn, kTechId.StructureBeacon) end
+
+if EggBeacon < 1 and  GetHasCragHive() then table.insert(tospawn, kTechId.EggBeacon) end
+
+
+if CommVortex < 1 and  GetHasShadeHive() then table.insert(tospawn, kTechId.CommVortex) end
+
+if BoneWall < 1 then table.insert(tospawn, kTechId.BoneWall) end
+
+if  table.count(tospawn) == 0 then return end
+
+local randomlychosen = table.random(tospawn)
+
+local cost = LookupTechData(randomlychosen, kTechDataCostKey)
+
+TresSpawn(who, cost, randomlychosen)
+AdditionalSpawns(who)
+
+
+
+return who:GetIsAlive() and not who:GetIsDestroyed()
+
+end
+
+--
 
 Shared.LinkClassToMap("Imaginator", Imaginator.kMapName, networkVars)

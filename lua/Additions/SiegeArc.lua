@@ -22,10 +22,10 @@ function SiegeArc:OnInitialized()
 end
 
 function SiegeArc:GetMaxHealth()
-    return 4000
+    return 2000
 end
 function SiegeArc:GetMaxArmor()
-    return 1200
+    return 500
 end
 
 function ARC:GetShowDamageIndicator()

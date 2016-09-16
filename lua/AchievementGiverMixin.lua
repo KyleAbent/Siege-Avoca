@@ -1,4 +1,4 @@
---this is all piece of shit and junk fuck you for offending me
+
 AchievementGiverMixin = CreateMixin(AchievementGiverMixin)
 AchievementGiverMixin.type = "AchievementGiver"
 

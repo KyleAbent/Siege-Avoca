@@ -29,8 +29,11 @@ function Researcher:OnCreate()
    self.marineenabled = false
 end
 local function NotBeingResearched(techId, who)   
+
+ if techId ==  kTechId.AdvancedArmoryUpgrade or techId == kTechId.UpgradeRoboticsFactory then return true end
+  
 for _, structure in ientitylist(Shared.GetEntitiesWithClassname( string.format("%s", who:GetClassName()) )) do
-         if not techId ==  kTechId.AdvancedArmoryUpgrade and structure:GetIsResearching() and structure:GetClassName() == who:GetClassName( )and structure:GetResearchingId() == techId then return false end
+         if structure:GetIsResearching() and structure:GetClassName() == who:GetClassName() and structure:GetResearchingId() == techId then return false end
      end
     return true
 end
@@ -48,25 +51,38 @@ local techIds = who:GetTechButtons() or {}
                              local cost = 0--LookupTechData(techId, kTechDataCostKey) * 
                                 if  NotBeingResearched(techId, who) and TresCheck(1,cost) then 
                                   who:SetResearching(techNode, who)
-                                  who:GetTeam():SetTeamResources(who:GetTeam():GetTeamResources() - cost)
+                                  break -- Because having 2 armslabs research at same time voids without break. So lower timer 16 to 4
+                                --  who:GetTeam():SetTeamResources(who:GetTeam():GetTeamResources() - cost)
                                  end
                              end
                          end
                       end
                   end
 end
+function Researcher:DelayedActivation() 
 
+            
+     local team1Commander = GetGamerules().team1:GetCommander()
+     self.marineenabled = not team1Commander
+     
+     
+       
+  if Server then
+              self:AddTimedCallback(Researcher.Calculate, 4)
+            end
+return false 
+
+end
 function Researcher:OnRoundStart() 
 
    for i = 1, 4 do
      Print("Researche Begin")
    end
-           if Server then
-              self:AddTimedCallback(Researcher.Calculate, 16)
+   
+              if Server then
+              self:AddTimedCallback(Researcher.DelayedActivation, 16)
             end
-            
-                 local team1Commander = GetGamerules().team1:GetCommander()
-     self.marineenabled = not team1Commander
+         
 end
 function Researcher:Calculate()
 local gamestarted = false
@@ -75,7 +91,7 @@ local team1Commander = GetGamerules().team1:GetCommander()
 
             if not gamestarted  or (self.marineenabled and not team1Commander) then
             for _, researchable in ipairs(GetEntitiesWithMixinForTeam("Research", 1)) do
-                 ResearchEachTechButton(researchable) 
+                if not researchable:isa("RoboticsFactory") then ResearchEachTechButton(researchable)  end
              end
          end
          

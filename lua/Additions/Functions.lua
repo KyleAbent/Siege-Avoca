@@ -1,4 +1,10 @@
 --Kyle 'Avoca' Abent
+function GetIsACreditStructure(who)
+local boolean = HasMixin(who, "Avoca") and who:GetIsACreditStructure()  or false
+--Print("isacredit structure is %s", boolean)
+return boolean
+
+end
  function TresCheck(team, cost)
     if team == 1 then
     return GetGamerules().team1:GetTeamResources() >= cost
@@ -197,6 +203,13 @@ function GetIsPointWithinHiveRadius(point)
   
    local hive = GetEntitiesWithinRange("Hive", point, ARC.kFireRange)
    if #hive >= 1 then return true end
+
+   return false
+end
+function GetIsPointWithinChairRadius(point)     
+  
+   local cc = GetEntitiesWithinRange("CommandStation", point, ARC.kFireRange)
+   if #cc >= 1 then return true end
 
    return false
 end

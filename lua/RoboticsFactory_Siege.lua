@@ -198,6 +198,7 @@ function RoboticsFactory:GetTechAllowed(techId, techNode, player)
     return allowed, canAfford
     
 end
+
 function RoboticsFactory:GetTechButtons(techId)
 
     local techButtons = {  kTechId.None, kTechId.MAC, kTechId.None, kTechId.None, 
@@ -349,7 +350,6 @@ function RoboticsFactory:OnTag(tagName)
     PROFILE("RoboticsFactory:OnTag")
                                                                                    //siege fix for autobuild
     if self.open and self.researchId ~= Entity.invalidId and tagName == "end" and self.builtEntity ~= nil then
-
         self.builtEntity:Rollout(self, RoboticsFactory.kRolloutLength)
         self.builtEntity = nil
         
@@ -373,16 +373,15 @@ end
 if Server then
   function RoboticsFactory:OnUpdate()
    if self.timeOfLastHealCheck == nil or Shared.GetTime() > self.timeOfLastHealCheck + 10 then
-   if self.automaticspawningmac then
-        if self:GetTeam():GetTeamResources() >= kMACCost and ( kMaxSupply - GetSupplyUsedByTeam(1) >= LookupTechData(kTechId.MAC, kTechDataSupply, 0)) and self.deployed and GetIsUnitActive(self) and self:GetResearchProgress() == 0 and not self.open and self:GetMacsAmount() <= 8 then
-        
+   if self.automaticspawningmac == true then
+        if self:GetTeam():GetTeamResources() >= kMACCost and self.deployed and GetIsUnitActive(self) and self:GetResearchProgress() == 0 and not self.open and self:GetMacsAmount() < 8 then
             self:OverrideCreateManufactureEntity(kTechId.MAC)
             //self.spawnedFreeMAC = true
             self:GetTeam():SetTeamResources(self:GetTeam():GetTeamResources() - kMACCost )
         end
     end
-    if self.automaticspawningarc then
-        if self:GetTeam():GetTeamResources() >= kARCCost and ( kMaxSupply - GetSupplyUsedByTeam(1) >= LookupTechData(kTechId.ARC, kTechDataSupply, 0)) and self.deployed and GetIsUnitActive(self) and self:GetResearchProgress() == 0 and not self.open and self:GetArcsAmount() <= 12 - 1 then
+    if self.automaticspawningarc == true then
+        if self:GetTeam():GetTeamResources() >= kARCCost and self.deployed and GetIsUnitActive(self) and self:GetResearchProgress() == 0 and not self.open and self:GetArcsAmount() < 12 then
         
             self:OverrideCreateManufactureEntity(kTechId.ARC)
             //self.spawnedFreeMAC = true
@@ -482,7 +481,47 @@ end
 Shared.LinkClassToMap("RoboticsFactory", RoboticsFactory.kMapName, networkVars, true)
 
 
-class 'ARCRoboticsFactory' (RoboticsFactory)
+Script.Load("lua/Additions/LevelsMixin.lua")
+Script.Load("lua/Additions/AvocaMixin.lua")
+class 'RoboticsFactoryAvoca' (RoboticsFactory)
+RoboticsFactoryAvoca.kMapName = "roboticsfactoryavoca"
+
+local networkVars = {}
+
+AddMixinNetworkVars(LevelsMixin, networkVars)
+AddMixinNetworkVars(AvocaMixin, networkVars)
+    
+
+    function RoboticsFactoryAvoca:OnInitialized()
+         RoboticsFactory.OnInitialized(self)
+        InitMixin(self, AvocaMixin)
+        InitMixin(self, LevelsMixin)
+        if self:GetTechId() ~= kTechId.ARCRoboticsFactory  then self:SetTechId(kTechId.RoboticsFactory) end
+    end
+        function RoboticsFactoryAvoca:GetMaxLevel()
+    return 25
+    end
+    function RoboticsFactoryAvoca:GetAddXPAmount()
+    return 0.25
+    end
+
+function RoboticsFactoryAvoca:OnGetMapBlipInfo()
+    local success = false
+    local blipType = kMinimapBlipType.Undefined
+    local blipTeam = -1
+    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
+    blipType = kMinimapBlipType.RoboticsFactory
+     blipTeam = self:GetTeamNumber()
+    if blipType ~= 0 then
+        success = true
+    end
+    
+    return success, blipType, blipTeam, isAttacked, false --isParasited
+end
+
+Shared.LinkClassToMap("RoboticsFactoryAvoca", RoboticsFactoryAvoca.kMapName, networkVars)
+
+class 'ARCRoboticsFactory' (RoboticsFactoryAvoca)
 ARCRoboticsFactory.kMapName = "arcroboticsfactory"
 Shared.LinkClassToMap("ARCRoboticsFactory", ARCRoboticsFactory.kMapName, { })
 
@@ -507,45 +546,3 @@ function RoboticsAddon:OnCreate()
 end
 
 Shared.LinkClassToMap("RoboticsAddon", RoboticsAddon.kMapName, addonNetworkVars)
-
-Script.Load("lua/Additions/LevelsMixin.lua")
-Script.Load("lua/Additions/AvocaMixin.lua")
-class 'RoboticsFactoryAvoca' (RoboticsFactory)
-RoboticsFactoryAvoca.kMapName = "roboticsfactoryavoca"
-
-local networkVars = {}
-
-AddMixinNetworkVars(LevelsMixin, networkVars)
-AddMixinNetworkVars(AvocaMixin, networkVars)
-    
-
-    function RoboticsFactoryAvoca:OnInitialized()
-         RoboticsFactory.OnInitialized(self)
-        InitMixin(self, AvocaMixin)
-        InitMixin(self, LevelsMixin)
-    end
-        function RoboticsFactoryAvoca:GetMaxLevel()
-    return 25
-    end
-    function RoboticsFactoryAvoca:GetAddXPAmount()
-    return 0.25
-    end
-        function RoboticsFactoryAvoca:GetTechId()
-         return kTechId.RoboticsFactory
-    end
-
-function RoboticsFactoryAvoca:OnGetMapBlipInfo()
-    local success = false
-    local blipType = kMinimapBlipType.Undefined
-    local blipTeam = -1
-    local isAttacked = HasMixin(self, "Combat") and self:GetIsInCombat()
-    blipType = kMinimapBlipType.RoboticsFactory
-     blipTeam = self:GetTeamNumber()
-    if blipType ~= 0 then
-        success = true
-    end
-    
-    return success, blipType, blipTeam, isAttacked, false --isParasited
-end
-
-Shared.LinkClassToMap("RoboticsFactoryAvoca", RoboticsFactoryAvoca.kMapName, networkVars)
