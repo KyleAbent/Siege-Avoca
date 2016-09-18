@@ -1,41 +1,25 @@
 Script.Load("lua/InfestationMixin.lua")
 
-
-class 'ClogMod' (Clog)
-ClogMod.kMapName = "clogmod"
-
 local networkVars = {}
 AddMixinNetworkVars(InfestationMixin, networkVars)
 
-local originit = Clog.OnInitialized
-function Clog:OnInitialized()
-  originit(self)
-    if Server and not self:isa("ClogMod") then
-    self:AddTimedCallback( function ()
-       local mod = CreateEntity(ClogMod.kMapName, self:GetOrigin(), 2) 
-       local owner = self:GetOwner()
-       if owner ~= nil then mod:SetOwner(owner) owner:GetTeam():UpdateClientOwnedStructures(self:GetId()) owner:GetTeam():AddGorgeStructure(owner, mod)   end 
-       DestroyEntity(self) end , .5)
-    end
-end
-function ClogMod:GetMinRangeAC()
+function Clog:GetMinRangeAC()
 return  kCystRedeployRange * .7      
 end
-function ClogMod:OnInitialized()
+
+local originit = Clog.OnInitialized
+function Clog:OnInitialized()
      originit(self)
   InitMixin(self, InfestationMixin)
 end
-function ClogMod:GetTechId()
-return kTechId.Clog
-end
-function ClogMod:GetInfestationRadius()
+function Clog:GetInfestationRadius()
   local frontdoor = GetEntitiesWithinRange("FrontDoor", self:GetOrigin(), 7)
    if #frontdoor >=1 then return 0
    else
     return 3.5
    end
 end
-function ClogMod:GetInfestationGrowthRate()
+function Clog:GetInfestationGrowthRate()
  return 0.5
 end
 function Clog:GetAttached()
@@ -45,13 +29,8 @@ end
 
 
 
-local originit = Clog.PreOnKill
+local origonkill = Clog.PreOnKill
 function Clog:PreOnKill(attacker, doer, point, direction)
-    --for i = 1, 8 do
-     --Print("Clog on kill")
-    --end
-    // trigger receed
- if self:isa("ClogMod") then
     self:SetDesiredInfestationRadius(0)
     
       for _, structure in ipairs( GetEntitiesWithMixinWithinRange("InfestationTracker", self:GetOrigin(), 8)) do
@@ -60,7 +39,6 @@ function Clog:PreOnKill(attacker, doer, point, direction)
       
       end
       
-      if Server and originit ~= nil  then originit(self, attacker, doer, point, direction) end
-end
+      if Server and origonkill ~= nil  then origonkill(self, attacker, doer, point, direction) end
 
-Shared.LinkClassToMap("ClogMod", ClogMod.kMapName, networkVars)
+Shared.LinkClassToMap("Clog", Clog.kMapName, networkVars)

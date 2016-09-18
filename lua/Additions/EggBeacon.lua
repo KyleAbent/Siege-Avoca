@@ -42,6 +42,14 @@ if Server then
     function EggBeacon:OnDestroy()
         ScriptActor.OnDestroy(self)
     end
+    local function TeleportNonCombatBots(self)
+        for index, bot in ipairs(GetEntitiesForTeam("Player", 2)) do
+                local client = bot:GetClient()
+                if client and client:GetIsVirtual() then
+                if bot:GetIsAlive() and (bot.GetIsInCombat and not bot:GetIsInCombat()) then bot:SetOrigin(FindFreeSpace(self:GetOrigin())) end
+               end
+        end
+    end
 function EggBeacon:OnConstructionComplete()
               local commander = self:GetTeam():GetCommander()
        if commander ~= nil then
@@ -49,6 +57,8 @@ function EggBeacon:OnConstructionComplete()
        end
         self:AddTimedCallback(TimeUp, kLifeSpan)  
         self:AddTimedCallback(EggBeacon.GenerateRandomNumberofEggsNearbyDerpHead, 1)
+        
+        TeleportNonCombatBots(self)
   end
 function EggBeacon:GenerateRandomNumberofEggsNearbyDerpHead()
     local spawnpoint = FindFreeSpace(self:GetOrigin(), .5, 7)

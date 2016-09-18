@@ -3,6 +3,7 @@ function PowerPoint:CanBeCompletedByScriptActor(player)
 end
 
  function PowerPoint:SpawnSurgeForEach()
+        if GetGamerules():GetGameState() == kGameState.Countdown then return end
            local canspawn = GetIsMarineImaginatorActive()
            if not canspawn then return false end
            local where = self:GetOrigin()
@@ -16,19 +17,40 @@ end
            local locationName = location and location:GetName() or ""
            local sameLocation = locationName == wherelocation
           if sameLocation then 
-                eligable:DeductHealth(100, nil, nil, true, false, true)
+                eligable:DeductHealth(420, nil, nil, true, false, true)
                 eligable:TriggerEffects("arc_hit_primary")
           end --
          end
      end--
      return not self:GetIsDisabled() and canspawn
 end
-local orig_PowerPoint_SetInternalPowerState = PowerPoint.SetInternalPowerState
-    function PowerPoint:SetInternalPowerState(powerState)
-    orig_PowerPoint_SetInternalPowerState(self, powerState)
-       if self.powerState == PowerPoint.kPowerState.destroyed and powerState == PowerPoint.kPowerState.socketed then
+
+
+local function ConfigureAirlock(self, boolean)
+
+
+  for index, ent in ipairs(GetAllLocationsWithSameName(self:GetOrigin())) do
+  
+       ent.airlock =  boolean
+  
+  end
+
+
+end
+
+
+
+local orig_PowerPoint_OnConstructionComplete = PowerPoint.OnConstructionComplete
+    function PowerPoint:OnConstructionComplete()
+    orig_PowerPoint_OnConstructionComplete(self)
+          local location = GetLocationForPoint(self:GetOrigin())
+          if location:GetRandomMarine() ~= nil then ConfigureAirlock(self, true)  end
            self:SpawnSurgeForEach()
-        --   AddSiegeTime(4)
-       end
    end
    
+   
+   local orig_PowerPoint_OnKill = PowerPoint.OnKill
+function PowerPoint:OnKill(attacker, doer, point, direction)
+    orig_PowerPoint_OnKill(self, attacker, doer, point, direction)
+    ConfigureAirlock(self, false)
+    end

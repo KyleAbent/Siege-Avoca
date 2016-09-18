@@ -15,6 +15,9 @@ ModLoader.SetupFileHook( "lua/Globals.lua", "lua/Globals_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/CommandStation.lua", "lua/CommandStation_Siege.lua", "post" )
 
 ModLoader.SetupFileHook( "lua/ArmsLab.lua", "lua/ArmsLab_Siege.lua", "post" )
+
+ModLoader.SetupFileHook( "lua/Harvester.lua", "lua/Harvester_Siege.lua", "post" )
+
 ModLoader.SetupFileHook( "lua/InfantryPortal.lua", "lua/InfantryPortal_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/PhaseGate.lua", "lua/PhaseGate_Siege.lua", "post" )
 ModLoader.SetupFileHook( "lua/PrototypeLab.lua", "lua/PrototypeLab_Siege.lua", "post" )

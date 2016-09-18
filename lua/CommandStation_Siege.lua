@@ -1,6 +1,6 @@
 Script.Load("lua/Additions/LevelsMixin.lua")
 function CommandStation:GetMinRangeAC()
-return math.random(16,420)      
+return math.random(16,42)      
 end
 
 

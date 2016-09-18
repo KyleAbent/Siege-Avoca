@@ -50,12 +50,27 @@ end
 function SandCastle:GetFrontLength()
  return self.FrontTimer 
 end
+function SandCastle:StartScanHivesTimer()
+local shouldscan = false
+               for index, arc in ientitylist(Shared.GetEntitiesWithClassname("SiegeArc")) do
+                 if GetIsPointWithinHiveRadius(arc:GetOrigin()) then shouldscan = true break end
+              end 
+              
+              if shouldscan == true then
+               local hivetable = EntityListToTable(Shared.GetEntitiesWithClassname("Hive"))
+               local hive = table.random(hivetable)
+               CreateEntity(Scan.kMapName, hive:GetOrigin(), 1)
+              end
+              return GetGamerules():GetGameStarted() and self.SiegeTimer == 0
+end
 function SandCastle:OpenSiegeDoors(cleartimer)
      if cleartimer == true then self.SiegeTimer = 0 end
      -- Print("OpenSiegeDoors SandCastle")
                for index, siegedoor in ientitylist(Shared.GetEntitiesWithClassname("SiegeDoor")) do
                  if not siegedoor:isa("FrontDoor") then siegedoor:Open() end
               end 
+              
+              self:AddTimedCallback(function() SandCastle:StartScanHivesTimer() end, 6.5)
 end
 function SandCastle:OpenFrontDoors(cleartimer, pregame)
 

@@ -207,38 +207,29 @@ function Imaginator:CystTimer()
            end
               return true
 end
-local function FindMarine(location, powerpoint)
-
-  local ents = location:GetEntitiesInTrigger()
-  
-  if #ents == 0 then return powerpoint:GetOrigin() end
-  
-  for i = 1, #ents do
-    local entity = ents[i]
-    if entity:isa("Marine") and entity:GetIsAlive() then return entity:GetOrigin() end
-  end
-
- return powerpoint:GetOrigin()
-end
-local function InsideLocation(ents)
+local function InsideLocation(ents, teamnum)
 local origin = nil
   if #ents == 0  then return origin end
   for i = 1, #ents do
     local entity = ents[i]   
+      if teamnum == 2 then
     if entity:isa("Alien") and entity:GetIsAlive() and (entity:GetGameEffectMask(kGameEffect.OnInfestation) ) then return entity:GetOrigin() end
+    elseif team == 1 then
+    if entity:isa("Marine") and entity:GetIsAlive() then return entity:GetOrigin() end
+    end 
   end
 return origin
   
 end
 
-local function FindAlien(location, powerpoint)
+local function FindPlayer(location, powerpoint, teamnum)
   if #location == 0  then return end
   local origin = nil
   
     for i = 1, #location do
     local location = location[i]   
       local ents = location:GetEntitiesInTrigger()
-      local potential = InsideLocation(ents)
+      local potential = InsideLocation(ents, teamnum)
       if potential ~= nil then origin = potential break end 
   end
   
@@ -250,20 +241,6 @@ local function FindAlien(location, powerpoint)
 
  return origin
 end
-/*
-local function FindAlien(location, powerpoint)
-  local ents = location:GetEntitiesInTrigger()
-  
-  if #ents == 0 then return powerpoint:GetOrigin() end
-  
-  for i = 1, #ents do
-    local entity = ents[i]   
-    if entity:isa("Alien") and entity:GetIsAlive() and (entity:GetGameEffectMask(kGameEffect.OnInfestation) ) then return entity:GetOrigin() end
-  end
-
- return powerpoint:GetOrigin()
-end
-*/
 local function GetRange(who, where)
     local ArcFormula = (where - who:GetOrigin()):GetLengthXZ()
     return ArcFormula
@@ -300,10 +277,10 @@ local function GetHasAdvancedArmory()
     end
     return false
 end
-local function GetHasTwoChairs()
+local function GetHasThreeChairs()
 local CommandStations = #GetEntitiesForTeam( "CommandStation", 1 )
 
-if CommandStations >= 2 then return true end
+if CommandStations >= 3 then return true end
 
 return false
 end
@@ -314,8 +291,23 @@ return boolean
 
 end
 local function OrganizedIPCheck(who)
+
+-- One entity at a time
 local count = 0
 local ips = GetEntitiesForTeamWithinRange("InfantryPortal", 1, who:GetOrigin(), kInfantryPortalAttachRange)
+
+      --Add in arms lab because having these spread through the map is a bit odd.
+      local armscost = LookupTechData(kTechId.ArmsLab, kTechDataCostKey)
+      local  ArmsLabs = #GetEntitiesForTeam( "ArmsLab", 1 )
+      
+      if ArmsLabs < 2 and TresCheck(1, armscost) then
+               local origin = FindFreeSpace(who:GetOrigin(), 1, kInfantryPortalAttachRange)
+               local armslab = CreateEntity(ArmsLabAvoca.kMapName, origin,  1)
+              armslab:GetTeam():SetTeamResources(armslab:GetTeam():GetTeamResources() - armscost)
+              return --one at a time
+      end
+      
+
             for index, ent in ipairs(ips) do
               if not GetIsACreditStructure(ent) then
                   count = count + 1
@@ -324,13 +316,13 @@ local ips = GetEntitiesForTeamWithinRange("InfantryPortal", 1, who:GetOrigin(), 
            
            if count >= 2 then return end
            
-           for i = 1, math.abs( 2 - count ) do
+         --  for i = 1, math.abs( 2 - count ) do --one at a time
            local cost = 20
                if TresCheck(1, cost) then 
                local origin = FindFreeSpace(who:GetOrigin(), 1, kInfantryPortalAttachRange)
                local ip = CreateEntity(InfantryPortalAvoca.kMapName, origin,  1)
               ip:GetTeam():SetTeamResources(ip:GetTeam():GetTeamResources() - cost)
-              end
+            --  end
            end
            
               
@@ -365,17 +357,12 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true H
 
       table.insert(tospawn, kTechId.Sentry)
       
-      local  ArmsLabs = #GetEntitiesForTeam( "ArmsLab", 1 )
+      
       --local  InfantryPortal = #GetEntitiesForTeam( "InfantryPortal", 1 )
       local  CommandStation = #GetEntitiesForTeam( "CommandStation", 1 )
       
 
-      
-      
-      if ArmsLabs < 2 then
-      table.insert(tospawn, kTechId.ArmsLab)
-      end
-      
+
       
       --if InfantryPortal < 4 then
       --table.insert(tospawn, kTechId.InfantryPortal)
@@ -388,6 +375,7 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true H
     
        for _, techid in pairs(tospawn) do
        local cost = LookupTechData(techid, kTechDataCostKey)
+         --if techid == kTechId.CommandStation then cost = cost * .5 end
            if not gamestarted or TresCheck(1,cost) then
              table.insert(canafford, techid)
            end
@@ -396,8 +384,13 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true H
      --if TresCheck(4) then
      --table.insert(tospawn, SentryBattery.kMapName)
      -- end
+                                                                            --Extra weight to help prioritize without rewriting much
+      local finalchoice = table.random(canafford) 
 
-      local finalchoice = table.random(canafford)
+     if table.find(canafford, kTechId.CommandStation) and math.random(1,100) <= 30  then
+        finalchoice = kTechId.CommandStation
+     end
+
       local finalcost = not gamestarted and 0
       finalcost = LookupTechData(finalchoice, kTechDataCostKey) 
       --Print("GetMarineSpawnList() return finalchoice %s, finalcost %s", finalchoice, finalcost)
@@ -439,7 +432,7 @@ end
 local function GetActiveAirLock()
   local airlocks = {}
   for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
-        if location:GetIsAirLock(true) then table.insert(airlocks,location) end
+        if location:GetIsAirLock() then table.insert(airlocks,location) end
     end
     return table.random(airlocks) 
 end
@@ -457,20 +450,17 @@ end
 local function BuildNotificationMessage(where, self, mapname)
 
 end
-local function ChangeArcTo(who, mapname)
+local function ChangeArcTo(who, boolean)
 
-if not who or not mapname  then return end
-
-                      local entity = CreateEntity(mapname, who:GetOrigin(), 1)
-                      entity:SetHealth(who:GetHealth())
-                      entity:SetArmor(who:GetArmor())
-                      DestroyEntity(who)
+if not who or not mapname or who.rolloutSourceFactory ~= nil then return end
+ 
+ who.boolean = true
                      
 
 end
 local function InstructSiegeArcs(self)
-             for index, siegearc in ipairs(GetEntitiesForTeam("SiegeArc", 1)) do
-                 siegearc:Instruct()
+             for index, arc in ipairs(GetEntitiesForTeam("ARC", 1)) do
+                 if arc.siegearc then arc:Instruct() end
              end
 end
 local function ManageRoboticFactories()
@@ -479,29 +469,37 @@ local function ManageRoboticFactories()
       
           --Because researcher will spawn macs.
         for index, robo in ipairs(GetEntitiesForTeam("RoboticsFactory", 1)) do
-       if  robo:GetTechId() ~= kTechId.ARCRoboticsFactory and robo:GetIsBuilt() and not robo:GetIsResearching() then
+       if  robo:GetTechId() ~= kTechId.ARCRoboticsFactory and GetIsUnitActive(robo) and not robo:GetIsResearching() then
            local techid = kTechId.UpgradeRoboticsFactory
           local techNode = robo:GetTeam():GetTechTree():GetTechNode( techid ) 
             robo:SetResearching(techNode, robo)
        end
-       if robo:GetTechId() == kTechId.ARCRoboticsFactory then table.insert(ARCRobo, robo) end --ugh
+       if robo:GetTechId() == kTechId.ARCRoboticsFactory and GetIsUnitActive(robo) then table.insert(ARCRobo, robo) end --ugh
      end
      
-     
-     if ( not GetHasTwoChairs() and not GetFrontDoorOpen() ) then return end
+                  --Because it's a bit silly when 12 arcs spawn before 2nd and 3rd bases.
+     if ( not GetHasThreeChairs() and not GetFrontDoorOpen() ) then return true end
         
-          if  table.count(ARCRobo) == 0 then return end
+          if  table.count(ARCRobo) == 0 then return  true end
           
                     ARCRobo = table.random(ARCRobo)
-          
+       
+
+     local  AvoArc = {}
+
+     
      for index, arc in ipairs(GetEntitiesForTeam("ARC", 1)) do
-       if not arc:isa("ARCCredit") and not arc:isa("SiegeArc") then table.insert(ARCS,arc) end
-     end
-          
+       if not arc:isa("ARCCredit") then table.insert(ARCS,arc) end
+       if arc.avocaarc then table.insert(AvocaArc, arc) end
+     end 
+     
+    
+    local AACount = table.count(AvoArc)
+ 
+          --Count siege arcs, otherwise they'll spawn infinite.. LOL
           --Not avoca arc because we want these changed to siegearcs when siege is open
+          
      local ArcCount = table.count(ARCS) 
-     
-     
       if ArcCount < 12 and TresCheck(1, kARCCost) then
       ARCRobo:GetTeam():SetTeamResources(ARCRobo:GetTeam():GetTeamResources() - kARCCost)
       ARCRobo:OverrideCreateManufactureEntity(kTechId.ARC)
@@ -512,20 +510,18 @@ local function ManageRoboticFactories()
 
                   --change arcs to siege
                   for index, ent in ipairs(ARCS) do
-                   ChangeArcTo(ent, SiegeArc.kMapName)
+                   ChangeArcTo(ent, siegearc)
                    end
                    InstructSiegeArcs(self) 
 
       return -- Dont want new AvocaArcs during siege
       end
       
-     local  AvoArc = GetEntitiesForTeam("AvocaArc", 1)
-     local AACount = table.count(AvoArc)
      
       if ArcCount  > 3 and AACount < 4 then
 
                     local victim = table.random(ARCS)
-                    ChangeArcTo(victim, AvocaArc.kMapName)
+                    ChangeArcTo(victim, avocaarc)
       
       end
    
@@ -544,6 +540,7 @@ local function ManageRoboticFactories()
           ent:Instruct()
        end       
 
+      return true
 --yes its funny to delete and create entities on the fly mid game such as this
 -- I dont feel like writing enums with seperate modes. Maybe this can be optimized, if fun.
 
@@ -561,7 +558,7 @@ local entity = nil
             if airlock and tospawn then
                 local powerpoint = GetPowerPointForLocation(airlock.name)
              if powerpoint then
-                 randomspawn = FindFreeSpace(FindMarine(airlock, powerpoint), 2.5)
+                 randomspawn = FindFreeSpace(FindPlayer(GetAllLocationsWithSameName(airlock:GetOrigin()), powerpoint, 1), 2.5)
             if randomspawn then
                 local nearestof = GetNearestMixin(randomspawn, "Construct", 1, function(ent) return ent:GetTechId() == tospawn or ( ent:GetTechId() == kTechId.AdvancedArmory and tospawn == kTechId.Armory)  or ( ent:GetTechId() == kTechId.ARCRoboticsFactory and tospawn == kTechId.RoboticsFactory) end)
                       if nearestof then
@@ -641,7 +638,9 @@ local function ChanceRandomContamination(who) --messy
      local chance = GetSiegeDoorOpen() and 50 or 30
      local randomchance = math.random(1, 100)
      if (not gamestarted or TresCheck( 2, 5 ) ) and randomchance <= chance then
-       local where = FindPoorVictim()
+       local where = GetPowerPointForLocation(GetActiveAirLock().name)
+             where = where:GetOrigin()
+             where = FindFreeSpace(where, 2, 24)
            if where then 
                local contamination = CreateEntityForTeam(kTechId.Contamination, FindFreeSpace(where, 4, 8), 2)
                     -- CreatePheromone(kTechId.ExpandingMarker,contamination:GetOrigin(), 2) 
@@ -663,13 +662,14 @@ function Imaginator:AlienConstructs(cystonly)
        
        end
        
+       self:DoBetterUpgs()
        
        for i = 1, 2 do
          local success = self:ActualAlienFormula(cystonly)
                   if success == true then return true end
        end
        
-      self:DoBetterUpgs()
+      
 
 return true
 
@@ -770,7 +770,7 @@ local entity = nil
      if powerPoints and tospawn then
                 local powerpoint = table.random(powerPoints)
              if powerpoint then                      
-                 randomspawn = FindFreeSpace(FindAlien(GetAllLocationsWithSameName(powerpoint:GetOrigin(), tospawn == kTechId.Clog), powerpoint), 2.5)
+                 randomspawn = FindFreeSpace(FindPlayer(GetAllLocationsWithSameName(powerpoint:GetOrigin(), tospawn == kTechId.Clog), powerpoint, 2), 2.5)
             if randomspawn then
                 local nearestof = GetNearestMixin(randomspawn, "Construct", 2, function(ent) return ent:GetTechId() == tospawn end)
                 if tospawn == kTechId.Clog then  nearestof = GetNearest(randomspawn, "Clog", 2) end

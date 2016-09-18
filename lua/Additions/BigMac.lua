@@ -11,6 +11,9 @@ function BigMac:OnCreate()
  if Server then self:LameFixATM() end
 end
 
+function BigMac:GetMovePhysicsMask()
+    return PhysicsMask.None
+end
 
 local function GetAutomaticOrder(self)
 

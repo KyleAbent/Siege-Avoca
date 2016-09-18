@@ -61,7 +61,7 @@ function SiegeDoor:OnInitialized()
     
     self:SetPhysicsType(PhysicsType.Kinematic)
     self:Open()
-    self:SetPhysicsGroup(PhysicsGroup.WhipGroup)
+    self:SetPhysicsGroup(PhysicsGroup.DefaultGroup)
     self.opened = false
 end
   

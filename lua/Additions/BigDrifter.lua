@@ -17,6 +17,10 @@ function BigDrifter:Check()
    if gamestarted and team2Commander then DestroyEntity(self) end
    return true
 end
+function BigDrifter:GetMovePhysicsMask()
+    return PhysicsMask.None
+end
+
 local function FindTask(self)
 
 local structure =  GetNearestMixin(self:GetOrigin(), "Construct", 2, function(ent) return not ent:GetIsBuilt() and (not ent.GetCanAutoBuild or ent:GetCanAutoBuild())  and self:CheckTarget(ent:GetOrigin()) and not (GetIsInSiege(ent) and not GetSiegeDoorOpen() )  end)
