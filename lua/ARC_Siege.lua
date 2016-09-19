@@ -73,6 +73,12 @@ local function FindNewParent(who)
     who:SetOwner(player)
     end
 end
+function ARC:GetIsDeployed()
+return  self.deployMode == ARC.kDeployMode.Deployed
+end
+function ARC:SetDeployed()
+GiveDeploy(self) 
+end
 function ARC:SpecificRules()
 local moving = self.mode == ARC.kMode.Moving     
         

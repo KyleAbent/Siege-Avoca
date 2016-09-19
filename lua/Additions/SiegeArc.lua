@@ -56,7 +56,7 @@ function SiegeArc:Check()
    if GetGamerules():GetGameState() == kGameState.Started or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end
    if gamestarted then 
          local team1Commander = GetGamerules().team1:GetCommander()
-     if team1Commander or not GetSandCastle():GetIsSiegeOpen() then DestroyEntity(self) end
+     if team1Commander or not GetSandCastle():GetIsSiegeOpen() then ChangeArcTo(self, ARC.kMapName) end
     end
    return true
 end

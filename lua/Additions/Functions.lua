@@ -1,4 +1,19 @@
 --Kyle 'Avoca' Abent
+function ChangeArcTo(who, mapname)
+
+if not who or not mapname or not who.rolledout  then return end
+
+
+
+                      local entity = CreateEntity(mapname, who:GetOrigin(), 1)
+                      entity:SetHealth(who:GetHealth())
+                      entity:SetArmor(who:GetArmor())
+                      who.rolledout = true
+                      if who:GetIsDeployed() then entity:SetDeployed() end
+                      DestroyEntity(who)
+                     
+
+end
 function ConfigureAirlock(who, boolean)
 
 
@@ -318,17 +333,17 @@ function GetIsPointInMarineBase(where)
     
 end
 function GetIsPointInAlienBase(where)    
-    local cclocation = nil
+    local hivelocation = nil
            for _, cc in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
-        cclocation = GetLocationForPoint(cc:GetOrigin())
-        cclocation = cclocation.name
+        hivelocation = GetLocationForPoint(cc:GetOrigin())
+        hivelocation = hivelocation.name
              break
           end
     
     local pointlocation = GetLocationForPoint(where)
           pointlocation = pointlocation and pointlocation.name or nil
           
-          return pointlocation == cclocation
+          return pointlocation == hivelocation
     
 end
 function GetNearestMixin(origin, mixinType, teamNumber, filterFunc)

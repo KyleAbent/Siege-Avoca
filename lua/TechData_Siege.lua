@@ -41,6 +41,21 @@ function GetCheckShellLimit(techId, origin, normal, commander)
     return num < 4
     
 end
+function GetCheckDrifterLimit(techId, origin, normal, commander)
+    local num = 0
+
+        
+        for index, shell in ientitylist(Shared.GetEntitiesWithClassname("Drifter")) do
+        
+           -- if not spur:isa("StructureBeacon") then 
+                num = num + 1
+          --  end
+            
+    end
+    
+    return num < 4
+    
+end
 function GetCheckVeilLimit(techId, origin, normal, commander)
     local num = 0
 
@@ -279,6 +294,8 @@ SetCachedTechData(kTechId.Observatory, kTechDataBuildMethodFailedMessage, "Limit
 SetCachedTechData(kTechId.RoboticsFactory, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
 SetCachedTechData(kTechId.PrototypeLab, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
 
+SetCachedTechData(kTechId.Drifter, kTechDataBuildMethodFailedMessage, "Limit reached for Commander ents of this type")
+
 
 
 SetCachedTechData(kTechId.ArmsLab, kTechDataBuildRequiresMethod, GetCheckArmsLabLimit)
@@ -300,6 +317,7 @@ SetCachedTechData(kTechId.CommandStation, kStructureAttachClass, false)
 SetCachedTechData(kTechId.Spur, kTechDataBuildRequiresMethod, GetCheckSpurLimit)
 SetCachedTechData(kTechId.Veil, kTechDataBuildRequiresMethod, GetCheckVeilLimit)
 SetCachedTechData(kTechId.Shell, kTechDataBuildRequiresMethod, GetCheckShellLimit)
+SetCachedTechData(kTechId.Drifter, kTechDataBuildRequiresMethod, GetCheckDrifterLimit)
 
 
 Script.Load("lua/Additions/Convars.lua")

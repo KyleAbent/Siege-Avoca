@@ -347,7 +347,7 @@ function RolloutMixin:Rollout(factory, factoryRolloutLength)
 rolloutorig(self, factory, factoryRolloutLength)
 
 
-    self:AddTimedCallback(MakeEligable, 10)
+    self:AddTimedCallback(MakeEligable, 16)
 
 end
 

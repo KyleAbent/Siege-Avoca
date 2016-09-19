@@ -38,4 +38,5 @@ function HydraAvoca:OnGetMapBlipInfo()
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
 
+
 Shared.LinkClassToMap("HydraAvoca", HydraAvoca.kMapName, networkVars)

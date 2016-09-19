@@ -13,15 +13,6 @@ function AvocaArc:OnCreate()
  self:AdjustMaxArmor(self:GetMaxArmor())
   if Server then  self:LameFixATM() end
 end
-function AvocaArc:OnInitialized()
- ARC.OnInitialized(self)
-   if Server then
- self:AddTimedCallback(AvocaArc.Instruct, 2.5)
- --self:AddTimedCallback(AvocaArc.Waypoint, 16)
-  --self:AddTimedCallback(AvocaArc.Scan, 6)
- end
-
-end
 
 function AvocaArc:GetMaxHealth()
     return kARCHealth
@@ -29,22 +20,7 @@ end
 function AvocaArc:GetMaxArmor()
     return kARCArmor
 end
-local function SoTheGameCanEnd(self, who) --Although HiveDefense prolongs it
-   local arc = GetEntitiesWithinRange("ARC", who:GetOrigin(), ARC.kFireRange)
-   if #arc >= 1 then CreateEntity(Scan.kMapName, who:GetOrigin(), 1) end
-end
-local function CheckHivesForScan()
-local hives = {}
-           for _, hiveent in ientitylist(Shared.GetEntitiesWithClassname("Hive")) do
-             table.insert(hives, hiveent)
-          end
-          if #hives == 0 then return end
-          --Scan hive if arc in range, only 1 check per hive.. not per arc.. or whatever. 
-          for i = 1, #hives do
-             local ent = hives[i]
-             SoTheGameCanEnd(self, ent)
-          end
-end
+
 function ARC:GetShowDamageIndicator()
     return true
 end
@@ -56,7 +32,7 @@ function AvocaArc:Check()
    if GetGamerules():GetGameState() == kGameState.Started or GetGamerules():GetGameState() == kGameState.Countdown then gamestarted = true end
    if gamestarted then 
          local team1Commander = GetGamerules().team1:GetCommander()
-     if team1Commander then self:Kill() end
+     if team1Commander then ChangeArcTo(self, ARC.kMapName) end
     end
    return true
 end
@@ -177,7 +153,6 @@ function AvocaArc:Scan()
     return true
 end
 function AvocaArc:Instruct()
-   CheckHivesForScan()
    self:SpecificRules()
    return true
 end

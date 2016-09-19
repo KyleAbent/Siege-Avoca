@@ -320,7 +320,6 @@ local ips = GetEntitiesForTeamWithinRange("InfantryPortal", 1, who:GetOrigin(), 
            local cost = 20
                if TresCheck(1, cost) then 
                local origin = FindFreeSpace(who:GetOrigin(), 1, kInfantryPortalAttachRange)
-               if origin == who:GetOrigin() then return end
                local ip = CreateEntity(InfantryPortalAvoca.kMapName, origin,  1)
               ip:GetTeam():SetTeamResources(ip:GetTeam():GetTeamResources() - cost)
             --  end
@@ -451,17 +450,7 @@ end
 local function BuildNotificationMessage(where, self, mapname)
 
 end
-local function ChangeArcTo(who, mapname)
 
-if not who or not mapname  or not who.rolledout  then return end
-
-                      local entity = CreateEntity(mapname, who:GetOrigin(), 1)
-                      entity:SetHealth(who:GetHealth())
-                      entity:SetArmor(who:GetArmor())
-                      DestroyEntity(who)
-                     
-
-end
 local function InstructSiegeArcs(self)
              for index, siegearc in ipairs(GetEntitiesForTeam("SiegeArc", 1)) do
                  siegearc:Instruct()
@@ -487,16 +476,19 @@ local function ManageRoboticFactories()
           if  table.count(ARCRobo) == 0 then return end
           
                     ARCRobo = table.random(ARCRobo)
-          
+      
+     local siegearcs = 0
+     
      for index, arc in ipairs(GetEntitiesForTeam("ARC", 1)) do
        if not arc:isa("ARCCredit") and not arc:isa("SiegeArc") then table.insert(ARCS,arc) end
+       if arc:isa("SiegeArc") then siegearcs = siegearcs + 1 end 
      end
           
           --Not avoca arc because we want these changed to siegearcs when siege is open
      local ArcCount = table.count(ARCS) 
      
      
-      if ArcCount < 12 and TresCheck(1, kARCCost) then
+      if siegearcs < 12 and ArcCount < 12 and TresCheck(1, kARCCost) then
       ARCRobo:GetTeam():SetTeamResources(ARCRobo:GetTeam():GetTeamResources() - kARCCost)
       ARCRobo:OverrideCreateManufactureEntity(kTechId.ARC)
       end
@@ -516,7 +508,7 @@ local function ManageRoboticFactories()
      local  AvoArc = GetEntitiesForTeam("AvocaArc", 1)
      local AACount = table.count(AvoArc)
      
-      if ArcCount  > 3 and AACount < 4 then
+      if ArcCount  >= 8 and AACount < 4 then
 
                     local victim = table.random(ARCS)
                     ChangeArcTo(victim, AvocaArc.kMapName)
@@ -532,10 +524,9 @@ local function ManageRoboticFactories()
       end
     end
       
-      --and finally instruct normal arcs, because siegearcs and avocaarcs have autopilot already.
 
        for index, ent in ipairs(ARCS) do
-          ent:Instruct()
+         if ent.rolledout then ent:Instruct() end
        end       
 
 --yes its funny to delete and create entities on the fly mid game such as this
@@ -642,7 +633,7 @@ local function ChanceRandomContamination(who) --messy
              where = FindFreeSpace(where, 2, 24)
            if where then 
                local contamination = CreateEntityForTeam(kTechId.Contamination, FindFreeSpace(where, 4, 8), 2)
-                    -- CreatePheromone(kTechId.ExpandingMarker,contamination:GetOrigin(), 2)     
+                    -- CreatePheromone(kTechId.ExpandingMarker,contamination:GetOrigin(), 2) 
                     contamination:StartBeaconTimer()
             if gamestarted then contamination:GetTeam():SetTeamResources(contamination:GetTeam():GetTeamResources() - 5) end
                         --     Print("nearestbuiltnode is %s", contamination)
@@ -654,7 +645,7 @@ function Imaginator:AlienConstructs(cystonly)
 
        if not cystonly then
        
-       if GetBioMassLevel() >= 9 and GetFrontDoorOpen() then
+       if GetFrontDoorOpen() and GetBioMassLevel() >= 9 then
          ChanceRandomContamination(self)
        
        end
