@@ -50,7 +50,9 @@ local function GetCanSpawn(self)
           return true
 end
 function Location:GetIsAirLock()
-     return self.airlock
+     local boolean = IsPowerUp(self) and self.airlock
+    -- Print("%s airlock is %s", self.name, boolean)
+     return boolean
 end
 
 
@@ -73,7 +75,16 @@ local lottery = {}
      
      return nil
 end
-
+local function SetAllSameNamesAsAirLock(self)
+    local locations = GetAllLocationsWithSameName(self:GetOrigin())
+    
+    for i = 1, #locations do
+    local location = locations[i]   
+     if not location.airlock then location.airlock = true end
+  end
+  
+  
+end
 local locorig = Location.OnTriggerEntered
  function Location:OnTriggerEntered(entity, triggerEnt)
         ASSERT(self == triggerEnt)
@@ -84,19 +95,15 @@ local locorig = Location.OnTriggerEntered
          end
                  local powerPoint = GetPowerPointForLocation(self.name)
             if powerPoint ~= nil then
-               if not powerPoint:GetIsDisabled() and not powerPoint:GetIsSocketed() then 
                     if entity:isa("Marine") and not entity:isa("Commander") then
+                         if not powerPoint:GetIsDisabled() and not powerPoint:GetIsSocketed() then 
                          powerPoint:SetInternalPowerState(PowerPoint.kPowerState.socketed)  
-                         
-                    if powerPoint:GetIsBuilt() and not powerPoint:GetIsDisabled() then
-                     if not self.airlock then self.airlock = true end
-                     end
-                         
-                         
-                    end
-                end
+                         elseif powerPoint:GetIsBuilt() and not powerPoint:GetIsDisabled() then
+                          SetAllSameNamesAsAirLock(self)
+                         end --
+                    end --
+            end --
                 
-end
 end
 
 end

@@ -13,6 +13,8 @@ Script.Load("lua/Additions/BigMac.lua")
 Script.Load("lua/Additions/LayStructures.lua")
 Script.Load("lua/Additions/CommTunnel.lua")
 Script.Load("lua/Additions/BigDrifter.lua")
+Script.Load("lua/Additions/AvocaArc.lua")
+Script.Load("lua/Additions/SiegeArc.lua")
 
 local orig_EvolutionChamber_OnResearchComplete = EvolutionChamber.OnResearchComplete
 function EvolutionChamber:OnResearchComplete(researchId)

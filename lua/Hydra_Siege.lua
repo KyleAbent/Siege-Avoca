@@ -37,21 +37,5 @@ function HydraAvoca:OnGetMapBlipInfo()
     
     return success, blipType, blipTeam, isAttacked, false --isParasited
 end
-function Hydra:GetLevelPercentage()
-return self.level / self:GetMaxLevel() * 2
-end
-function Hydra:GetMaxLevel()
-return 30
-end
-function HydraAvoca:OnAdjustModelCoords(modelCoords)
-    local coords = modelCoords
-	local scale = self:GetLevelPercentage()
-       if scale >= 1 then
-        coords.xAxis = coords.xAxis * scale
-        coords.yAxis = coords.yAxis * scale
-        coords.zAxis = coords.zAxis * scale
-    end
-    return coords
-end
 
 Shared.LinkClassToMap("HydraAvoca", HydraAvoca.kMapName, networkVars)

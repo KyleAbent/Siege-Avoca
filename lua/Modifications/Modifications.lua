@@ -3,6 +3,8 @@ Script.Load("lua/Modifications/CustomLightRules.lua")
 Script.Load("lua/Modifications/FastBuildSpeed.lua")
 
 
+kPlayingTeamInitialTeamRes = 420
+
 SetCachedTechData(kTechId.Hydra, kTechDataMapName, HydraAvoca.kMapName)
 SetCachedTechData(kTechId.Sentry, kTechDataMapName, SentryAvoca.kMapName)
 SetCachedTechData(kTechId.Crag, kTechDataMapName, CragAvoca.kMapName)
@@ -20,6 +22,21 @@ SetCachedTechData(kTechId.InfantryPortal, kTechDataMapName,InfantryPortalAvoca.k
 function Veil:GetMinRangeAC()
 return  9999   
 end
+      --Rather than use powerpoint on construction complete (because it doesnt work the same way)
+local orig_PowerSourceMixin_SetPoweringState = PowerSourceMixin.SetPoweringState
+    function PowerSourceMixin:SetPoweringState(powering)
+    orig_PowerSourceMixin_SetPoweringState(self, powering)        
+  --   if powering == true then
+   --       local location = GetLocationForPoint(self:GetOrigin())
+      --            if location:GetRandomMarine() ~= nil then ConfigureAirlock(self, true)  end
+        --          self:SpawnSurgeForEach()
+   --  elseif powering == false then
+        if powering == false then
+          ConfigureAirlock(self, false)
+         end --
+end
+   
+   
 function LeapMixin:GetHasSecondary(player)
     return GetHasTech(player, kTechId.Leap)
 end
@@ -317,6 +334,23 @@ origmaturinit(self)
 end
 
 
+local function MakeEligable(self)
+    if not self:GetIsDestroyed() then
+        self.rolledout = true
+    end
+    return false
+end
+
+local rolloutorig =  RolloutMixin.Rollout
+
+function RolloutMixin:Rollout(factory, factoryRolloutLength)
+rolloutorig(self, factory, factoryRolloutLength)
+
+
+    self:AddTimedCallback(MakeEligable, 10)
+
+end
+
 function PowerConsumerMixin:GetHasSentryBatteryInRadius()
       local backupbattery = GetEntitiesWithinRange("SentryBattery", self:GetOrigin(), kBatteryPowerRange)
           for index, battery in ipairs(backupbattery) do
@@ -347,4 +381,7 @@ end
     end
     
 end
+
+
+
 

@@ -26,31 +26,7 @@ end
 end
 
 
-local function ConfigureAirlock(self, boolean)
-
-
-  for index, ent in ipairs(GetAllLocationsWithSameName(self:GetOrigin())) do
-  
-       ent.airlock =  boolean
-  
-  end
-
-
-end
 
 
 
-local orig_PowerPoint_OnConstructionComplete = PowerPoint.OnConstructionComplete
-    function PowerPoint:OnConstructionComplete()
-    orig_PowerPoint_OnConstructionComplete(self)
-          local location = GetLocationForPoint(self:GetOrigin())
-          if location:GetRandomMarine() ~= nil then ConfigureAirlock(self, true)  end
-           self:SpawnSurgeForEach()
-   end
-   
-   
-   local orig_PowerPoint_OnKill = PowerPoint.OnKill
-function PowerPoint:OnKill(attacker, doer, point, direction)
-    orig_PowerPoint_OnKill(self, attacker, doer, point, direction)
-    ConfigureAirlock(self, false)
-    end
+--modifications.lua - powersourcemixin mod

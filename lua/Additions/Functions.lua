@@ -1,4 +1,15 @@
 --Kyle 'Avoca' Abent
+function ConfigureAirlock(who, boolean)
+
+
+  for index, ent in ipairs(GetAllLocationsWithSameName(who:GetOrigin())) do
+  
+       ent.airlock =  boolean
+  
+  end
+
+
+end
 function GetIsACreditStructure(who)
 local boolean = HasMixin(who, "Avoca") and who:GetIsACreditStructure()  or false
 --Print("isacredit structure is %s", boolean)

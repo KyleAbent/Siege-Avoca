@@ -213,9 +213,9 @@ local origin = nil
   for i = 1, #ents do
     local entity = ents[i]   
       if teamnum == 2 then
-    if entity:isa("Alien") and entity:GetIsAlive() and (entity:GetGameEffectMask(kGameEffect.OnInfestation) ) then return entity:GetOrigin() end
-    elseif team == 1 then
-    if entity:isa("Marine") and entity:GetIsAlive() then return entity:GetOrigin() end
+    if entity:isa("Alien") and entity:GetIsAlive() and (entity:GetGameEffectMask(kGameEffect.OnInfestation) ) then return FindFreeSpace(entity:GetOrigin()) end
+    elseif teamnum == 1 then
+    if entity:isa("Marine") and entity:GetIsAlive() then return FindFreeSpace(entity:GetOrigin()) end
     end 
   end
 return origin
@@ -235,7 +235,7 @@ local function FindPlayer(location, powerpoint, teamnum)
   
 
   
- if origin == nil then origin = powerpoint:GetOrigin() end
+ if origin == nil then origin = FindFreeSpace(powerpoint:GetOrigin(),2 ) end
   
 
 
@@ -320,6 +320,7 @@ local ips = GetEntitiesForTeamWithinRange("InfantryPortal", 1, who:GetOrigin(), 
            local cost = 20
                if TresCheck(1, cost) then 
                local origin = FindFreeSpace(who:GetOrigin(), 1, kInfantryPortalAttachRange)
+               if origin == who:GetOrigin() then return end
                local ip = CreateEntity(InfantryPortalAvoca.kMapName, origin,  1)
               ip:GetTeam():SetTeamResources(ip:GetTeam():GetTeamResources() - cost)
             --  end
@@ -349,9 +350,9 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true H
    -- local  AdvancedArmory = #GetEntitiesForTeam( "AdvancedArmory", 1 )
      
         --  if AdvancedArmory => 1 then
-            if GetHasAdvancedArmory() then
+            --if GetHasAdvancedArmory() then
             table.insert(tospawn, kTechId.PrototypeLab)
-            end
+           -- end
     --  end
       
 
@@ -374,7 +375,7 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true H
       
     
        for _, techid in pairs(tospawn) do
-       local cost = LookupTechData(techid, kTechDataCostKey)
+       local cost = Clamp(LookupTechData(techid, kTechDataCostKey), 1, 10)
          --if techid == kTechId.CommandStation then cost = cost * .5 end
            if not gamestarted or TresCheck(1,cost) then
              table.insert(canafford, techid)
@@ -450,17 +451,20 @@ end
 local function BuildNotificationMessage(where, self, mapname)
 
 end
-local function ChangeArcTo(who, boolean)
+local function ChangeArcTo(who, mapname)
 
-if not who or not mapname or who.rolloutSourceFactory ~= nil then return end
- 
- who.boolean = true
+if not who or not mapname  or not who.rolledout  then return end
+
+                      local entity = CreateEntity(mapname, who:GetOrigin(), 1)
+                      entity:SetHealth(who:GetHealth())
+                      entity:SetArmor(who:GetArmor())
+                      DestroyEntity(who)
                      
 
 end
 local function InstructSiegeArcs(self)
-             for index, arc in ipairs(GetEntitiesForTeam("ARC", 1)) do
-                 if arc.siegearc then arc:Instruct() end
+             for index, siegearc in ipairs(GetEntitiesForTeam("SiegeArc", 1)) do
+                 siegearc:Instruct()
              end
 end
 local function ManageRoboticFactories()
@@ -469,37 +473,29 @@ local function ManageRoboticFactories()
       
           --Because researcher will spawn macs.
         for index, robo in ipairs(GetEntitiesForTeam("RoboticsFactory", 1)) do
-       if  robo:GetTechId() ~= kTechId.ARCRoboticsFactory and GetIsUnitActive(robo) and not robo:GetIsResearching() then
+       if  robo:GetTechId() ~= kTechId.ARCRoboticsFactory and robo:GetIsBuilt() and not robo:GetIsResearching() then
            local techid = kTechId.UpgradeRoboticsFactory
           local techNode = robo:GetTeam():GetTechTree():GetTechNode( techid ) 
             robo:SetResearching(techNode, robo)
        end
-       if robo:GetTechId() == kTechId.ARCRoboticsFactory and GetIsUnitActive(robo) then table.insert(ARCRobo, robo) end --ugh
+       if robo:GetTechId() == kTechId.ARCRoboticsFactory then table.insert(ARCRobo, robo) end --ugh
      end
      
-                  --Because it's a bit silly when 12 arcs spawn before 2nd and 3rd bases.
-     if ( not GetHasThreeChairs() and not GetFrontDoorOpen() ) then return true end
+     
+     if ( not GetHasThreeChairs() and not GetFrontDoorOpen() ) then return end
         
-          if  table.count(ARCRobo) == 0 then return  true end
+          if  table.count(ARCRobo) == 0 then return end
           
                     ARCRobo = table.random(ARCRobo)
-       
-
-     local  AvoArc = {}
-
-     
-     for index, arc in ipairs(GetEntitiesForTeam("ARC", 1)) do
-       if not arc:isa("ARCCredit") then table.insert(ARCS,arc) end
-       if arc.avocaarc then table.insert(AvocaArc, arc) end
-     end 
-     
-    
-    local AACount = table.count(AvoArc)
- 
-          --Count siege arcs, otherwise they'll spawn infinite.. LOL
-          --Not avoca arc because we want these changed to siegearcs when siege is open
           
+     for index, arc in ipairs(GetEntitiesForTeam("ARC", 1)) do
+       if not arc:isa("ARCCredit") and not arc:isa("SiegeArc") then table.insert(ARCS,arc) end
+     end
+          
+          --Not avoca arc because we want these changed to siegearcs when siege is open
      local ArcCount = table.count(ARCS) 
+     
+     
       if ArcCount < 12 and TresCheck(1, kARCCost) then
       ARCRobo:GetTeam():SetTeamResources(ARCRobo:GetTeam():GetTeamResources() - kARCCost)
       ARCRobo:OverrideCreateManufactureEntity(kTechId.ARC)
@@ -510,18 +506,20 @@ local function ManageRoboticFactories()
 
                   --change arcs to siege
                   for index, ent in ipairs(ARCS) do
-                   ChangeArcTo(ent, siegearc)
+                   ChangeArcTo(ent, SiegeArc.kMapName)
                    end
                    InstructSiegeArcs(self) 
 
       return -- Dont want new AvocaArcs during siege
       end
       
+     local  AvoArc = GetEntitiesForTeam("AvocaArc", 1)
+     local AACount = table.count(AvoArc)
      
       if ArcCount  > 3 and AACount < 4 then
 
                     local victim = table.random(ARCS)
-                    ChangeArcTo(victim, avocaarc)
+                    ChangeArcTo(victim, AvocaArc.kMapName)
       
       end
    
@@ -540,7 +538,6 @@ local function ManageRoboticFactories()
           ent:Instruct()
        end       
 
-      return true
 --yes its funny to delete and create entities on the fly mid game such as this
 -- I dont feel like writing enums with seperate modes. Maybe this can be optimized, if fun.
 
@@ -638,12 +635,14 @@ local function ChanceRandomContamination(who) --messy
      local chance = GetSiegeDoorOpen() and 50 or 30
      local randomchance = math.random(1, 100)
      if (not gamestarted or TresCheck( 2, 5 ) ) and randomchance <= chance then
-       local where = GetPowerPointForLocation(GetActiveAirLock().name)
+     local airlock = GetActiveAirLock()
+     if not airlock then return end 
+       local where = GetPowerPointForLocation(airlock.name)
              where = where:GetOrigin()
              where = FindFreeSpace(where, 2, 24)
            if where then 
                local contamination = CreateEntityForTeam(kTechId.Contamination, FindFreeSpace(where, 4, 8), 2)
-                    -- CreatePheromone(kTechId.ExpandingMarker,contamination:GetOrigin(), 2) 
+                    -- CreatePheromone(kTechId.ExpandingMarker,contamination:GetOrigin(), 2)     
                     contamination:StartBeaconTimer()
             if gamestarted then contamination:GetTeam():SetTeamResources(contamination:GetTeam():GetTeamResources() - 5) end
                         --     Print("nearestbuiltnode is %s", contamination)
@@ -655,7 +654,7 @@ function Imaginator:AlienConstructs(cystonly)
 
        if not cystonly then
        
-       if GetBioMassLevel() >= 9 then
+       if GetBioMassLevel() >= 9 and GetFrontDoorOpen() then
          ChanceRandomContamination(self)
        
        end
@@ -811,6 +810,7 @@ local function TresSpawn(who, cost, randomlychosen)
  if TresCheck(2, cost) then 
 
 local entity = CreateEntityForTeam(randomlychosen, FindFreeSpace(who:GetOrigin(), 1, 8), 2)
+  if entity:isa("EggBeacon") or entity:isa("StructureBeacon") then local chance = math.random(1,100) if chance <= 10 then entity:SetConstructionComplete() end end
  entity:GetTeam():SetTeamResources(entity:GetTeam():GetTeamResources() - cost)
 end
 
