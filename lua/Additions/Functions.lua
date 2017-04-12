@@ -1,4 +1,25 @@
 --Kyle 'Avoca' Abent
+function GetIsTimeUp(timeof, timelimitof)
+ local time = Shared.GetTime()
+ local boolean = (timeof + timelimitof) <= time
+ --Print("timeof is %s, timelimitof is %s, time is %s", timeof, timelimitof, time)
+ -- if boolean == true then Print("GetTimeIsUp boolean is %s, timelimitof is %s", boolean, timelimitof) end
+ return boolean
+end
+function GetPayloadPercent() 
+    local entityList = Shared.GetEntitiesWithClassname("AvocaArc")
+    if entityList:GetSize() > 0 then
+                 local payload = entityList:GetEntityAtIndex(0) 
+                 local furthestgoal = payload:GetHighestWaypoint()
+                 local speed = payload:GetMoveSpeed()
+                 local isReverse = speed < 2
+                 local distance =  GetPathDistance(payload:GetOrigin(), furthestgoal:GetOrigin()) 
+                 local time = math.round(distance / speed, 1)
+                 //Print("Distance is %s, speed is %s, time is %s", distance, speed, time)
+                 return time, speed, isReverse
+    end    
+    return nil
+end
 function ChangeArcTo(who, mapname)
 
 if not who or not mapname or not who.rolledout  then return end
@@ -287,6 +308,9 @@ function AddFrontTime(seconds)
                 sandcastle:SendNotification(seconds)
                 sandcastle:AddTime(seconds) 
     end    
+end
+function GetSetupConcluded()
+return GetFrontDoorOpen()
 end
 function GetFrontDoorOpen()
    return GetSandCastle():GetIsFrontOpen()

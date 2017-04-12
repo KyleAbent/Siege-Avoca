@@ -539,7 +539,7 @@ function Imaginator:ActualFormulaMarine()
 --Print("AutoBuildConstructs")
 local randomspawn = nil
 local tospawn, cost, gamestarted = GetMarineSpawnList()
-if gamestarted then ManageRoboticFactories() end
+--if gamestarted then ManageRoboticFactories() end
 local airlock = GetActiveAirLock()
 local success = false
 local entity = nil
