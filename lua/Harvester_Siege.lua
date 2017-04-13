@@ -8,7 +8,7 @@ function Harvester:OnInitialized() --Seeing as harvs require infest to be placed
 originit(self)
 
  if not self:GetGameEffectMask(kGameEffect.OnInfestation) then 
-        local clog = CreateEntity(Clog.kMapName, FindFreeSpace(self:GetOrigin()), 2)
+        local clog = CreateEntity(Cyst.kMapName, FindFreeSpace(self:GetOrigin()), 2)
   end
 
 end

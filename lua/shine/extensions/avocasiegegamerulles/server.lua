@@ -36,6 +36,31 @@ local function GetResearcher()
     end    
     return nil
 end
+local function AddPayLoadPercent(who)
+    local Client = who
+    local time, speed, isReverse = GetPayloadPercent()
+    if isReverse then
+    Shine.ScreenText.Add( 3, {X = 0.40, Y = 0.85,Text = string.format("Payload(%sx): Reversing!",  speed-1 ) , Duration = 4,R = 255, G = 255, B = 255,Alignment = 0,Size = 3,FadeIn = 0,}, Client )
+    return
+    end
+    
+     if time > 1 then
+    Shine.ScreenText.Add( 3, {X = 0.40, Y = 0.85,Text = string.format("Payload(%sx): %s seconds",  speed-1, time ) , Duration = 4,R = 255, G = 255, B = 255,Alignment = 0,Size = 3,FadeIn = 0,}, Client )
+    else
+     Shine.ScreenText.Add( 3, {X = 0.40, Y = 0.85,Text = "Payload: Deployed!", Duration = 4,R = 255, G = 255, B = 255,Alignment = 0,Size = 3,FadeIn = 0,}, Client )
+    end
+end
+local function GivePayloadInfoToAll(self)
+       self:CreateTimer( 1, 4, -1, function() 
+              local Players = Shine.GetAllPlayers()
+              for i = 1, #Players do
+              local Player = Players[ i ]
+                  if Player then
+                  AddPayLoadPercent(Player)
+                  end
+               end
+        end)
+end
 
 function Plugin:Initialise()
 self:CreateCommands()
@@ -85,7 +110,12 @@ Shine:NotifyDualColour( Player, 255, 165, 0,  "[Season 3]",  255, 0, 0, String, 
 end
 
 function Plugin:SetGameState( Gamerules, State, OldState )
-           if State == kGameState.Countdown then
+
+           if State == kGameState.Started  then
+            if string.find(Shared.GetMapName(), "pl_") then 
+             GivePayloadInfoToAll(self)
+            end
+           elseif State == kGameState.Countdown then
            
            
              GetSandCastle():OnRoundStart()

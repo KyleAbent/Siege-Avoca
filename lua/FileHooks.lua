@@ -46,6 +46,7 @@ ModLoader.SetupFileHook( "lua/AlienTeam.lua", "lua/AlienTeam_Siege.lua", "post" 
 ModLoader.SetupFileHook( "lua/Lerk.lua", "lua/Additions/PrimalScream.lua", "pre" ) 
 ModLoader.SetupFileHook( "lua/Crag.lua", "lua/Crag_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Clog.lua", "lua/Clog_Siege.lua", "post" ) 
+ModLoader.SetupFileHook( "lua/Cyst.lua", "lua/Cyst_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Whip.lua", "lua/Whip_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Shift.lua", "lua/Shift_Siege.lua", "post" ) 
 ModLoader.SetupFileHook( "lua/Shade.lua", "lua/Shade_Siege.lua", "post" ) 

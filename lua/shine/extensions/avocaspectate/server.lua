@@ -71,9 +71,13 @@ local choices = {}
 local interesting = GetLocationWithMostMixedPlayers()
 if interesting ~= nil then table.insert(choices,interesting) end
                
+              for index, mac in ientitylist(Shared.GetEntitiesWithClassname("MAC")) do
+                  if GetIsBusy(mac) then table.insert(choices, mac) break end 
+              end     
+              
                for index, arc in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
                     local order = arc:GetCurrentOrder()
-                      if order then
+                      if order then 
                  if order:GetType() == kTechId.Move then table.insert(choices, arc) break end -- just 1
                      end
               end 
@@ -283,12 +287,12 @@ end
         if GetSiegeDoorOpen() then
          --  Print("ChangeView Siege Open")
            vip = GetSiegeView()
-        else--if GetSetupConcluded() then
+        elseif GetSetupConcluded() then
          --  Print("ChangeView Setup Concluded")
            vip = GetMiddleView()
-        --else
+        else
           -- Print("ChangeView Setup In Progress")
-         --  vip = GetSetupView()
+           vip = GetSetupView()
         end
        
         if vip ~= nil then 

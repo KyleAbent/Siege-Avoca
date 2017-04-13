@@ -15,7 +15,7 @@ local networkVars =
     scale = "vector",
     model = "string (128)",
     savedOrigin = "vector",
-    opened = "private boolean",
+    opened = "boolean",
 }
 
 AddMixinNetworkVars(BaseModelMixin, networkVars)
@@ -65,10 +65,9 @@ function SiegeDoor:OnInitialized()
     self.opened = false
 end
   
-function SiegeDoor:Open(pregame)    
+function SiegeDoor:Open()    
  if not self.opened then
         self:SetOrigin(self:GetOrigin() + Vector(0,.5,0) )   
-        if pregame == true then self:SetOrigin(self:GetOrigin() + Vector(0,kDoorMoveUpVect,0) )  end 
         local waypointreached = (self:GetOrigin() - self.savedOrigin):GetLength() >= kDoorMoveUpVect
         self:UpdatePosition(waypointreached)
         self.opened = waypointreached
@@ -99,7 +98,7 @@ function SiegeDoor:HasOpened()
 return self.opened
 end
 function SiegeDoor:GetIsLocked()    
-return not self:HasOpened()
+return self.opened
 end
 function SiegeDoor:MakeSurePlayersCanGoThroughWhenMoving()
                 self:UpdateModelCoords()
@@ -153,6 +152,23 @@ Shared.LinkClassToMap("SiegeDoor", SiegeDoor.kMapName, networkVars)
 
 class 'FrontDoor' (SiegeDoor)
 
+function FrontDoor:GetIsLocked()    
+return not GetFrontDoorOpen()
+end
+
 FrontDoor.kMapName = "frontdoor"
 
 Shared.LinkClassToMap("FrontDoor", FrontDoor.kMapName, networkVars)
+
+
+
+class 'SideDoor' (SiegeDoor)
+
+
+function SideDoor:GetIsLocked()    
+return not GetPrimaryDoorOpen()
+end
+
+SideDoor.kMapName = "sidedoor"
+
+Shared.LinkClassToMap("SideDoor", SideDoor.kMapName, networkVars)

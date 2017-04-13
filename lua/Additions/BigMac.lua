@@ -3,6 +3,8 @@ BigMac.kMapName = "bigmac"
 
 local networkVars = {}
 
+MAC.kRepairHealthPerSecond = 250
+
 function BigMac:OnCreate()
  MAC.OnCreate(self)
  self:AdjustMaxHealth(kMACHealth * 4)
@@ -14,7 +16,25 @@ end
 function BigMac:GetMovePhysicsMask()
     return PhysicsMask.None
 end
+function BigMac:GetCanTakeDamageOverride()
+    return false
+end
+function BigMac:isPayload(where, who)
 
+            if not GetFrontDoorOpen() and string.find(Shared.GetMapName(), "pl_") then 
+             return GetIsPointInMarineBase(where)
+            end
+            
+      local nearestmarine = GetNearest(self:GetOrigin(), "Marine", 1,  function(ent) return   GetLocationForPoint(who:GetOrigin()) ==  GetLocationForPoint(ent:GetOrigin())  end )
+      local nearby = false
+      if nearestmarine then
+        nearby = true
+      end
+      
+            return nearby
+            
+    
+end
 local function GetAutomaticOrder(self)
 
     local target = nil
@@ -37,22 +57,11 @@ local function GetAutomaticOrder(self)
 
             -- If there's a friendly entity nearby that needs constructing, constuct it.
             
-            local constructable =  GetNearestMixin(self:GetOrigin(), "Construct", 1, function(ent) return not ent:GetIsBuilt() and ent:GetCanConstruct(self) and self:CheckTarget(ent:GetOrigin()) and not (GetIsInSiege(ent) and not GetSiegeDoorOpen() )  end)
+            local constructable =  GetNearestMixin(self:GetOrigin(), "Construct", 1, function(ent) return self:isPayload(ent:GetOrigin(), ent) and not ent:GetIsBuilt() and ent:GetCanConstruct(self) and self:CheckTarget(ent:GetOrigin()) and not (GetIsInSiege(ent) and not GetSiegeDoorOpen() )  end)
                if constructable then
                     target = constructable
                     orderType = kTechId.Construct
                 end
-
-            if not target then
-            
-            local weldable =  GetNearestMixin(self:GetOrigin(), "Weldable", 1, function(ent) return not ent:isa("Player") and ent:GetCanBeWelded(self) and ent:GetWeldPercentage() < 1  and self:CheckTarget(ent:GetOrigin())   and not (GetIsInSiege(ent) and not GetSiegeDoorOpen() ) end)
-               if weldable then
-                    target = constructable
-                    orderType = kTechId.AutoWeld
-                end
-            
-            end
-        
         end
 
         self.timeOfLastFindSomethingTime = Shared.GetTime()
@@ -66,7 +75,8 @@ local function FindSomethingToDo(self)
 
     local target, orderType = GetAutomaticOrder(self)
     if target and orderType then
-        return self:GiveOrder(orderType, target:GetId(), target:GetOrigin(), nil, false, false) ~= kTechId.None    
+          local where = target:GetOrigin()
+        return self:GiveOrder(orderType, target:GetId(), where, nil, false, false) ~= kTechId.None    
     end
     
     return false
@@ -132,7 +142,7 @@ function BigMac:OnUpdate(deltaTime)
         -- assume we're not moving initially
         self.moving = false
     
-        if not self:GetHasOrder() then
+        if GetGamerules():GetGameState() == kGameState.Started and not self:GetHasOrder() then
             FindSomethingToDo(self)
         else
             UpdateOrders(self, deltaTime)
@@ -221,9 +231,9 @@ function BigMac:GetMoveSpeed()
 end
  function BigMac:OnAdjustModelCoords(modelCoords)
          local coords = modelCoords
-        coords.xAxis = coords.xAxis * 2                          
-        coords.yAxis = coords.yAxis * 2                             
-        coords.zAxis = coords.zAxis * 2
+        coords.xAxis = coords.xAxis * 1.3                          
+        coords.yAxis = coords.yAxis * 1.3                           
+        coords.zAxis = coords.zAxis * 1.3
    
     return coords
 end

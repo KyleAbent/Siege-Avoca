@@ -1,4 +1,11 @@
 --Kyle 'Avoca' Abent
+function GetNonBusyArc()
+          for _, ARC in ientitylist(Shared.GetEntitiesWithClassname("ARC")) do
+               if not ARC:GetInAttackMode() and not ARC:isa("AvocaArc") and ARC.mode ~= ARC.kMode.Moving then
+                return ARC
+                end
+          end
+end
 function GetIsTimeUp(timeof, timelimitof)
  local time = Shared.GetTime()
  local boolean = (timeof + timelimitof) <= time
@@ -12,7 +19,7 @@ function GetPayloadPercent()
                  local payload = entityList:GetEntityAtIndex(0) 
                  local furthestgoal = payload:GetHighestWaypoint()
                  local speed = payload:GetMoveSpeed()
-                 local isReverse = speed < 2
+                 local isReverse = speed < 0.7
                  local distance =  GetPathDistance(payload:GetOrigin(), furthestgoal:GetOrigin()) 
                  local time = math.round(distance / speed, 1)
                  //Print("Distance is %s, speed is %s, time is %s", distance, speed, time)
@@ -313,10 +320,10 @@ function GetSetupConcluded()
 return GetFrontDoorOpen()
 end
 function GetFrontDoorOpen()
-   return GetSandCastle():GetIsFrontOpen()
+   return GetSandCastle():GetFrontOpenBoolean()
 end
 function GetSiegeDoorOpen()
-   return GetSandCastle():GetIsSiegeOpen()
+   return GetSandCastle():GetSiegeOpenBoolean()
 end
 function GetSandCastle() --it washed away
     local entityList = Shared.GetEntitiesWithClassname("SandCastle")

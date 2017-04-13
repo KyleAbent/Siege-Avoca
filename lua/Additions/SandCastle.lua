@@ -6,18 +6,35 @@ class 'SandCastle' (ScriptActor)
 SandCastle.kMapName = "sandcastle"
 
 
+if Server then
+
+SandCastle.kSiegeDoorSound = PrecacheAsset("sound/siegeroom.fev/door/siege")
+SandCastle.kFrontDoorSound = PrecacheAsset("sound/siegeroom.fev/door/frontdoor")
+
+
+end
+
 
 local networkVars = 
 
 {
    SiegeTimer = "float",
    FrontTimer = "float",
+   frontOpened = "boolean",
+   siegeOpened = "boolean",
 }
-
-
-function SandCastle:OnReset() 
+function SandCastle:TimerValues()
+   if kSiegeTimer == nil then kSiegeTimer = 960 end
+   if kFrontTimer == nil then kFrontTimer = 330 end
+   if kPrimaryTimer == nil then kPrimaryTimer = 0 end
    self.SiegeTimer = kSiegeTimer
    self.FrontTimer = kFrontTimer
+   self.siegeOpened = false
+   self.frontOpened = false
+end
+
+function SandCastle:OnReset() 
+   self:TimerValues()
 end
 function SandCastle:GetIsMapEntity()
 return true
@@ -26,8 +43,7 @@ function SandCastle:ClearAttached()
 return 
 end
 function SandCastle:OnCreate()
-     self.SiegeTimer = kSiegeTimer
-   self.FrontTimer = kFrontTimer
+  self:TimerValues()
       self:SetUpdates(true)
 end
 local function DoubleCheckLocks(who)
@@ -36,128 +52,172 @@ local function DoubleCheckLocks(who)
               end 
 end
 function SandCastle:OnRoundStart() 
-
-
-if Server then   self:AddTimedCallback(SandCastle.DiscoLights, 16) end
-   self.SiegeTimer = kSiegeTimer
-   self.FrontTimer = kFrontTimer
-  -- self:AutoBioMass()
+  self:TimerValues()
   DoubleCheckLocks(self)
+  GetGamerules():SetDamageMultiplier(0)
 end
 function SandCastle:GetSiegeLength()
  return self.SiegeTimer
 end
+function SandCastle:SetSiegeOpenBoolean(option)
+ self.siegeOpened = option
+end
+function SandCastle:GetSiegeOpenBoolean()
+  //Print("Sandcastle siege open is %s", self.siegeOpened)
+ return self.siegeOpened 
+end
+function SandCastle:GetFrontOpenBoolean()
+ return self.frontOpened
+end
 function SandCastle:GetFrontLength()
  return self.FrontTimer 
 end
-function SandCastle:StartScanHivesTimer()
-local shouldscan = false
-               for index, arc in ientitylist(Shared.GetEntitiesWithClassname("SiegeArc")) do
-                 if GetIsPointWithinHiveRadius(arc:GetOrigin()) then shouldscan = true break end
-              end 
-              
-              if shouldscan == true then
-               local hivetable = EntityListToTable(Shared.GetEntitiesWithClassname("Hive"))
-               local hive = table.random(hivetable)
-               CreateEntity(Scan.kMapName, hive:GetOrigin(), 1)
-              end
-              return GetGamerules():GetGameStarted() and self.SiegeTimer == 0
+function SandCastle:GetPrimaryLength()
+ return self.PrimaryTimer 
 end
-function SandCastle:OpenSiegeDoors(cleartimer)
-     if cleartimer == true then self.SiegeTimer = 0 end
+local function OpenEightTimes(who)
+
+if not who then return end
+
+for i = 1, math.max(kDoorMoveUpVect / 2, 16) do //more than 8
+                who:Open()
+                who.isvisible = false
+end
+
+end
+function SandCastle:OpenSiegeDoors()
+     self.SiegeTimer = 0
      -- Print("OpenSiegeDoors SandCastle")
                for index, siegedoor in ientitylist(Shared.GetEntitiesWithClassname("SiegeDoor")) do
-                 if not siegedoor:isa("FrontDoor") then siegedoor:Open() end
+                 if not siegedoor:isa("FrontDoor") then OpenEightTimes(siegedoor) end
               end 
               
-              self:AddTimedCallback(function() SandCastle:StartScanHivesTimer() end, 6.5)
+              if GetGameStarted() then
+              
+                for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
+              StartSoundEffectForPlayer(SandCastle.kSiegeDoorSound, player)
+              end
+              
+              end  
+              
+              self.siegeOpened = true
+              
+              
 end
-function SandCastle:OpenFrontDoors(cleartimer, pregame)
 
-      if cleartimer == true then self.FrontTimer = 0 end
+function SandCastle:OpenFrontDoors()
+           GetGamerules():SetDamageMultiplier(1)
+      self.FrontTimer = 0
                for index, frontdoor in ientitylist(Shared.GetEntitiesWithClassname("FrontDoor")) do
-                frontdoor:Open(pregame)
-                frontdoor.isvisible = false
+                      OpenEightTimes(frontdoor)
               end 
+              
+               if GetGameStarted() then 
+
+              for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
+              StartSoundEffectForPlayer(SandCastle.kFrontDoorSound, player)
+              end
+
+               end
+               
+               self.frontOpened = true
+end
+function SandCastle:OpenPrimaryDoors()
+          GetGamerules():SetDamageMultiplier(1)
+      self.PrimaryTimer = 0
+               for index, Primarydoor in ientitylist(Shared.GetEntitiesWithClassname("SideDoor")) do
+                      OpenEightTimes(Primarydoor)
+              end 
+
+             -- for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
+             -- StartSoundEffectForPlayer(SandCastle.kFrontDoorSound, player)
+             -- end
 
 
 end
 function SandCastle:GetIsSiegeOpen()
-           local gamestarttime = GetGamerules():GetGameStartTime()
+           local gamestarttime = GetGameInfoEntity():GetStartTime()
            local gameLength = Shared.GetTime() - gamestarttime
            return  gameLength >= self.SiegeTimer
 end
 function SandCastle:GetIsFrontOpen()
-           local gamestarttime = GetGamerules():GetGameStartTime()
+           local gamestarttime = GetGameInfoEntity():GetStartTime()
            local gameLength = Shared.GetTime() - gamestarttime
            return  gameLength >= self.FrontTimer
 end
+function SandCastle:GetIsPrimaryOpen()
+           local gamestarttime = GetGameInfoEntity():GetStartTime()
+           local gameLength = Shared.GetTime() - gamestarttime
+           return  gameLength >= self.PrimaryTimer
+end
 function SandCastle:CountSTimer()
-   local boolean = false
        if  self:GetIsSiegeOpen() then
-               self:OpenSiegeDoors(true)
+               self:OpenSiegeDoors()
        end
        
+end
+function SandCastle:CountPrimaryTimer()
+       if  self:GetIsPrimaryOpen() then
+               self:OpenPrimaryDoors()
+       end
+       
+end
+function SandCastle:ForAllSiegeLocationsAct()
+  local siegelocations = {}
+  --Print("Finding all siege locations")
+               for index, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
+                     if string.find(location.name, "siege") or string.find(location.name, "Siege") then
+                       table.insert(siegelocations, location)
+                       end
+              end 
+              
+              for i = 1, #siegelocations do
+                local loc = siegelocations[i]
+                  loc:BuffFadesInSiegeRoom()
+                   -- Print("Buffing fades in siege room")
+              end
+
+  return ConditionalValue(self.SiegeTimer == 0, true, false)
 end
 function SandCastle:OnUpdate(deltatime)
   if Server then
     local gamestarted = GetGamerules():GetGameStarted()
   if gamestarted then 
        if not self.timelasttimerup or self.timelasttimerup + 1 <= Shared.GetTime() then
-       self:FrontDoorTimer()
-       self:CountSTimer()
+       
+       
+       if self.FrontTimer ~= 0 then self:FrontDoorTimer() end
+       
+           if self. SiegeTimer ~= 0 then
+           self:CountSTimer() 
+           else
+           self:ForAllSiegeLocationsAct()
+          end
+          
+          
+      if self. PrimaryTimer ~= 0 then self:CountPrimaryTimer() end
         self.timeLastAutomations = Shared.GetTime()
          end
   
   end
   end
 end
-function SandCastle:AddSiegeTime(seconds)
-  if not self:GetIsSiegeOpen() then self.SiegeTimer = self.SiegeTimer + seconds end
-end
 function SandCastle:FrontDoorTimer()
     if self:GetIsFrontOpen() then
          boolean = true
-         self:OpenFrontDoors(true) -- Ddos!
+         self:OpenFrontDoors() -- Ddos!
        end
 
-end
-local function CoordinateWithPowerNode(locationname)
-                 local powernode = GetPowerPointForLocation(locationname)
-                    if powernode then
-                    powernode:SetLightMode(kLightMode.MainRoom)
-                    powernode:AddTimedCallback(function() powernode:SetLightMode(kLightMode.Normal) end, 10)
-                    end
-end
-function SandCastle:DiscoLights()
-local locations = EntityListToTable(Shared.GetEntitiesWithClassname("Location"))
-      -- locations = table.random(locations)
-
-       local name = nil
-       for _, derp in ipairs(locations) do
-        local powernode = GetPowerPointForLocation(derp.name)
-         if powernode and ( powernode:GetIsBuilt() and not powernode:GetIsDisabled() )  then   name = derp.name break end
-       end
-       
-       if name == nil then return true end
-
-               for _, location in ientitylist(Shared.GetEntitiesWithClassname("Location")) do
-           if location.name == name then 
-         CoordinateWithPowerNode(location.name)
-        end
-    end
-
-       return true
 end
 function SandCastle:OnPreGame()
-
    for i = 1, 4 do
      Print("SandCastle OnPreGame")
    end
    
    for i = 1, 8 do
-   self:OpenSiegeDoors(false, true)
-   self:OpenFrontDoors(false, true)
+   self:OpenSiegeDoors()
+   self:OpenFrontDoors()
+   self:OpenPrimaryDoors()
    end
    
 end

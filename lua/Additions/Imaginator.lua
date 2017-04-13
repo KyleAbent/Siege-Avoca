@@ -18,14 +18,10 @@ local function BuildPowerNodes()
                        if not powerpoint:GetIsSocketed() then powerpoint:SetConstructionComplete()  powerpoint:Kill() end
              end
 end
-local function BuildKill()
+local function Socket()
             for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-                       if not powerpoint:GetIsSocketed() and not GetIsInSiege(powerpoint) then 
-                        powerpoint:SetConstructionComplete()
-                       local resnodes = GetEntitiesWithinRange( "ResourcePoint", powerpoint:GetOrigin(), 18 )
-                       if #resnodes >= 4 then 
-                      powerpoint:Kill()
-                      end
+                       if not powerpoint:GetIsSocketed() then 
+                        powerpoint:SocketPowerNode()
                      end
              end
 end
@@ -93,7 +89,7 @@ function Imaginator:OnRoundStart()
    for i = 1, 4 do
      Print("Imaginator OnRoundStart")
    end
-     BuildKill()
+     Socket()
 
       self.marineenabled = false
    self.alienenabled = false
@@ -116,7 +112,7 @@ function Imaginator:SetImagination(boolean, team)
    
   elseif team == 2 then
   self.alienenabled = boolean
-  if self.alienenabled == true then BuildKill() end --and not GetSandCastle():GetIsFrontOpen() then BuildKill() end
+  if self.alienenabled == true then Socket() end --and not GetSandCastle():GetIsFrontOpen() then Socket() end
   end
 
 
@@ -124,7 +120,7 @@ end
 local function GetDisabledPowerPoints()
  local nodes = {}
             for _, powerpoint in ientitylist(Shared.GetEntitiesWithClassname("PowerPoint")) do
-                    if powerpoint and  powerpoint:GetIsDisabled() and not ( not GetSiegeDoorOpen() and GetIsInSiege(powerpoint) ) then
+                    if powerpoint and  (powerpoint:GetIsDisabled() or ( powerpoint:GetIsSocketed() and not powerpoint:GetIsBuilt() ) )  and not ( not GetSiegeDoorOpen() and GetIsInSiege(powerpoint) ) then
                     table.insert(nodes, powerpoint)
                     end
                     
@@ -456,6 +452,21 @@ local function InstructSiegeArcs(self)
                  siegearc:Instruct()
              end
 end
+local function ManageArcs()
+local arc = GetNonBusyArc()
+local powerpoints = {}
+
+   for index, powerpoint in ipairs(GetEntitiesForTeam("PowerPoint", 1)) do
+       if powerpoint:GetIsBuilt() and not powerpoint:GetIsDisabled() then
+           table.insert(powerpoints, powerpoint)
+       end
+   end
+ if arc then
+        local where = FindFreeSpace(table.random(powerpoints):GetOrigin(), 4, 8)
+        arc:GiveOrder(kTechId.Move, nil, where, nil, true, true)
+ end
+ 
+end
 local function ManageRoboticFactories()
       local  ARCS = {}
       local ARCRobo = {} --ugh
@@ -468,6 +479,7 @@ local function ManageRoboticFactories()
             robo:SetResearching(techNode, robo)
        end
        if robo:GetTechId() == kTechId.ARCRoboticsFactory then table.insert(ARCRobo, robo) end --ugh
+          if robo.open then return true end
      end
      
      
@@ -493,6 +505,11 @@ local function ManageRoboticFactories()
       ARCRobo:OverrideCreateManufactureEntity(kTechId.ARC)
       end
 
+      if string.find(Shared.GetMapName(), "pl_") then
+      
+      return 
+      
+      end
 
       if GetSandCastle():GetIsSiegeOpen() then 
 
@@ -504,6 +521,8 @@ local function ManageRoboticFactories()
 
       return -- Dont want new AvocaArcs during siege
       end
+
+      
       
      local  AvoArc = GetEntitiesForTeam("AvocaArc", 1)
      local AACount = table.count(AvoArc)
@@ -539,7 +558,7 @@ function Imaginator:ActualFormulaMarine()
 --Print("AutoBuildConstructs")
 local randomspawn = nil
 local tospawn, cost, gamestarted = GetMarineSpawnList()
---if gamestarted then ManageRoboticFactories() end
+--if gamestarted then ManageRoboticFactories() ManageArcs() end
 local airlock = GetActiveAirLock()
 local success = false
 local entity = nil
@@ -593,7 +612,7 @@ if GetGamerules():GetGameState() == kGameState.Started then gamestarted = true e
       
       
       if cystonly then
-      return kTechId.Clog, 1, gamestarted
+      return kTechId.Cyst, 1, gamestarted
       end
       
        for _, techid in pairs(tospawn) do
